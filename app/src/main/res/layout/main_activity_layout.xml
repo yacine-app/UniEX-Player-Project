@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    android:id="@+id/mainView">
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/main_action_bar"
+        style="@style/ThemeOverlay.AppCompat.ActionBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:menu="@menu/main_tracks_menu"
+        android:background="@android:color/white"
+        app:constraintSet="@style/ThemeOverlay.AppCompat.ActionBar"
+        app:layout_constraintTop_toTopOf="parent"
+        app:title="@string/app_name" />
+
+    <!-- TODO: Media player list -->
+
+    <LinearLayout
+        android:id="@+id/coordinator_layout_block"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="?attr/actionBarSize"
+        android:layout_marginBottom="55dp"
+        app:layout_constraintTop_toBottomOf="@id/main_action_bar"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <ListView
+            android:id="@+id/list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:choiceMode="singleChoice"/>
+
+    </LinearLayout>
+
+    <FrameLayout
+        android:id="@+id/frameLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@android:color/white"
+        app:layout_constraintBottom_toBottomOf="parent"
+        style="?attr/bottomSheetStyle"
+        app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior"
+        app:behavior_hideable="false"
+        app:behavior_peekHeight="55dp"
+        android:focusableInTouchMode="true"
+        android:focusable="true"
+        android:clickable="true">
+
+        <RelativeLayout
+            android:id="@+id/media_controller"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <ImageView
+                android:id="@+id/media_info_art"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_alignParentStart="true"/>
+
+            <LinearLayout
+                android:id="@+id/media_info"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_toEndOf="@+id/media_info_art"
+                android:layout_toStartOf="@id/media_actions"
+                android:orientation="vertical"
+                android:layout_marginStart="5dp"
+                android:gravity="center_vertical">
+
+                <TextView
+                    android:id="@+id/media_info_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:singleLine="true"
+                    android:marqueeRepeatLimit="marquee_forever"
+                    android:focusable="true"
+                    android:focusableInTouchMode="true"
+                    android:freezesText="true"
+                    android:scrollHorizontally="true"
+                    android:ellipsize="marquee"
+                    android:text="@string/unknown_media_info"/>
+
+                <TextView
+                    android:id="@+id/media_info_artist"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:singleLine="true"
+                    android:marqueeRepeatLimit="marquee_forever"
+                    android:focusable="true"
+                    android:focusableInTouchMode="true"
+                    android:freezesText="true"
+                    android:scrollHorizontally="true"
+                    android:ellipsize="marquee"
+                    android:text="@string/unknown_media_info"/>
+
+            </LinearLayout>
+
+            <MediaController
+                android:id="@+id/media_actions"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+
+                    <ImageButton
+                        android:id="@+id/skip_to_previous"
+                        android:layout_width="50dp"
+                        android:layout_height="50dp"
+                        android:src="@drawable/ic_backward_icon"
+                        style="@style/Widget.MaterialComponents.ExtendedFloatingActionButton.Icon"/>
+
+                    <ImageButton
+                        android:id="@+id/play_pause"
+                        android:layout_width="50dp"
+                        android:layout_height="50dp"
+                        android:src="@drawable/ic_play_icon"
+                        style="@style/Widget.MaterialComponents.ExtendedFloatingActionButton.Icon"/>
+
+                    <ImageButton
+                        android:id="@+id/skip_to_next"
+                        android:layout_width="50dp"
+                        android:layout_height="50dp"
+                        android:src="@drawable/ic_forward_icon"
+                        style="@style/Widget.MaterialComponents.ExtendedFloatingActionButton.Icon"/>
+
+                </LinearLayout>
+
+            </MediaController>
+
+        </RelativeLayout>
+
+        <include
+            android:id="@+id/included_frame_layout"
+            android:visibility="gone"
+            layout="@layout/player_frame_layout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+
+
+    </FrameLayout>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

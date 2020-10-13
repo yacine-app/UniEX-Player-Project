@@ -1,0 +1,17 @@
+<resources>
+    <string name="app_name">UniEX Player</string>
+
+    <string name="permission_non_granted_message">Need permission to run!</string>
+
+    <string translatable="false" name="unknown_media_info">&lt;unknown&gt;</string>
+
+    <string translatable="false" name="media_time_duration_nan">--:--</string>
+
+    <string name="unable_to_play_during_call">Can\'t play during call!</string>
+
+    <string name="notification_player_service">Player Service</string>
+    <string name="permission_activity_text">The following permissions is needed in order to app for operate</string>
+    <string name="permission_activity_button">Accept</string>
+    <string name="permission_activity_storage_per">Storage: </string>
+    <string name="permission_activity_storage_after">storage permission is needed to read media content to play musics</string>
+</resources>
