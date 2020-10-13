@@ -7,4 +7,4 @@ this project is for learning purposes.
 
 # RELEASE_ALPHA: v0.0.1-alpha-1
 
-you can [download](href="https://github.com/Dteam-dz/UniEX_Player_BETA/releases/download/v0.0.1-alpha.1/app-debug.apk) and try this release.
+you can [download](https://github.com/Dteam-dz/UniEX_Player_BETA/releases/download/v0.0.1-alpha.1/app-debug.apk) and try this release.
