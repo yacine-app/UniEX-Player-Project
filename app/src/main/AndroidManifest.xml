@@ -57,15 +57,18 @@
         <receiver android:name=".Receivers.MediaControlReceiver">
             <intent-filter>
                 <action android:name="android.media.AUDIO_BECOMING_NOISY"/>
+                <action android:name="android.intent.action.HEADSET_PLUG"/>
             </intent-filter>
         </receiver>
 
         <service android:name=".Services.PlayerService"
             android:exported="true"
+            android:label="@string/uniex_playback_service_label"
             android:foregroundServiceType="mediaPlayback"
             android:permission="null">
             <intent-filter>
                 <action android:name="android.intent.action.MEDIA_BUTTON"/>
+                <action android:name="android.media.browse.MediaBrowserService"/>
             </intent-filter>
         </service>
 

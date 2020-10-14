@@ -208,7 +208,7 @@ public class PlayerCore implements AudioManager.OnAudioFocusChangeListener {
         if(cannotBePlayed){
             Toast.makeText(context, context.getResources().getString(R.string.unable_to_play_during_call), Toast.LENGTH_SHORT).show();
             return;
-        }
+        }if(items.isEmpty())return;
         wasPlaying = isPlaying();
         if(!ready) setMediaSource(items.get(CURRENT_POSITION).getDescription().getMediaUri());
         this.mediaPlayer.start();

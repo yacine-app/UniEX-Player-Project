@@ -2,18 +2,24 @@ package com.dzteam.UniExPlayer.Services;
 
 import android.app.PendingIntent;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.ServiceInfo;
 import android.graphics.BitmapFactory;
+import android.media.AudioManager;
 import android.os.Binder;
+import android.os.Bundle;
 import android.os.IBinder;
+import android.support.v4.media.MediaBrowserCompat;
 import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
 import android.util.Log;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
+import androidx.media.MediaBrowserServiceCompat;
 import androidx.media.session.MediaButtonReceiver;
 
 import com.dzteam.UniExPlayer.Activities.MainActivity;
@@ -21,12 +27,13 @@ import com.dzteam.UniExPlayer.ApplicationSetup;
 import com.dzteam.UniExPlayer.Components.MediaAdapterInfo;
 import com.dzteam.UniExPlayer.Components.PlayerCore;
 import com.dzteam.UniExPlayer.R;
-import com.dzteam.UniExPlayer.UniEXService;
+import com.dzteam.UniExPlayer.Receivers.MediaControlReceiver;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.List;
 
-public class PlayerService extends UniEXService implements PlayerCore.ErrorListener {
+public class PlayerService extends MediaBrowserServiceCompat implements PlayerCore.ErrorListener {
 
     public static final String ACTION_MEDIA_SERVICE_EXIT    = "com.dzteam.UniExPlayer.Services.PlayerService.ACTION_MEDIA_SERVICE_EXIT";
 
@@ -39,6 +46,8 @@ public class PlayerService extends UniEXService implements PlayerCore.ErrorListe
     private int[] loopStates = new int[]{PlayerCore.LOOP_STATE_ALL, PlayerCore.LOOP_STATE_ALL_REPEAT, PlayerCore.LOOP_STATE_ONE_REPEAT};
     private int currentLoopIndex = 0;
     public final int NOTIFICATION_ID = 0x058;
+    private MediaControlReceiver mediaControlReceiver = new MediaControlReceiver();
+    private IntentFilter intentFilter = new IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY);
     private NotificationCompat.Builder notificationBuilder = null;
     private PlayerCore playerCore;
     private MediaAdapterInfo mediaAdapterInfo;
@@ -65,7 +74,11 @@ public class PlayerService extends UniEXService implements PlayerCore.ErrorListe
         notificationBuilder.addAction(skipToNextAction)
                 .addAction(forwardAction);
 
-        startForeground(NOTIFICATION_ID, notificationBuilder.build(), ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK);
+        try {
+            startForeground(NOTIFICATION_ID, notificationBuilder.build(), ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK);
+        }catch (NoSuchMethodError e){
+            startForeground(NOTIFICATION_ID, notificationBuilder.build());
+        }
     }
 
     private NotificationCompat.Action createAction(int icon, String title, long action){
@@ -74,15 +87,7 @@ public class PlayerService extends UniEXService implements PlayerCore.ErrorListe
 
     private PendingIntent createPendingAction(long action){
         return MediaButtonReceiver.buildMediaButtonPendingIntent(this, action);
-        //return PendingIntent.getService(this, 0, new Intent(this, this.getClass()).setAction(action), PendingIntent.FLAG_UPDATE_CURRENT);
     }
-
-    /*public void setMediaInfo(MediaInfo info){
-        startForeground(NOTIFICATION_ID, notification(info));
-        playerCore.setMediaSource(info.getPath());
-        playerCore.play();
-        Toast.makeText(this, info.getPath(), Toast.LENGTH_SHORT).show();
-    }*/
 
     @Nullable
     public MediaMetadataCompat getMetaData(){ return playerCore.getMetaData(); }
@@ -206,6 +211,13 @@ public class PlayerService extends UniEXService implements PlayerCore.ErrorListe
             public void onPlay() {
                 super.onPlay();
                 updateNotification();
+                registerReceiver(mediaControlReceiver, intentFilter);
+            }
+
+            @Override
+            public void onStop() {
+                super.onStop();
+                unregisterReceiver(mediaControlReceiver);
             }
 
             @Override
@@ -227,6 +239,17 @@ public class PlayerService extends UniEXService implements PlayerCore.ErrorListe
         //stopForeground(true);
         Log.e("BINDER", "bound!");
         return sBinder;
+    }
+
+    @Nullable
+    @Override
+    public BrowserRoot onGetRoot(@NonNull String clientPackageName, int clientUid, @Nullable Bundle rootHints) {
+        return null;
+    }
+
+    @Override
+    public void onLoadChildren(@NonNull String parentId, @NonNull Result<List<MediaBrowserCompat.MediaItem>> result) {
+
     }
 
     @Override

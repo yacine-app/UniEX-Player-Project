@@ -9,6 +9,8 @@
 
     <string name="unable_to_play_during_call">Can\'t play during call!</string>
 
+    <string name="uniex_playback_service_label">UniEX Playback service</string>
+
     <string name="notification_player_service">Player Service</string>
     <string name="permission_activity_text">The following permissions is needed in order to app for operate</string>
     <string name="permission_activity_button">Accept</string>

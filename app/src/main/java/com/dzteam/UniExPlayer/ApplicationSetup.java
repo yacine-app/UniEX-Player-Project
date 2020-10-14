@@ -3,6 +3,7 @@ package com.dzteam.UniExPlayer;
 import android.app.Application;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.util.Log;
 
 import androidx.core.app.NotificationCompat;
 
@@ -23,7 +24,11 @@ public class ApplicationSetup extends Application {
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
             NotificationChannel playerService = new NotificationChannel(Notification.NOTIFICATION_PLAYER_SERVICE, getResources().getString(R.string.notification_player_service), NotificationManager.IMPORTANCE_LOW);
             playerService.setLockscreenVisibility(android.app.Notification.VISIBILITY_PUBLIC);
-            playerService.setAllowBubbles(false);
+            try{
+                playerService.setAllowBubbles(false);
+            }catch (NoSuchMethodError e){
+                Log.e(this.getClass().getName(), "NotificationChannel#setAllowBubbles() is not existed", e);
+            }
             playerService.setShowBadge(false);
             channels.add(playerService);
             manager.createNotificationChannels(channels);
