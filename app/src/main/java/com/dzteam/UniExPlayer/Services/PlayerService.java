@@ -1,8 +1,8 @@
 package com.dzteam.UniExPlayer.Services;
 
-import android.app.Notification;
 import android.app.PendingIntent;
 import android.content.Intent;
+import android.content.pm.ServiceInfo;
 import android.graphics.BitmapFactory;
 import android.os.Binder;
 import android.os.IBinder;
@@ -28,11 +28,7 @@ import java.util.ArrayList;
 
 public class PlayerService extends UniEXService implements PlayerCore.ErrorListener {
 
-    public static final String ACTION_DEBUG_RUN             = "com.dzteam.UniExPlayer.Services.PlayerService.ACTION_DEBUG_RUN";
-    public static final String EXTRA_QUEUE_POSITION         = "com.dzteam.UniExPlayer.Services.PlayerService.EXTRA_QUEUE_POSITION";
     public static final String ACTION_MEDIA_SERVICE_EXIT    = "com.dzteam.UniExPlayer.Services.PlayerService.ACTION_MEDIA_SERVICE_EXIT";
-
-    public static boolean SERVER_CREATED = false;
 
     public class SBinder extends Binder {
         public PlayerService getService(){
@@ -42,33 +38,34 @@ public class PlayerService extends UniEXService implements PlayerCore.ErrorListe
 
     private int[] loopStates = new int[]{PlayerCore.LOOP_STATE_ALL, PlayerCore.LOOP_STATE_ALL_REPEAT, PlayerCore.LOOP_STATE_ONE_REPEAT};
     private int currentLoopIndex = 0;
-    public final int NOTIFICATION_ID = 1;
+    public final int NOTIFICATION_ID = 0x058;
     private NotificationCompat.Builder notificationBuilder = null;
     private PlayerCore playerCore;
     private MediaAdapterInfo mediaAdapterInfo;
     private NotificationCompat.Action rewindAction, skipToPreviousAction, playAction, pauseAction, skipToNextAction, forwardAction;
     private SBinder sBinder = new SBinder();
 
-    private Notification notification(MediaMetadataCompat info){
+    private void updateNotification(){
         //TODO
-        if(info == null)return notificationBuilder.build();
+        MediaMetadataCompat info = playerCore.getMetaData();
+        if(info == null)return;
         try{
             Field f = notificationBuilder.getClass().getDeclaredField("mActions");
             f.setAccessible(true);
             f.set(notificationBuilder, new ArrayList<>());
-        }catch (NoSuchFieldException | IllegalAccessException e){ Log.e(this.getClass().getName(), "Error: ", e);}
+        }catch (NoSuchFieldException | IllegalAccessException e){ Log.e(this.getClass().getName(), "Error: ", e); }
         notificationBuilder.setContentTitle(info.getText(MediaMetadataCompat.METADATA_KEY_TITLE))
                 .setContentText(info.getText(MediaMetadataCompat.METADATA_KEY_ARTIST))
                 .setLargeIcon(info.getBitmap(MediaMetadataCompat.METADATA_KEY_ART))
                 .addAction(rewindAction)
                 .addAction(skipToPreviousAction);
 
-        if(playerCore.isPlaying()) notificationBuilder.addAction(pauseAction).setOngoing(false).setSmallIcon(R.drawable.ic_play_icon);
-        else notificationBuilder.addAction(playAction).setOngoing(true).setSmallIcon(R.drawable.ic_pause_icon);
+        if(isPlaying()) notificationBuilder.addAction(pauseAction).setSmallIcon(R.drawable.ic_play_icon);
+        else notificationBuilder.addAction(playAction).setSmallIcon(R.drawable.ic_pause_icon);
         notificationBuilder.addAction(skipToNextAction)
                 .addAction(forwardAction);
 
-        return notificationBuilder.build();
+        startForeground(NOTIFICATION_ID, notificationBuilder.build(), ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK);
     }
 
     private NotificationCompat.Action createAction(int icon, String title, long action){
@@ -104,6 +101,8 @@ public class PlayerService extends UniEXService implements PlayerCore.ErrorListe
         this.mediaAdapterInfo = mediaAdapterInfo;
         playerCore.setQueueFromMediaAdapterInfo(mediaAdapterInfo);
     }
+
+    public void skipTo(int pos){ playerCore.skipTo(pos); }
 
     public void setCurrentPlayIndex(){
         //Toast.makeText(this, String.valueOf(getCurrentPlayIndex()), Toast.LENGTH_SHORT).show();
@@ -142,17 +141,14 @@ public class PlayerService extends UniEXService implements PlayerCore.ErrorListe
         //TODO
         MediaButtonReceiver.handleIntent(playerCore.getMediaSession(), intent);
 
-        if(intent != null && ACTION_DEBUG_RUN.equals(intent.getAction())){
-            playerCore.skipTo(intent.getIntExtra(EXTRA_QUEUE_POSITION, 0));
-            playerCore.play();
-        }//else startForeground(NOTIFICATION_ID, notification(null));
         if(intent != null && ACTION_MEDIA_SERVICE_EXIT.equals(intent.getAction())){
             stopForeground(true);
             stopSelf();
         }
+
         Log.e(this.getClass().getName(), String.valueOf(intent.getAction()));
 
-        return START_NOT_STICKY;
+        return START_STICKY;
     }
 
     @Override
@@ -164,7 +160,6 @@ public class PlayerService extends UniEXService implements PlayerCore.ErrorListe
     @Override
     public void onCreate() {
         super.onCreate();
-        SERVER_CREATED = true;
         playerCore = new PlayerCore(this);
         playerCore.setErrorListener(this);
         rewindAction = createAction(R.drawable.ic_rewind_icon, "Rewind", PlaybackStateCompat.ACTION_REWIND);
@@ -180,14 +175,11 @@ public class PlayerService extends UniEXService implements PlayerCore.ErrorListe
                 .setShowWhen(false)
                 .setColorized(true)
                 .setAutoCancel(false)
-                .setOngoing(false)
                 .setColor(0x0EF9A7E)
                 .setContentIntent(PendingIntent.getActivity(this, 0, new Intent(this, MainActivity.class), PendingIntent.FLAG_UPDATE_CURRENT))
                 .setStyle(new androidx.media.app.NotificationCompat.MediaStyle()
                         .setMediaSession(playerCore.getMediaSession().getSessionToken())
-                        .setShowActionsInCompactView(1, 2, 3)
-                        .setShowCancelButton(true)
-                        .setCancelButtonIntent(PendingIntent.getService(this, 0, new Intent(this, this.getClass()).setAction(ACTION_MEDIA_SERVICE_EXIT),PendingIntent.FLAG_UPDATE_CURRENT)))
+                        .setShowActionsInCompactView(1, 2, 3))
                 .setLargeIcon(BitmapFactory.decodeResource(getResources(), R.raw.ic_track_media))
                 .addAction(rewindAction)
                 .addAction(skipToPreviousAction)
@@ -197,16 +189,29 @@ public class PlayerService extends UniEXService implements PlayerCore.ErrorListe
                 .setPriority(NotificationCompat.PRIORITY_LOW)
                 .setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
         playerCore.addCallback(new MediaSessionCompat.Callback() {
+
+            @Override
+            public void onSkipToNext() {
+                super.onSkipToNext();
+                updateNotification();
+            }
+
+            @Override
+            public void onSkipToPrevious() {
+                super.onSkipToPrevious();
+                updateNotification();
+            }
+
             @Override
             public void onPlay() {
                 super.onPlay();
-                startForeground(NOTIFICATION_ID, notification(playerCore.getMetaData()));
+                updateNotification();
             }
 
             @Override
             public void onPause() {
                 super.onPause();
-                startForeground(NOTIFICATION_ID, notification(playerCore.getMetaData()));
+                updateNotification();
             }
         });
     }
@@ -214,14 +219,12 @@ public class PlayerService extends UniEXService implements PlayerCore.ErrorListe
     @Override
     public void onDestroy() {
         super.onDestroy();
-        playerCore.release();
-        SERVER_CREATED = true;
+        //playerCore.release();
     }
 
     @Override
     public IBinder onBind(Intent intent) {
         //stopForeground(true);
-        //Toast.makeText(this, "Bound", Toast.LENGTH_SHORT).show();
         Log.e("BINDER", "bound!");
         return sBinder;
     }
@@ -237,6 +240,6 @@ public class PlayerService extends UniEXService implements PlayerCore.ErrorListe
     public boolean onUnbind(Intent intent) {
         //startForeground(NOTIFICATION_ID, notification(null));
         Log.e("BINDER", "unbound!");
-        return true;
+        return false;
     }
 }

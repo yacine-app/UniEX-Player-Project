@@ -20,7 +20,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.dzteam.UniExPlayer.Activities.MainActivity;
-import com.dzteam.UniExPlayer.Activities.StartUpActivity;
 import com.dzteam.UniExPlayer.R;
 
 import java.io.IOException;
@@ -49,6 +48,7 @@ public class PlayerCore implements AudioManager.OnAudioFocusChangeListener {
     private float PLAY_BACK_SPEED = 1.0f;
     private boolean cannotBePlayed = false;
     protected boolean ready = false;
+    @SuppressWarnings("unused")
     private boolean wasPlaying = false;
 
     private Context context;
@@ -271,6 +271,7 @@ public class PlayerCore implements AudioManager.OnAudioFocusChangeListener {
                 .setState(PlaybackStateCompat.STATE_SKIPPING_TO_QUEUE_ITEM, this.mediaPlayer.getCurrentPosition(), 1.0f)
                 .build());
         this.mediaSession.setMetadata(getMetaData());
+        play();
     }
 
     public void release(){

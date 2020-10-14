@@ -22,7 +22,6 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -40,8 +39,8 @@ import com.dzteam.UniExPlayer.Services.PlayerService;
 import com.dzteam.UniExPlayer.UniEXActivity;
 
 import com.github.stefanodp91.android.circularseekbar.CircularSeekBar;
-
 import com.github.stefanodp91.android.circularseekbar.OnCircularSeekBarChangeListener;
+
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 
 import java.util.List;
@@ -317,9 +316,7 @@ public class MainActivity extends UniEXActivity.MediaPlayerActivity implements V
         MediaAdapterInfo adapterInfo = (MediaAdapterInfo) parent.getAdapter();
         //Toast.makeText(this, (adapterInfo.getItem(position).getYear() + ": /\\ :" + adapterInfo.getItem(position).getAlbumArtist()),Toast.LENGTH_SHORT).show();
         adapterInfo.setSelected(this, position);
-        startService(new Intent(this, PlayerService.class)
-                .setAction(PlayerService.ACTION_DEBUG_RUN)
-                .putExtra(PlayerService.EXTRA_QUEUE_POSITION, position));
+        playerService.skipTo(position);
     }
 
     @Override
@@ -365,14 +362,14 @@ public class MainActivity extends UniEXActivity.MediaPlayerActivity implements V
     @Override
     protected void onStart() {
         super.onStart();
-        int flag = BIND_AUTO_CREATE;
-        if(bound) flag = BIND_ADJUST_WITH_ACTIVITY;
-        bindService(new Intent(this, PlayerService.class).setAction(PlayerService.ACTION_DEBUG_RUN), connection, flag);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+        int flag = BIND_ADJUST_WITH_ACTIVITY;
+        if(bound) flag = BIND_ADJUST_WITH_ACTIVITY;
+        bindService(new Intent(this, PlayerService.class), connection, flag);
         if(getIntent() != null && ACTION_LAUNCH_PLAY_BACK.equals(getIntent().getAction()))
             behaviorDefaultLaunch = BottomSheetBehavior.STATE_EXPANDED;
         else behaviorDefaultLaunch = bottomSheetBehavior.getState();
@@ -384,14 +381,14 @@ public class MainActivity extends UniEXActivity.MediaPlayerActivity implements V
     @Override
     protected void onPause() {
         super.onPause();
+        unbindService(connection);
+        bound = false;
         handler.removeCallbacks(runnable);
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        unbindService(connection);
-        bound = false;
     }
 
     @Override

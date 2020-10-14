@@ -62,6 +62,7 @@
 
         <service android:name=".Services.PlayerService"
             android:exported="true"
+            android:foregroundServiceType="mediaPlayback"
             android:permission="null">
             <intent-filter>
                 <action android:name="android.intent.action.MEDIA_BUTTON"/>
