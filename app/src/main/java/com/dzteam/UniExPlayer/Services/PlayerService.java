@@ -32,6 +32,8 @@ public class PlayerService extends UniEXService implements PlayerCore.ErrorListe
     public static final String EXTRA_QUEUE_POSITION         = "com.dzteam.UniExPlayer.Services.PlayerService.EXTRA_QUEUE_POSITION";
     public static final String ACTION_MEDIA_SERVICE_EXIT    = "com.dzteam.UniExPlayer.Services.PlayerService.ACTION_MEDIA_SERVICE_EXIT";
 
+    public static boolean SERVER_CREATED = false;
+
     public class SBinder extends Binder {
         public PlayerService getService(){
             return PlayerService.this;
@@ -162,6 +164,7 @@ public class PlayerService extends UniEXService implements PlayerCore.ErrorListe
     @Override
     public void onCreate() {
         super.onCreate();
+        SERVER_CREATED = true;
         playerCore = new PlayerCore(this);
         playerCore.setErrorListener(this);
         rewindAction = createAction(R.drawable.ic_rewind_icon, "Rewind", PlaybackStateCompat.ACTION_REWIND);
@@ -177,11 +180,14 @@ public class PlayerService extends UniEXService implements PlayerCore.ErrorListe
                 .setShowWhen(false)
                 .setColorized(true)
                 .setAutoCancel(false)
+                .setOngoing(false)
                 .setColor(0x0EF9A7E)
                 .setContentIntent(PendingIntent.getActivity(this, 0, new Intent(this, MainActivity.class), PendingIntent.FLAG_UPDATE_CURRENT))
                 .setStyle(new androidx.media.app.NotificationCompat.MediaStyle()
                         .setMediaSession(playerCore.getMediaSession().getSessionToken())
-                        .setShowActionsInCompactView(1, 2, 3))
+                        .setShowActionsInCompactView(1, 2, 3)
+                        .setShowCancelButton(true)
+                        .setCancelButtonIntent(PendingIntent.getService(this, 0, new Intent(this, this.getClass()).setAction(ACTION_MEDIA_SERVICE_EXIT),PendingIntent.FLAG_UPDATE_CURRENT)))
                 .setLargeIcon(BitmapFactory.decodeResource(getResources(), R.raw.ic_track_media))
                 .addAction(rewindAction)
                 .addAction(skipToPreviousAction)
@@ -209,11 +215,12 @@ public class PlayerService extends UniEXService implements PlayerCore.ErrorListe
     public void onDestroy() {
         super.onDestroy();
         playerCore.release();
+        SERVER_CREATED = true;
     }
 
     @Override
     public IBinder onBind(Intent intent) {
-        stopForeground(true);
+        //stopForeground(true);
         //Toast.makeText(this, "Bound", Toast.LENGTH_SHORT).show();
         Log.e("BINDER", "bound!");
         return sBinder;
@@ -222,13 +229,13 @@ public class PlayerService extends UniEXService implements PlayerCore.ErrorListe
     @Override
     public void onRebind(Intent intent) {
         super.onRebind(intent);
-        stopForeground(true);
+        //stopForeground(true);
         Log.e("BINDER", "rebound!");
     }
 
     @Override
     public boolean onUnbind(Intent intent) {
-        startForeground(NOTIFICATION_ID, notification(null));
+        //startForeground(NOTIFICATION_ID, notification(null));
         Log.e("BINDER", "unbound!");
         return true;
     }

@@ -356,6 +356,7 @@ public class MainActivity extends UniEXActivity.MediaPlayerActivity implements V
         if((BottomSheetBehavior.STATE_EXPANDED == bottomSheetBehavior.getState() || BottomSheetBehavior.STATE_DRAGGING == bottomSheetBehavior.getState()) && keyCode == KeyEvent.KEYCODE_BACK){
             bottomSheetBehavior.setDraggable(true);
             bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+            organizeBottomSheet(BottomSheetBehavior.STATE_COLLAPSED);
             return false;
         }
         return super.onKeyDown(keyCode, event);
@@ -364,14 +365,14 @@ public class MainActivity extends UniEXActivity.MediaPlayerActivity implements V
     @Override
     protected void onStart() {
         super.onStart();
+        int flag = BIND_AUTO_CREATE;
+        if(bound) flag = BIND_ADJUST_WITH_ACTIVITY;
+        bindService(new Intent(this, PlayerService.class).setAction(PlayerService.ACTION_DEBUG_RUN), connection, flag);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        int flag = BIND_AUTO_CREATE;
-        if(bound) flag = BIND_ADJUST_WITH_ACTIVITY;
-        bindService(new Intent(this, PlayerService.class).setAction(PlayerService.ACTION_DEBUG_RUN), connection, flag);
         if(getIntent() != null && ACTION_LAUNCH_PLAY_BACK.equals(getIntent().getAction()))
             behaviorDefaultLaunch = BottomSheetBehavior.STATE_EXPANDED;
         else behaviorDefaultLaunch = bottomSheetBehavior.getState();
@@ -383,12 +384,15 @@ public class MainActivity extends UniEXActivity.MediaPlayerActivity implements V
     @Override
     protected void onPause() {
         super.onPause();
-        unbindService(connection);
         handler.removeCallbacks(runnable);
     }
 
     @Override
-    protected void onStop() { super.onStop(); }
+    protected void onStop() {
+        super.onStop();
+        unbindService(connection);
+        bound = false;
+    }
 
     @Override
     protected void onDestroy() {
