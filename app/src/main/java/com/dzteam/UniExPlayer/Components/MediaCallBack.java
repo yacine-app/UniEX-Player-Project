@@ -15,6 +15,7 @@ class MediaCallBack extends MediaSessionCompat.Callback {
         MediaPlayer.OnPreparedListener preparedListener = new MediaPlayer.OnPreparedListener() {
             @Override
             public void onPrepared(MediaPlayer mp) {
+                MediaCallBack.this.core.ready = true;
                 if (!MediaCallBack.this.core.onPreparedListeners.isEmpty())
                     for (PlayerCore.OnPreparedListener a : MediaCallBack.this.core.onPreparedListeners)
                         a.onPrepared();

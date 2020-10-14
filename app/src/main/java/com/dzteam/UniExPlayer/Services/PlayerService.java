@@ -43,6 +43,7 @@ public class PlayerService extends UniEXService implements PlayerCore.ErrorListe
     public final int NOTIFICATION_ID = 1;
     private NotificationCompat.Builder notificationBuilder = null;
     private PlayerCore playerCore;
+    private MediaAdapterInfo mediaAdapterInfo;
     private NotificationCompat.Action rewindAction, skipToPreviousAction, playAction, pauseAction, skipToNextAction, forwardAction;
     private SBinder sBinder = new SBinder();
 
@@ -91,14 +92,23 @@ public class PlayerService extends UniEXService implements PlayerCore.ErrorListe
 
     public int getCurrentPosition(){ return playerCore.getCurrentPosition(); }
 
+    public int getCurrentPlayIndex(){ return playerCore.getCurrentPlayIndex(); }
+
     public boolean isPlaying(){ return playerCore.isPlaying(); }
 
     public int getLoopState(){ return playerCore.getLoopState(); }
 
-    public void setLoopState(int state){ playerCore.setLoopState(state); }
-
     public void setMediaQueue(MediaAdapterInfo mediaAdapterInfo){
+        this.mediaAdapterInfo = mediaAdapterInfo;
         playerCore.setQueueFromMediaAdapterInfo(mediaAdapterInfo);
+    }
+
+    public void setCurrentPlayIndex(){
+        //Toast.makeText(this, String.valueOf(getCurrentPlayIndex()), Toast.LENGTH_SHORT).show();
+        if(mediaAdapterInfo != null) {
+            mediaAdapterInfo.setSelected(this, getCurrentPlayIndex());
+            mediaAdapterInfo.notifyDataSetChanged();
+        }
     }
 
     public void playPause(){

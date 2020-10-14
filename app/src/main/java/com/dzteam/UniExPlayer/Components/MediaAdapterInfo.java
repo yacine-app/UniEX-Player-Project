@@ -18,18 +18,25 @@ import java.util.List;
 
 public class MediaAdapterInfo extends BaseAdapter {
 
+    public static class Index {
+        private int index;
+        public Index(int index){ this.index = Math.max(index, -1); }
+    }
+
     private List<MediaInfo> mediaInfoList = new ArrayList<>();
     private List<View> views = new ArrayList<>();
+    private Index index = null;
+
+    public MediaAdapterInfo(List<MediaInfo> mediaInfoList){ setMediaInfoList(mediaInfoList); }
+
+    @SuppressWarnings("unused")
+    public MediaAdapterInfo(){}
 
     protected List<MediaInfo> getMediaInfoList() { return mediaInfoList; }
 
     public void setMediaInfoList(List<MediaInfo> mediaInfoList) { this.mediaInfoList = mediaInfoList; }
 
-    public MediaAdapterInfo(List<MediaInfo> mediaInfoList){
-        setMediaInfoList(mediaInfoList);
-    }
-
-    public MediaAdapterInfo(){}
+    public void setSelectedIndex(Index index){ if(index.index > -1) this.index = index; }
 
     public void setSelected(Context context, int id){
         TextView title, artist;
@@ -80,12 +87,20 @@ public class MediaAdapterInfo extends BaseAdapter {
             view = LayoutInflater.from(parent.getContext()).inflate(R.layout.media_item_info_list_layout, parent, false);
             view.setTag(new ViewTag(view.findViewById(R.id.media_info_item_list)));
         }
+        @SuppressWarnings("unused")
         ViewTag tag = (ViewTag) view.getTag();
         if(!views.contains(view)) views.add(view);
         final MediaInfo info = mediaInfoList.get(position);
         ImageView imageView = view.findViewById(R.id.art_image_list);
         TextView title = view.findViewById(R.id.media_info_title);
         TextView artist = view.findViewById(R.id.media_info_artist);
+        if(index != null && index.index == position){
+            title.setTypeface(title.getTypeface(), Typeface.BOLD);
+            title.setSelected(true);
+            title.setTextColor(view.getContext().getResources().getColor(R.color.colorMainTheme, null));
+            artist.setTextColor(view.getContext().getResources().getColor(R.color.colorMainTheme, null));
+            index = null;
+        }
         //title.setSelected(true);
         title.setText(info.getTitle());
         artist.setText(info.getArtist());

@@ -12,7 +12,6 @@ import android.os.IBinder;
 import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -23,6 +22,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -48,16 +48,18 @@ import java.util.List;
 
 public class MainActivity extends UniEXActivity.MediaPlayerActivity implements View.OnClickListener, LoadInternalMedia.OnDoneListener, AdapterView.OnItemClickListener, OnCircularSeekBarChangeListener, View.OnApplyWindowInsetsListener {
 
-    private boolean circularSeekBarChanging = false;
+    public static final String ACTION_LAUNCH_PLAY_BACK = "ACTION_LAUNCH_PLAY_BACK";
+
+    private boolean circularSeekBarChanging = false, bound = false;
     private int CIRCULAR_SEEK_BAR_UPDATE_DELAY = 300;
     private float CIRCULAR_PROGRESS = 0.0f;
+    private int behaviorDefaultLaunch = BottomSheetBehavior.STATE_COLLAPSED;
 
     private PlayerService playerService = null;
     private ListView listView;
     private MediaAdapterInfo mediaAdapterInfo;
     private View includedLayout, mediaController, toolBarBehavior;
     private BottomSheetBehavior bottomSheetBehavior;
-    private Toolbar mainActionBar;
     private TimeFormatter timeFormatter;
     private CircularSeekBar circularSeekBar;
     private ImageView mediaArt, frameArt;
@@ -72,12 +74,12 @@ public class MainActivity extends UniEXActivity.MediaPlayerActivity implements V
             timeFormatter = new TimeFormatter(playerService.getDuration());
             frameCurrentTime.setText(timeFormatter.getCurrentTime(0));
             frameDuration.setText(timeFormatter.getTotalTime());
+            playerService.setCurrentPlayIndex();
         }
     };
     private PlayerCore.OnLoopChangedListener onLoopChangedListener = new PlayerCore.OnLoopChangedListener() {
         @Override
         public void onChanged(int loopState) {
-
             switch (loopState){
                 case PlayerCore.LOOP_STATE_ALL:
                     changeLoop.setBackgroundResource(R.drawable.ic_play_all_once_icon);
@@ -92,11 +94,18 @@ public class MainActivity extends UniEXActivity.MediaPlayerActivity implements V
         }
     };
     private MediaSessionCompat.Callback callback = new MediaSessionCompat.Callback() {
+
         @Override
         public void onPause() {
             super.onPause();
             updateUi(playerService.getMetaData());
             handler.removeCallbacks(runnable);
+        }
+
+        @Override
+        public void onStop() {
+            super.onStop();
+            onPause();
         }
 
         @Override
@@ -116,6 +125,7 @@ public class MainActivity extends UniEXActivity.MediaPlayerActivity implements V
             playerService.setOnLoopChangedListener(onLoopChangedListener);
             updateUi(playerService.getMetaData());
             onPreparedListener.onPrepared();
+            bound = true;
         }
 
         @Override
@@ -126,16 +136,16 @@ public class MainActivity extends UniEXActivity.MediaPlayerActivity implements V
                 playerService.removeOnPreparedListener(onPreparedListener);
                 playerService.removeOnLoopChangedListener(onLoopChangedListener);
             }
+            bound = false;
         }
     };
     private Runnable runnable = new Runnable() {
         @Override
         public void run() {
-            if(!circularSeekBarChanging){
+            if(!circularSeekBarChanging && timeFormatter != null){
                 int pos = playerService.getCurrentPosition();
                 frameCurrentTime.setText(timeFormatter.getCurrentTime(pos));
-                float prg = pos * 100.0f / timeFormatter.getTotalTimeInt();
-                circularSeekBar.setProgress(prg);
+                circularSeekBar.setProgress(pos * 100.0f / timeFormatter.getTotalTimeInt());
             }
             handler.postDelayed(this, CIRCULAR_SEEK_BAR_UPDATE_DELAY);
         }
@@ -147,8 +157,7 @@ public class MainActivity extends UniEXActivity.MediaPlayerActivity implements V
         if(playerService.isPlaying()){
             playPause.setImageResource(R.drawable.ic_pause_icon);
             playPauseFrame.setBackgroundResource(R.drawable.ic_pause_icon);
-        }
-        else{
+        } else{
             playPause.setImageResource(R.drawable.ic_play_icon);
             playPauseFrame.setBackgroundResource(R.drawable.ic_play_icon);
         }
@@ -163,19 +172,25 @@ public class MainActivity extends UniEXActivity.MediaPlayerActivity implements V
         frameArtist.setText(artist);
         frameTitle.setSelected(true);
         mediaTitle.setSelected(true);
+        onLoopChangedListener.onChanged(playerService.getLoopState());
     }
 
-    private void orginizeBottomSheet(int state){
+    private void organizeBottomSheet(int state){
         switch (state){
             case BottomSheetBehavior.STATE_EXPANDED:
                 mediaController.setVisibility(View.GONE);
                 toolBarBehavior.setVisibility(View.VISIBLE);
+                includedLayout.setVisibility(View.VISIBLE);
+                mediaController.setAlpha(0.0f);
+                toolBarBehavior.setAlpha(1.0f);
                 circularSeekBarChanging = false;
                 break;
             case BottomSheetBehavior.STATE_COLLAPSED:
                 mediaController.setVisibility(View.VISIBLE);
                 toolBarBehavior.setVisibility(View.GONE);
                 includedLayout.setVisibility(View.GONE);
+                mediaController.setAlpha(1.0f);
+                toolBarBehavior.setAlpha(0.0f);
                 circularSeekBarChanging = true;
                 break;
             case BottomSheetBehavior.STATE_DRAGGING:
@@ -189,9 +204,13 @@ public class MainActivity extends UniEXActivity.MediaPlayerActivity implements V
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        if(getIntent() != null && ACTION_LAUNCH_PLAY_BACK.equals(getIntent().getAction()))
+            behaviorDefaultLaunch = BottomSheetBehavior.STATE_EXPANDED;
+
         setContentView(R.layout.main_activity_layout);
 
-        mainActionBar = findViewById(R.id.main_action_bar);
+        Toolbar mainActionBar = findViewById(R.id.main_action_bar);
 
         skipToNext = findViewById(R.id.skip_to_next);
         skipToPrevious = findViewById(R.id.skip_to_previous);
@@ -225,11 +244,10 @@ public class MainActivity extends UniEXActivity.MediaPlayerActivity implements V
 
         bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet);
 
-
         bottomSheetBehavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback(){
             @Override
             public void onStateChanged(@NonNull View bottomSheet, int newState) {
-                orginizeBottomSheet(newState);
+                organizeBottomSheet(newState);
             }
 
             @Override
@@ -252,6 +270,9 @@ public class MainActivity extends UniEXActivity.MediaPlayerActivity implements V
         circularSeekBar.setOnRoundedSeekChangeListener(this);
 
         setSupportActionBar(mainActionBar);
+
+        organizeBottomSheet(behaviorDefaultLaunch);
+        bottomSheetBehavior.setState(behaviorDefaultLaunch);
 
         if(ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) prepareList();
         else finish(getResources().getText(R.string.permission_non_granted_message));
@@ -278,9 +299,12 @@ public class MainActivity extends UniEXActivity.MediaPlayerActivity implements V
             @Override
             public void run() {
                 mediaAdapterInfo = new MediaAdapterInfo(mediaInfoList);
+                if(playerService != null){
+                    mediaAdapterInfo.setSelectedIndex(new MediaAdapterInfo.Index(playerService.getCurrentPlayIndex()));
+                    playerService.setMediaQueue(mediaAdapterInfo);
+                }
                 listView.setAdapter(mediaAdapterInfo);
                 listView.setOnItemClickListener(MainActivity.this);
-                if(playerService != null)playerService.setMediaQueue(mediaAdapterInfo);
             }
         });
     }
@@ -291,6 +315,7 @@ public class MainActivity extends UniEXActivity.MediaPlayerActivity implements V
         //playerService.setMediaInfo((MediaInfo) listView.getAdapter().getItem(position));
         //Toast.makeText(this, "0", Toast.LENGTH_SHORT).show();
         MediaAdapterInfo adapterInfo = (MediaAdapterInfo) parent.getAdapter();
+        //Toast.makeText(this, (adapterInfo.getItem(position).getYear() + ": /\\ :" + adapterInfo.getItem(position).getAlbumArtist()),Toast.LENGTH_SHORT).show();
         adapterInfo.setSelected(this, position);
         startService(new Intent(this, PlayerService.class)
                 .setAction(PlayerService.ACTION_DEBUG_RUN)
@@ -315,7 +340,7 @@ public class MainActivity extends UniEXActivity.MediaPlayerActivity implements V
             case R.id.frameLayout:
                 //TODO
                 //if(bottomSheetBehavior.getState() == BottomSheetBehavior.STATE_COLLAPSED) bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
-                //orginizeBottomSheet(BottomSheetBehavior.STATE_EXPANDED);
+                //organizeBottomSheet(BottomSheetBehavior.STATE_EXPANDED);
                 break;
             case R.id.change_loop_mode_frame:
                 playerService.changeLoopState();
@@ -339,14 +364,20 @@ public class MainActivity extends UniEXActivity.MediaPlayerActivity implements V
     @Override
     protected void onStart() {
         super.onStart();
-        orginizeBottomSheet(bottomSheetBehavior.getState());
-        bindService(new Intent(this, PlayerService.class).setAction(PlayerService.ACTION_DEBUG_RUN), connection, BIND_ADJUST_WITH_ACTIVITY);
-        handler.postDelayed(runnable, CIRCULAR_SEEK_BAR_UPDATE_DELAY);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+        int flag = BIND_AUTO_CREATE;
+        if(bound) flag = BIND_ADJUST_WITH_ACTIVITY;
+        bindService(new Intent(this, PlayerService.class).setAction(PlayerService.ACTION_DEBUG_RUN), connection, flag);
+        if(getIntent() != null && ACTION_LAUNCH_PLAY_BACK.equals(getIntent().getAction()))
+            behaviorDefaultLaunch = BottomSheetBehavior.STATE_EXPANDED;
+        else behaviorDefaultLaunch = bottomSheetBehavior.getState();
+        organizeBottomSheet(behaviorDefaultLaunch);
+        bottomSheetBehavior.setState(behaviorDefaultLaunch);
+        handler.postDelayed(runnable, CIRCULAR_SEEK_BAR_UPDATE_DELAY);
     }
 
     @Override
@@ -357,16 +388,13 @@ public class MainActivity extends UniEXActivity.MediaPlayerActivity implements V
     }
 
     @Override
-    protected void onStop() {
-        super.onStop();
-    }
+    protected void onStop() { super.onStop(); }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
         if(playerService != null && !playerService.isPlaying()) startService(new Intent(this, PlayerService.class).setAction(PlayerService.ACTION_MEDIA_SERVICE_EXIT));
     }
-
 
     @Override
     public void onProgressChange(CircularSeekBar CircularSeekBar, float progress) {
@@ -388,7 +416,7 @@ public class MainActivity extends UniEXActivity.MediaPlayerActivity implements V
     @Override
     public WindowInsets onApplyWindowInsets(View v, WindowInsets insets) {
         v.setPadding(0, insets.getStableInsetTop(), 0, 0);
-        Log.e("00000000", String.valueOf(insets.getStableInsetTop()));
+        //Log.e("00000000", String.valueOf(insets.getStableInsetTop()));
         return insets.consumeSystemWindowInsets();
     }
 }

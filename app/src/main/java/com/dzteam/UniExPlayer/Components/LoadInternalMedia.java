@@ -57,19 +57,7 @@ public class LoadInternalMedia implements Runnable {
         String sortOrder = MediaStore.Audio.Media.TITLE + " ASC";
         Cursor cursor = contentResolver.query(uri, null, selection, null, sortOrder);
         if(cursor != null && cursor.moveToFirst()){
-            int mediaId = cursor.getColumnIndex(MediaStore.Audio.Media._ID);
-            int mediaTitle = cursor.getColumnIndex(MediaStore.Audio.Media.TITLE);
-            int mediaArtist = cursor.getColumnIndex(MediaStore.Audio.Media.ARTIST);
-            int mediaPath = cursor.getColumnIndex(MediaStore.Audio.Media.DATA);
-            do {
-                long id = cursor.getLong(mediaId);
-                String title = cursor.getString(mediaTitle);
-                String artist = cursor.getString(mediaArtist);
-                String path = cursor.getString(mediaPath);
-                MediaInfo info = new MediaInfo(id, title, artist, path);
-                //if(info.getArt() == null)info.setArt(defaultIcon);
-                result.add(info);
-            }while (cursor.moveToNext());
+            MediaInfo.fillListFromCursor(cursor, result);
             cursor.close();
         }
         done(result);
