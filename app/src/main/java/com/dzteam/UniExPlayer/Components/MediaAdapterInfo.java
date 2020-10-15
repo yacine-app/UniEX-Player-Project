@@ -32,7 +32,7 @@ public class MediaAdapterInfo extends BaseAdapter {
     @SuppressWarnings("unused")
     public MediaAdapterInfo(){}
 
-    protected List<MediaInfo> getMediaInfoList() { return mediaInfoList; }
+    public List<MediaInfo> getMediaInfoList() { return mediaInfoList; }
 
     public void setMediaInfoList(List<MediaInfo> mediaInfoList) { this.mediaInfoList = mediaInfoList; }
 

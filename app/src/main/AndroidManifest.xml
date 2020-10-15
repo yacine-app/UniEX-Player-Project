@@ -1,7 +1,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.dzteam.UniExPlayer"
     android:installLocation="auto"
-    android:sharedUserId="com.dzteam.UniEXPlayer">
+    android:isFeatureSplit="false"
+    android:sharedUserId="com.dzteam.UniEXPlayer"
+    tools:ignore="UnusedAttribute">
 
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
     <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS"/>
@@ -43,7 +46,7 @@
 
         <activity android:name=".Activities.MainActivity"
             android:launchMode="singleTask"
-            android:configChanges="screenSize|screenLayout|smallestScreenSize|mcc|mnc|layoutDirection|keyboardHidden|keyboard|touchscreen|density|fontScale|locale|navigation|uiMode|colorMode"
+            android:configChanges="screenSize|orientation|screenLayout|smallestScreenSize|mcc|mnc|layoutDirection|keyboardHidden|keyboard|touchscreen|density|fontScale|locale|navigation|uiMode|colorMode"
             android:theme="@style/AppTheme">
 
         </activity>

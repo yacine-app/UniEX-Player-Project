@@ -29,7 +29,7 @@ public abstract class UniEXActivity extends AppCompatActivity {
 
     //TODO
 
-    protected View currentContentView = null;
+    private View currentContentView = null;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -76,6 +76,8 @@ public abstract class UniEXActivity extends AppCompatActivity {
             e.printStackTrace();
         }
     }
+
+    protected View getCurrentContentView() { return currentContentView; }
 
     /*public boolean isPermissionsGranted(String[] permissions){
         return ContextCompat.checkSelfPermission(this, permissions) == PackageManager.PERMISSION_GRANTED;

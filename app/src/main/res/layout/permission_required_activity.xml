@@ -3,12 +3,29 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@android:color/white"
     android:padding="15dp">
 
+    <ImageView
+        android:id="@+id/image_logo"
+        android:layout_width="200dp"
+        android:layout_height="200dp"
+        android:layout_centerInParent="true"
+        android:scaleType="fitXY"
+        android:contentDescription="@string/app_name"
+        android:background="@drawable/animated_start_logo_first"/>
+
     <LinearLayout
+        android:id="@+id/required_permission_layout"
+        android:alpha="0.0"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_below="@id/image_logo"
+        android:layout_marginTop="30dp"
+        android:paddingTop="20dp"
+        android:background="@drawable/permission_layout_design_text"
         android:orientation="vertical">
+
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -38,7 +55,51 @@
                 android:layout_marginStart="5dp"
                 android:text="@string/permission_activity_storage_after"/>
 
+        </LinearLayout>
+
     </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/optimal_permission_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:alpha="0.0"
+        android:layout_below="@id/required_permission_layout"
+        android:paddingTop="15dp"
+        android:layout_marginTop="15dp"
+        android:background="@drawable/permission_layout_design_text"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="17sp"
+            android:text="@string/permission_activity_text_optimal"/>
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="20dp"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:text="@string/permission_activity_microphone_per"
+                app:drawableLeftCompat="@drawable/ic_microphone_hardware_icon" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="5dp"
+                android:text="@string/permission_activity_microphone_after"/>
+
+        </LinearLayout>
 
     </LinearLayout>
 
@@ -48,6 +109,14 @@
         android:layout_height="wrap_content"
         android:text="@string/permission_activity_button"
         android:layout_alignParentBottom="true"
-        android:layout_alignParentEnd="true"/>
+        android:layout_alignParentEnd="true"
+        android:alpha="0.0"
+        android:clickable="false"
+        android:textSize="18sp"
+        android:padding="5dp"
+        android:paddingStart="30dp"
+        android:paddingEnd="30dp"
+        android:textColor="@color/button_uniex_music_style_color"
+        android:background="@drawable/button_uniex_music_style_background" />
 
 </RelativeLayout>

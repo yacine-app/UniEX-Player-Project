@@ -10,6 +10,7 @@ import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Handler;
+import android.os.Looper;
 import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
@@ -61,7 +62,7 @@ public class PlayerCore implements AudioManager.OnAudioFocusChangeListener {
     private List<MediaSessionCompat.QueueItem> items = new ArrayList<>();
     protected List<OnPreparedListener> onPreparedListeners = new ArrayList<>();
     private List<OnLoopChangedListener> onLoopChangedListeners = new ArrayList<>();
-    private Handler handler = new Handler();
+    private Handler handler = new Handler(Looper.getMainLooper());
     private Runnable runnable = new Runnable() {
         @Override
         public void run() {
@@ -97,7 +98,7 @@ public class PlayerCore implements AudioManager.OnAudioFocusChangeListener {
                 handler.postDelayed(runnable, 2000);
                 break;
             case AudioManager.AUDIOFOCUS_LOSS:
-                pause();
+                stop();
                 break;
             case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT:
                 pause();
@@ -265,6 +266,7 @@ public class PlayerCore implements AudioManager.OnAudioFocusChangeListener {
     public void setErrorListener(ErrorListener errorListener) { this.errorListener = errorListener; }
 
     public void skipTo(int position){
+        if(position < 0 || position >= items.size())return;
         CURRENT_POSITION = position;
         setMediaSource(items.get(CURRENT_POSITION).getDescription().getMediaUri());
         this.mediaSession.setPlaybackState(playBackStateBuilder
@@ -294,7 +296,13 @@ public class PlayerCore implements AudioManager.OnAudioFocusChangeListener {
 
     public int getDuration(){ return this.mediaPlayer.getDuration(); }
 
-    public boolean isPlaying(){ return this.mediaPlayer.isPlaying(); }
+    public boolean isPlaying(){
+        boolean res = false;
+        try{
+            res = this.mediaPlayer.isPlaying();
+        }catch (IllegalStateException e){ Log.e(this.getClass().getName(), "", e); }
+        return res;
+    }
 
     public int getCurrentPlayIndex(){ return this.CURRENT_POSITION; }
 
@@ -324,6 +332,7 @@ public class PlayerCore implements AudioManager.OnAudioFocusChangeListener {
         }else audioManager.requestAudioFocus(this, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
     }
 
+    @SuppressWarnings("deprecation")
     private void internalPrepare(Context context, String tag){
         tag = tag==null?"Media_Player":tag;
         this.context = context;

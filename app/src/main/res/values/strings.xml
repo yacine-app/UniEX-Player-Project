@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">UniEX Player</string>
+    <string name="app_name">UniEX Music</string>
 
     <string name="permission_non_granted_message">Need permission to run!</string>
 
@@ -9,11 +9,14 @@
 
     <string name="unable_to_play_during_call">Can\'t play during call!</string>
 
-    <string name="uniex_playback_service_label">UniEX Playback service</string>
+    <string name="uniex_playback_service_label">Playback service</string>
 
     <string name="notification_player_service">Player Service</string>
-    <string name="permission_activity_text">The following permissions is needed in order to app for operate</string>
+    <string name="permission_activity_text">UniEX Music need the following permission in order to operate:</string>
     <string name="permission_activity_button">Accept</string>
     <string name="permission_activity_storage_per">Storage: </string>
-    <string name="permission_activity_storage_after">storage permission is needed to read media content to play musics</string>
+    <string name="permission_activity_storage_after">storage permission is needed to read media content and play musics.</string>
+    <string name="permission_activity_text_optimal">Optimal permission:</string>
+    <string name="permission_activity_microphone_per">Microphone: </string>
+    <string name="permission_activity_microphone_after">microphone permission is needed for visualizing function to work, you can use app without it.</string>
 </resources>
