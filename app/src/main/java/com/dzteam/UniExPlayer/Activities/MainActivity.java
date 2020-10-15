@@ -130,6 +130,7 @@ public class MainActivity extends UniEXActivity.MediaPlayerActivity implements V
             }else {
                 playerService.updateMediaAdapterInfo();
                 updateUi(playerService.getMetaData());
+                onPreparedListener.onPrepared();
             }
             listView.setAdapter(playerService.getMediaAdapterInfo());
             onPreparedListener.onPrepared();
@@ -441,7 +442,6 @@ public class MainActivity extends UniEXActivity.MediaPlayerActivity implements V
         frameTitle.setSelected(true);
         mediaTitle.setSelected(true);
         onLoopChangedListener.onChanged(playerService.getLoopState());
-        onPreparedListener.onPrepared();
     }
 
     private void organizeBottomSheet(int state){
