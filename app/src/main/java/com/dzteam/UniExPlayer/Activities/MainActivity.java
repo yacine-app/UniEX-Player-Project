@@ -63,6 +63,7 @@ public class MainActivity extends UniEXActivity.MediaPlayerActivity implements V
     private PlayerService playerService = null;
     private Handler handler = new Handler(Looper.getMainLooper());
     private ListView listView;
+    private Toolbar mainActionBar;
     private BarVisualizer barVisualizer;
     private MediaAdapterInfo mediaAdapterInfo;
     private View includedLayout, mediaController, toolBarBehavior;
@@ -139,6 +140,7 @@ public class MainActivity extends UniEXActivity.MediaPlayerActivity implements V
             }
             listView.setAdapter(playerService.getMediaAdapterInfo());
             onPreparedListener.onPrepared();
+            changeBehaviorState(behaviorDefaultLaunch);
             bound = true;
         }
 
@@ -263,7 +265,6 @@ public class MainActivity extends UniEXActivity.MediaPlayerActivity implements V
         if(getIntent() != null && ACTION_LAUNCH_PLAY_BACK.equals(getIntent().getAction()))
             behaviorDefaultLaunch = BottomSheetBehavior.STATE_EXPANDED;
         else behaviorDefaultLaunch = bottomSheetBehavior.getState();
-        changeBehaviorState(behaviorDefaultLaunch);
         handler.postDelayed(runnable, CIRCULAR_SEEK_BAR_UPDATE_DELAY);
     }
 
@@ -347,7 +348,7 @@ public class MainActivity extends UniEXActivity.MediaPlayerActivity implements V
 
         setContentView(R.layout.main_activity_layout);
 
-        Toolbar mainActionBar = findViewById(R.id.main_action_bar);
+        mainActionBar = findViewById(R.id.main_action_bar);
 
         skipToNext = findViewById(R.id.skip_to_next);
         skipToPrevious = findViewById(R.id.skip_to_previous);
@@ -402,6 +403,7 @@ public class MainActivity extends UniEXActivity.MediaPlayerActivity implements V
             public void onSlide(@NonNull View bottomSheet, float slideOffset) {
                 mediaController.setAlpha(1.0f - slideOffset);
                 toolBarBehavior.setAlpha(slideOffset);
+                mainActionBar.setAlpha(mediaController.getAlpha());
             }
         });
 
@@ -469,6 +471,7 @@ public class MainActivity extends UniEXActivity.MediaPlayerActivity implements V
                 includedLayout.setVisibility(View.VISIBLE);
                 mediaController.animate().alpha(0.0f).start();
                 toolBarBehavior.animate().alpha(1.0f).start();
+                mainActionBar.setVisibility(View.GONE);
                 if(playerService != null && isPermissionGranted(Manifest.permission.RECORD_AUDIO)) barVisualizer.setAudioSessionId(playerService.getAudioSessionId());
                 circularSeekBarChanging = false;
                 break;
@@ -476,12 +479,14 @@ public class MainActivity extends UniEXActivity.MediaPlayerActivity implements V
                 mediaController.setVisibility(View.VISIBLE);
                 toolBarBehavior.setVisibility(View.GONE);
                 includedLayout.setVisibility(View.GONE);
+                mainActionBar.setVisibility(View.VISIBLE);
                 mediaController.animate().alpha(1.0f).start();
                 toolBarBehavior.animate().alpha(0.0f).start();
                 barVisualizer.release();
                 circularSeekBarChanging = true;
                 break;
             case BottomSheetBehavior.STATE_DRAGGING:
+                mainActionBar.setVisibility(View.VISIBLE);
                 mediaController.setVisibility(View.VISIBLE);
                 toolBarBehavior.setVisibility(View.VISIBLE);
                 includedLayout.setVisibility(View.VISIBLE);

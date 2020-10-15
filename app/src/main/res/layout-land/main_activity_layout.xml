@@ -45,9 +45,11 @@
         android:background="@android:color/white"
         app:layout_constraintBottom_toBottomOf="parent"
         style="?attr/bottomSheetStyle"
+        android:layout_margin="0dp"
         app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior"
         app:behavior_hideable="false"
         app:behavior_peekHeight="55dp"
+        app:layout_dodgeInsetEdges="all"
         android:focusableInTouchMode="true"
         android:focusable="true"
         android:clickable="true">
