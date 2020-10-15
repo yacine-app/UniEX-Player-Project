@@ -2,6 +2,7 @@ package com.dzteam.UniExPlayer.Components;
 
 import android.content.Context;
 import android.graphics.Typeface;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,7 +24,7 @@ public class MediaAdapterInfo extends BaseAdapter {
         public Index(int index){ this.index = Math.max(index, -1); }
     }
 
-    private List<MediaInfo> mediaInfoList = new ArrayList<>();
+    private List<MediaInfo> mediaInfoList = null;
     private List<View> views = new ArrayList<>();
     private Index index = null;
 
@@ -34,11 +35,16 @@ public class MediaAdapterInfo extends BaseAdapter {
 
     public List<MediaInfo> getMediaInfoList() { return mediaInfoList; }
 
+    public void clear(){ mediaInfoList.clear(); }
+
     public void setMediaInfoList(List<MediaInfo> mediaInfoList) { this.mediaInfoList = mediaInfoList; }
 
-    public void setSelectedIndex(Index index){ if(index.index > -1) this.index = index; }
+    public void setSelectedIndex(Index index){
+        if(index.index > -1) this.index = index;
+        this.notifyDataSetChanged();
+    }
 
-    public void setSelected(Context context, int id){
+    /*public void setSelected(Context context, int id){
         TextView title, artist;
         for (View v: views){
             title = v.findViewById(R.id.media_info_title);
@@ -54,7 +60,7 @@ public class MediaAdapterInfo extends BaseAdapter {
         title.setSelected(true);
         title.setTextColor(context.getResources().getColor(R.color.colorMainTheme, null));
         artist.setTextColor(context.getResources().getColor(R.color.colorMainTheme, null));
-    }
+    }*/
 
     @Override
     public boolean isEmpty() {
@@ -89,11 +95,16 @@ public class MediaAdapterInfo extends BaseAdapter {
         }
         @SuppressWarnings("unused")
         ViewTag tag = (ViewTag) view.getTag();
-        if(!views.contains(view)) views.add(view);
+        views.add(position, view);
+        Log.e(this.getClass().getName(), String.valueOf(position));
         final MediaInfo info = mediaInfoList.get(position);
         ImageView imageView = view.findViewById(R.id.art_image_list);
         TextView title = view.findViewById(R.id.media_info_title);
         TextView artist = view.findViewById(R.id.media_info_artist);
+        title.setTextColor(0x0FF252525);
+        artist.setTextColor(0x0FF2F2F2F);
+        title.setSelected(false);
+        title.setTypeface(Typeface.defaultFromStyle(Typeface.NORMAL));
         if(index != null && index.index == position){
             title.setTypeface(title.getTypeface(), Typeface.BOLD);
             title.setSelected(true);

@@ -233,8 +233,9 @@ public class PlayerService extends MediaBrowserServiceCompat implements PlayerCo
 
     public void setCurrentPlayIndex(){
         if(mediaAdapterInfo != null) {
-            mediaAdapterInfo.setSelected(this, getCurrentPlayIndex());
-            mediaAdapterInfo.notifyDataSetChanged();
+            //mediaAdapterInfo.setSelected(this, getCurrentPlayIndex());
+            //mediaAdapterInfo.notifyDataSetChanged();
+            mediaAdapterInfo.setSelectedIndex(new MediaAdapterInfo.Index(getCurrentPlayIndex()));
         }
     }
 

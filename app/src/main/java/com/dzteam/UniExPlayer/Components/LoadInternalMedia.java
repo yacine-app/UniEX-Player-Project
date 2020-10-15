@@ -8,6 +8,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.provider.MediaStore;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresPermission;
@@ -38,10 +39,7 @@ public class LoadInternalMedia implements Runnable {
     }
 
     public void setOnDoneListener(OnDoneListener onDoneListener) { this.onDoneListener = onDoneListener; }
-
-    public void execute(){
-        if(!started) thread.start();
-    }
+    public void execute(){ if(!started) thread.start(); }
 
     private void done(List<MediaInfo> result){
         if(onDoneListener != null) onDoneListener.onDone(result);
@@ -58,6 +56,7 @@ public class LoadInternalMedia implements Runnable {
         Cursor cursor = contentResolver.query(uri, null, selection, null, sortOrder);
         if(cursor != null && cursor.moveToFirst()){
             MediaInfo.fillListFromCursor(cursor, result);
+            Log.e("ZEZFGTZERGGRH", String.valueOf(result.size()));
             cursor.close();
         }
         done(result);

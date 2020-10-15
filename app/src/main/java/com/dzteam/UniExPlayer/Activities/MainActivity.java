@@ -24,6 +24,8 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresPermission;
@@ -188,6 +190,7 @@ public class MainActivity extends UniEXActivity.MediaPlayerActivity implements V
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
+
                 mediaAdapterInfo = new MediaAdapterInfo(mediaInfoList);
                 if(playerService != null){
                     mediaAdapterInfo.setSelectedIndex(new MediaAdapterInfo.Index(playerService.getCurrentPlayIndex()));
@@ -200,8 +203,10 @@ public class MainActivity extends UniEXActivity.MediaPlayerActivity implements V
 
     @Override
     public void onItemClick(@NonNull AdapterView<?> parent, @NonNull View view, int position, long id) {
-        MediaAdapterInfo adapterInfo = (MediaAdapterInfo) parent.getAdapter();
-        adapterInfo.setSelected(this, position);
+        if(bound && playerService.getMediaAdapterInfo() != null) {
+            //playerService.getMediaAdapterInfo().setSelected(this, position);
+            playerService.getMediaAdapterInfo().setSelectedIndex(new MediaAdapterInfo.Index(position));
+        }
         startService(
                 new Intent(this, PlayerService.class)
                         .setAction(PlayerService.ACTION_MEDIA_SERVICE_TO_ITEM)
@@ -292,7 +297,7 @@ public class MainActivity extends UniEXActivity.MediaPlayerActivity implements V
     @Override
     public void onProgressChange(CircularSeekBar CircularSeekBar, float progress) {
         CIRCULAR_PROGRESS = progress;
-        frameCurrentTime.setText(timeFormatter.getCurrentTime((int) (CIRCULAR_PROGRESS * playerService.getDuration() / 100.0f)));
+        frameCurrentTime.setText(timeFormatter.getCurrentTime(CIRCULAR_PROGRESS * playerService.getDuration() / 100.0f));
     }
 
     @Override
