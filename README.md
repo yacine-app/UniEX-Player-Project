@@ -7,7 +7,7 @@ this project is for learning purposes.
 
 ## ALPHA_TEST_RELEASES:
 
-### v0.0.1-alpha.1:
+### v0.0.1-alpha.2:
 #### Download link:
  * you can [download](https://github.com/yacine-app/UniEX-Player-Project/releases/download/v0.0.1-alpha.2/app-debug.apk) and try this release.
 
