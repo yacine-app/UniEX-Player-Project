@@ -24,6 +24,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.dzteam.UniExPlayer.R;
+import com.dzteam.UniExPlayer.Services.PlayerService;
 import com.dzteam.UniExPlayer.UniEXActivity;
 
 import java.util.Arrays;
@@ -34,7 +35,7 @@ public class StartUpActivity extends UniEXActivity implements View.OnClickListen
 
     private final String[] requiredPermissions = new String[]{Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.RECORD_AUDIO};
 
-    private boolean permissionGranted = false;
+    private boolean permissionAlreadyGranted = false;
     private boolean notReadyToScroll = true;
 
     private Button acceptButton;
@@ -68,7 +69,12 @@ public class StartUpActivity extends UniEXActivity implements View.OnClickListen
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        permissionGranted = isPermissionGranted(Manifest.permission.READ_EXTERNAL_STORAGE);
+        if(PlayerService.SERVICE_ALREADY_CREATED){
+            permissionAlreadyGranted = true;
+            runMainActivity();
+            return;
+        }
+        permissionAlreadyGranted = isPermissionGranted(Manifest.permission.READ_EXTERNAL_STORAGE);
         setTheme(R.style.AppTheme);
         setContentView(R.layout.permission_required_activity);
         acceptButton = findViewById(R.id.ask_for_permission_button);
@@ -84,7 +90,7 @@ public class StartUpActivity extends UniEXActivity implements View.OnClickListen
                 return notReadyToScroll;
             }
         });
-        if(permissionGranted) logoImage.setBackgroundResource(R.drawable.animated_start_logo);
+        if(permissionAlreadyGranted) logoImage.setBackgroundResource(R.drawable.animated_start_logo);
         AnimatedVectorDrawable animationDrawable = (AnimatedVectorDrawable) logoImage.getBackground();
         animationDrawable.registerAnimationCallback(new Animatable2.AnimationCallback() {
             @Override
@@ -99,7 +105,7 @@ public class StartUpActivity extends UniEXActivity implements View.OnClickListen
     }
 
     private void animationEnd2(){
-        if(permissionGranted){
+        if(permissionAlreadyGranted){
             runMainActivity();
             return;
         }
@@ -170,11 +176,11 @@ public class StartUpActivity extends UniEXActivity implements View.OnClickListen
         Runnable runnable = new Runnable(){
             @Override
             public void run() {
-                startActivity(new Intent(getApplicationContext(), MainActivity.class));
+                startActivity(new Intent(getApplicationContext(), MainActivity.class).setAction(MainActivity.ACTION_LAUNCH_PLAY_BACK_IF_PLAYING));
                 finish();
             }
         };
-        if(permissionGranted) handler.postDelayed(runnable, RUN_DELAY);
+        if(permissionAlreadyGranted) handler.postDelayed(runnable, RUN_DELAY);
         else handler.post(runnable);
     }
 

@@ -49,6 +49,7 @@ import java.util.List;
 public class MainActivity extends UniEXActivity.MediaPlayerActivity implements View.OnClickListener, LoadInternalMedia.OnDoneListener, AdapterView.OnItemClickListener, OnCircularSeekBarChangeListener, View.OnLongClickListener {
 
     public static final String ACTION_LAUNCH_PLAY_BACK = "ACTION_LAUNCH_PLAY_BACK";
+    public static final String ACTION_LAUNCH_PLAY_BACK_IF_PLAYING = "ACTION_LAUNCH_PLAY_BACK_IF_PLAYING";
 
     private boolean circularSeekBarChanging = false, bound = false;
     private int CIRCULAR_SEEK_BAR_UPDATE_DELAY = 300;
@@ -168,10 +169,7 @@ public class MainActivity extends UniEXActivity.MediaPlayerActivity implements V
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
-        if(intent != null && ACTION_LAUNCH_PLAY_BACK.equals(intent.getAction()))
-            behaviorDefaultLaunch = BottomSheetBehavior.STATE_EXPANDED;
-        organizeBottomSheet(behaviorDefaultLaunch);
-        bottomSheetBehavior.setState(behaviorDefaultLaunch);
+        handleIntent(intent);
     }
 
     @Override
@@ -198,11 +196,7 @@ public class MainActivity extends UniEXActivity.MediaPlayerActivity implements V
 
     @Override
     public void onItemClick(@NonNull AdapterView<?> parent, @NonNull View view, int position, long id) {
-        //if(playerService == null)return;
-        //playerService.setMediaInfo((MediaInfo) listView.getAdapter().getItem(position));
-        //Toast.makeText(this, "0", Toast.LENGTH_SHORT).show();
         MediaAdapterInfo adapterInfo = (MediaAdapterInfo) parent.getAdapter();
-        //Toast.makeText(this, (adapterInfo.getItem(position).getYear() + ": /\\ :" + adapterInfo.getItem(position).getAlbumArtist()),Toast.LENGTH_SHORT).show();
         adapterInfo.setSelected(this, position);
         startService(
                 new Intent(this, PlayerService.class)
@@ -320,6 +314,21 @@ public class MainActivity extends UniEXActivity.MediaPlayerActivity implements V
                 break;
         }
         return true;
+    }
+
+    private void handleIntent(Intent intent){
+        if(intent != null && intent.getAction() != null){
+            switch (intent.getAction()) {
+                case ACTION_LAUNCH_PLAY_BACK:
+                    behaviorDefaultLaunch = BottomSheetBehavior.STATE_EXPANDED;
+                    break;
+                case ACTION_LAUNCH_PLAY_BACK_IF_PLAYING:
+                    if(bound && playerService.isPlaying())
+                        behaviorDefaultLaunch = BottomSheetBehavior.STATE_EXPANDED;
+            }
+            organizeBottomSheet(behaviorDefaultLaunch);
+            bottomSheetBehavior.setState(behaviorDefaultLaunch);
+        }
     }
 
     @SuppressWarnings("deprecation")
