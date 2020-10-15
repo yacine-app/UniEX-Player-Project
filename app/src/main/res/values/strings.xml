@@ -11,6 +11,12 @@
 
     <string name="uniex_playback_service_label">Playback service</string>
 
+    <string name="menu_action_about">About</string>
+    <string name="menu_action_volume">Volume</string>
+    <string name="menu_action_equalizer">Equalizer</string>
+    <string name="menu_action_back">Back</string>
+    <string name="menu_action_search">Search</string>
+
     <string name="notification_player_service">Player Service</string>
     <string name="permission_activity_text">UniEX Music need the following permission in order to operate:</string>
     <string name="permission_activity_button">Accept</string>

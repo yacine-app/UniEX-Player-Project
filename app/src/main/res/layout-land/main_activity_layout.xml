@@ -12,11 +12,12 @@
         style="@style/ThemeOverlay.AppCompat.ActionBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:menu="@menu/main_tracks_menu"
+        app:menu="@menu/main_media_track_menu"
         android:background="@android:color/white"
+        android:elevation="4dp"
         app:constraintSet="@style/ThemeOverlay.AppCompat.ActionBar"
         app:layout_constraintTop_toTopOf="parent"
-        app:title="@string/app_name" />
+        app:title="@string/app_name"/>
 
     <!-- TODO: Media player list -->
 
