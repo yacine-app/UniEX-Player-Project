@@ -123,6 +123,7 @@ public class PlayerService extends MediaBrowserServiceCompat implements PlayerCo
         SERVICE_ALREADY_CREATED = true;
         playerCore = new PlayerCore(this);
         playerCore.setErrorListener(this);
+        PendingIntent contentIntent = PendingIntent.getActivity(this, 0, new Intent(this, MainActivity.class).setAction(MainActivity.ACTION_LAUNCH_PLAY_BACK), PendingIntent.FLAG_UPDATE_CURRENT);
         rewindAction = createAction(R.drawable.ic_rewind_icon, "Rewind", PlaybackStateCompat.ACTION_REWIND);
         skipToPreviousAction = createAction(R.drawable.ic_backward_icon, "Prev", PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS);
         playAction = createAction(R.drawable.ic_play_icon, "Play", PlaybackStateCompat.ACTION_PLAY);
@@ -137,7 +138,7 @@ public class PlayerService extends MediaBrowserServiceCompat implements PlayerCo
                 .setColorized(true)
                 .setAutoCancel(false)
                 .setColor(0x0EF9A7E)
-                .setContentIntent(PendingIntent.getActivity(this, 0, new Intent(this, MainActivity.class).setAction(MainActivity.ACTION_LAUNCH_PLAY_BACK), PendingIntent.FLAG_UPDATE_CURRENT))
+                .setContentIntent(contentIntent)
                 .setStyle(new androidx.media.app.NotificationCompat.MediaStyle()
                         .setMediaSession(playerCore.getMediaSession().getSessionToken())
                         .setShowActionsInCompactView(1, 2, 3))
@@ -268,6 +269,8 @@ public class PlayerService extends MediaBrowserServiceCompat implements PlayerCo
     public int getCurrentPosition(){ return playerCore.getCurrentPosition(); }
 
     public int getCurrentPlayIndex(){ return playerCore.getCurrentPlayIndex(); }
+
+    public int getAudioSessionId(){ return playerCore.getAudioSessionId(); }
 
     public boolean isPlaying(){ return playerCore.isPlaying(); }
 

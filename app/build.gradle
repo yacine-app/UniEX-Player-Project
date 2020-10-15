@@ -30,10 +30,11 @@ dependencies {
     implementation 'androidx.cardview:cardview:1.0.0'
     implementation 'androidx.media:media:1.2.0'
 
-    implementation 'me.hiennguyen.circleseekbar:circleseekbar:1.0.1'
     implementation 'com.google.android.material:material:1.3.0-alpha03'
 
     implementation 'com.github.stefanodp91.android:circularseekbar:0.2'
+
+    implementation 'com.gauravk.audiovisualizer:audiovisualizer:0.9.1'
 
     testImplementation 'junit:junit:4.13'
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'

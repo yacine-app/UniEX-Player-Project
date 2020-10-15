@@ -174,7 +174,7 @@ public class PlayerCore implements AudioManager.OnAudioFocusChangeListener {
     public void skipToNext(){
         CURRENT_POSITION = CURRENT_POSITION + 1 >= items.size()? 0 : CURRENT_POSITION + 1;
         this.setMediaSource(items.get(CURRENT_POSITION).getDescription().getMediaUri());
-        play();
+        if(!cannotBePlayed) play();
         if(!callbacks.isEmpty())
             for(MediaSessionCompat.Callback a: callbacks)
                 a.onSkipToNext();
@@ -187,7 +187,7 @@ public class PlayerCore implements AudioManager.OnAudioFocusChangeListener {
         }
         CURRENT_POSITION = CURRENT_POSITION - 1 < 0? items.size() - 1 : CURRENT_POSITION - 1;
         this.setMediaSource(items.get(CURRENT_POSITION).getDescription().getMediaUri());
-        play();
+        if(!cannotBePlayed) play();
         if(!callbacks.isEmpty())
             for(MediaSessionCompat.Callback a: callbacks)
                 a.onSkipToPrevious();
@@ -307,6 +307,8 @@ public class PlayerCore implements AudioManager.OnAudioFocusChangeListener {
     public int getCurrentPlayIndex(){ return this.CURRENT_POSITION; }
 
     public int getLoopState() { return LOOP_STATE; }
+
+    public int getAudioSessionId(){ return this.mediaPlayer.getAudioSessionId(); }
 
     @Nullable
     public MediaMetadataCompat getMetaData(){

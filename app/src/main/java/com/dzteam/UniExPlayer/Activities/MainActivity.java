@@ -39,6 +39,7 @@ import com.dzteam.UniExPlayer.R;
 import com.dzteam.UniExPlayer.Services.PlayerService;
 import com.dzteam.UniExPlayer.UniEXActivity;
 
+import com.gauravk.audiovisualizer.visualizer.BarVisualizer;
 import com.github.stefanodp91.android.circularseekbar.CircularSeekBar;
 import com.github.stefanodp91.android.circularseekbar.OnCircularSeekBarChangeListener;
 
@@ -60,6 +61,7 @@ public class MainActivity extends UniEXActivity.MediaPlayerActivity implements V
     private PlayerService playerService = null;
     private Handler handler = new Handler(Looper.getMainLooper());
     private ListView listView;
+    private BarVisualizer barVisualizer;
     private MediaAdapterInfo mediaAdapterInfo;
     private View includedLayout, mediaController, toolBarBehavior;
     private BottomSheetBehavior bottomSheetBehavior;
@@ -74,6 +76,7 @@ public class MainActivity extends UniEXActivity.MediaPlayerActivity implements V
             timeFormatter = new TimeFormatter(playerService.getDuration());
             frameCurrentTime.setText(timeFormatter.getCurrentTime(0));
             frameDuration.setText(timeFormatter.getTotalTime());
+            circularSeekBar.setProgress(0.0f);
         }
     };
     private PlayerCore.OnLoopChangedListener onLoopChangedListener = new PlayerCore.OnLoopChangedListener() {
@@ -282,6 +285,7 @@ public class MainActivity extends UniEXActivity.MediaPlayerActivity implements V
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        barVisualizer.release();
         if(playerService != null && !playerService.isPlaying()) startService(new Intent(this, PlayerService.class).setAction(PlayerService.ACTION_MEDIA_SERVICE_EXIT));
     }
 
@@ -366,6 +370,16 @@ public class MainActivity extends UniEXActivity.MediaPlayerActivity implements V
         toolBarBehavior = findViewById(R.id.main_action_bar_frame);
         includedLayout = findViewById(R.id.included_frame_layout);
 
+        if(barVisualizer != null){
+            barVisualizer.release();
+        }
+
+        barVisualizer = findViewById(R.id.visualizerView);
+
+        if(barVisualizer != null && playerService != null && isPermissionGranted(Manifest.permission.RECORD_AUDIO)){
+            barVisualizer.setAudioSessionId(playerService.getAudioSessionId());
+        }
+
         listView = findViewById(R.id.list);
 
         circularSeekBar.setIndicatorEnabled(false);
@@ -411,6 +425,8 @@ public class MainActivity extends UniEXActivity.MediaPlayerActivity implements V
             bottomSheetBehavior.setState(state);
         }
 
+        if(timeFormatter != null) frameDuration.setText(timeFormatter.getTotalTime());
+
         if (bound && playerService != null && playerService.getMediaAdapterInfo() != null) listView.setAdapter(playerService.getMediaAdapterInfo());
     }
 
@@ -452,6 +468,7 @@ public class MainActivity extends UniEXActivity.MediaPlayerActivity implements V
                 includedLayout.setVisibility(View.VISIBLE);
                 mediaController.animate().alpha(0.0f).start();
                 toolBarBehavior.animate().alpha(1.0f).start();
+                if(playerService != null && isPermissionGranted(Manifest.permission.RECORD_AUDIO)) barVisualizer.setAudioSessionId(playerService.getAudioSessionId());
                 circularSeekBarChanging = false;
                 break;
             case BottomSheetBehavior.STATE_COLLAPSED:
@@ -460,6 +477,7 @@ public class MainActivity extends UniEXActivity.MediaPlayerActivity implements V
                 includedLayout.setVisibility(View.GONE);
                 mediaController.animate().alpha(1.0f).start();
                 toolBarBehavior.animate().alpha(0.0f).start();
+                barVisualizer.release();
                 circularSeekBarChanging = true;
                 break;
             case BottomSheetBehavior.STATE_DRAGGING:

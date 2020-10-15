@@ -29,6 +29,20 @@
         app:layout_constraintBottom_toTopOf="@id/media_info_title_frame"
         android:layout_marginTop="?attr/actionBarSize"/>
 
+    <com.gauravk.audiovisualizer.visualizer.BarVisualizer
+        android:id="@+id/visualizerView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginBottom="30dp"
+        app:avSpeed="medium"
+        app:avColor="@color/colorMainTheme"
+        app:avDensity="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/media_info_title_frame"
+        app:layout_constraintTop_toBottomOf="@id/main_action_bar_frame"
+        app:layout_constraintBottom_toTopOf="@id/media_info_title_frame"
+        android:layout_marginTop="?attr/actionBarSize"/>
+
     <TextView
         android:id="@+id/media_info_title_frame"
         android:layout_width="match_parent"
