@@ -14,6 +14,7 @@ import android.os.Looper;
 import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -72,7 +73,6 @@ public class MainActivity extends UniEXActivity.MediaPlayerActivity implements V
             timeFormatter = new TimeFormatter(playerService.getDuration());
             frameCurrentTime.setText(timeFormatter.getCurrentTime(0));
             frameDuration.setText(timeFormatter.getTotalTime());
-            playerService.setCurrentPlayIndex();
         }
     };
     private PlayerCore.OnLoopChangedListener onLoopChangedListener = new PlayerCore.OnLoopChangedListener() {
@@ -110,6 +110,7 @@ public class MainActivity extends UniEXActivity.MediaPlayerActivity implements V
         public void onPlay() {
             super.onPlay();
             updateUi(playerService.getMetaData());
+            playerService.setCurrentPlayIndex();
             handler.postDelayed(runnable, CIRCULAR_SEEK_BAR_UPDATE_DELAY);
         }
     };
@@ -125,8 +126,11 @@ public class MainActivity extends UniEXActivity.MediaPlayerActivity implements V
             if(playerService.getMediaAdapterInfo() == null){
                 if(ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) prepareList();
                 else finish(getResources().getText(R.string.permission_non_granted_message));
-            }else listView.setAdapter(playerService.getMediaAdapterInfo());
-            updateUi(playerService.getMetaData());
+            }else {
+                playerService.updateMediaAdapterInfo();
+                updateUi(playerService.getMetaData());
+            }
+            listView.setAdapter(playerService.getMediaAdapterInfo());
             onPreparedListener.onPrepared();
             bound = true;
         }
@@ -266,7 +270,11 @@ public class MainActivity extends UniEXActivity.MediaPlayerActivity implements V
     @Override
     protected void onPause() {
         super.onPause();
-        unbindService(connection);
+        try {
+            unbindService(connection);
+        }catch (IllegalArgumentException e){
+            Log.e(this.getClass().getName(), "Error: ", e);
+        }
         bound = false;
         handler.removeCallbacks(runnable);
     }
