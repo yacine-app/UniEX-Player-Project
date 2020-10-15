@@ -1,8 +1,6 @@
 package com.dzteam.UniExPlayer.Components;
 
-import android.content.Context;
 import android.graphics.Typeface;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,7 +12,6 @@ import androidx.annotation.NonNull;
 
 import com.dzteam.UniExPlayer.R;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class MediaAdapterInfo extends BaseAdapter {
@@ -25,7 +22,6 @@ public class MediaAdapterInfo extends BaseAdapter {
     }
 
     private List<MediaInfo> mediaInfoList = null;
-    private List<View> views = new ArrayList<>();
     private Index index = null;
 
     public MediaAdapterInfo(List<MediaInfo> mediaInfoList){ setMediaInfoList(mediaInfoList); }
@@ -35,6 +31,7 @@ public class MediaAdapterInfo extends BaseAdapter {
 
     public List<MediaInfo> getMediaInfoList() { return mediaInfoList; }
 
+    @SuppressWarnings("unused")
     public void clear(){ mediaInfoList.clear(); }
 
     public void setMediaInfoList(List<MediaInfo> mediaInfoList) { this.mediaInfoList = mediaInfoList; }
@@ -44,7 +41,9 @@ public class MediaAdapterInfo extends BaseAdapter {
         this.notifyDataSetChanged();
     }
 
-    /*public void setSelected(Context context, int id){
+    /*
+    @Deprecated
+    public void setSelected(Context context, int id){
         TextView title, artist;
         for (View v: views){
             title = v.findViewById(R.id.media_info_title);
@@ -60,7 +59,8 @@ public class MediaAdapterInfo extends BaseAdapter {
         title.setSelected(true);
         title.setTextColor(context.getResources().getColor(R.color.colorMainTheme, null));
         artist.setTextColor(context.getResources().getColor(R.color.colorMainTheme, null));
-    }*/
+    }
+     */
 
     @Override
     public boolean isEmpty() {
@@ -95,8 +95,6 @@ public class MediaAdapterInfo extends BaseAdapter {
         }
         @SuppressWarnings("unused")
         ViewTag tag = (ViewTag) view.getTag();
-        views.add(position, view);
-        Log.e(this.getClass().getName(), String.valueOf(position));
         final MediaInfo info = mediaInfoList.get(position);
         ImageView imageView = view.findViewById(R.id.art_image_list);
         TextView title = view.findViewById(R.id.media_info_title);
