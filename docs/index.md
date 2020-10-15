@@ -4,7 +4,7 @@
 #### Download link:
  * you can [download](https://github.com/yacine-app/UniEX-Player-Project/releases/download/v0.0.1-alpha.2/app-debug.apk) and try this release.
 
-####Change log:
+#### Change log:
  * change app name from UniEX Player to UniEX Music.
  * change app icon.
  * add splash screen when app launches.
