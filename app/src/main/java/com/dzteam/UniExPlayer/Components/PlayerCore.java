@@ -98,7 +98,7 @@ public class PlayerCore implements AudioManager.OnAudioFocusChangeListener {
                 handler.postDelayed(runnable, 2000);
                 break;
             case AudioManager.AUDIOFOCUS_LOSS:
-                stop();
+                pause();
                 break;
             case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT:
                 pause();
