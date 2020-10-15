@@ -110,7 +110,6 @@ public class MediaAdapterInfo extends BaseAdapter {
             title.setSelected(true);
             title.setTextColor(view.getContext().getResources().getColor(R.color.colorMainTheme, null));
             artist.setTextColor(view.getContext().getResources().getColor(R.color.colorMainTheme, null));
-            index = null;
         }
         //title.setSelected(true);
         title.setText(info.getTitle());
