@@ -6,102 +6,117 @@
     android:background="@android:color/white"
     android:padding="15dp">
 
-    <ImageView
-        android:id="@+id/image_logo"
-        android:layout_width="200dp"
-        android:layout_height="200dp"
-        android:layout_centerInParent="true"
-        android:scaleType="fitXY"
-        android:contentDescription="@string/app_name"
-        android:background="@drawable/animated_start_logo_first"/>
-
-    <LinearLayout
-        android:id="@+id/required_permission_layout"
-        android:alpha="0.0"
+    <ScrollView
+        android:id="@+id/required_permission_scrollView"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/image_logo"
-        android:layout_marginTop="30dp"
-        android:paddingTop="20dp"
-        android:background="@drawable/permission_layout_design_text"
-        android:orientation="vertical">
+        android:layout_height="match_parent"
+        android:layout_above="@id/ask_for_permission_button">
 
-        <TextView
+        <RelativeLayout
+            android:id="@+id/required_permission_scrollView_layout"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textSize="17sp"
-            android:text="@string/permission_activity_text"/>
+            android:layout_height="wrap_content">
 
-        <Space
-            android:layout_width="match_parent"
-            android:layout_height="20dp"/>
+            <ImageView
+                android:id="@+id/image_logo"
+                android:layout_width="200dp"
+                android:layout_height="200dp"
+                android:layout_centerInParent="true"
+                android:scaleType="fitXY"
+                android:contentDescription="@string/app_name"
+                android:background="@drawable/animated_start_logo_first"/>
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
-            <TextView
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:id="@+id/required_permission_layout"
+                android:alpha="0.0"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                android:text="@string/permission_activity_storage_per"
-                app:drawableLeftCompat="@drawable/ic_storage_icon" />
+                android:layout_below="@id/image_logo"
+                android:layout_marginTop="30dp"
+                android:paddingTop="20dp"
+                android:background="@drawable/permission_layout_design_text"
+                android:orientation="vertical">
 
-            <TextView
-                android:layout_width="wrap_content"
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="17sp"
+                    android:text="@string/permission_activity_text"/>
+
+                <Space
+                    android:layout_width="match_parent"
+                    android:layout_height="20dp"/>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:text="@string/permission_activity_storage_per"
+                        app:drawableLeftCompat="@drawable/ic_storage_icon" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="5dp"
+                        android:text="@string/permission_activity_storage_after"/>
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/optimal_permission_layout"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="5dp"
-                android:text="@string/permission_activity_storage_after"/>
+                android:alpha="0.0"
+                android:layout_below="@id/required_permission_layout"
+                android:paddingTop="15dp"
+                android:layout_marginTop="15dp"
+                android:background="@drawable/permission_layout_design_text"
+                android:orientation="vertical">
 
-        </LinearLayout>
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="17sp"
+                    android:text="@string/permission_activity_text_optimal"/>
 
-    </LinearLayout>
+                <Space
+                    android:layout_width="match_parent"
+                    android:layout_height="20dp"/>
 
-    <LinearLayout
-        android:id="@+id/optimal_permission_layout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:alpha="0.0"
-        android:layout_below="@id/required_permission_layout"
-        android:paddingTop="15dp"
-        android:layout_marginTop="15dp"
-        android:background="@drawable/permission_layout_design_text"
-        android:orientation="vertical">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textSize="17sp"
-            android:text="@string/permission_activity_text_optimal"/>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:text="@string/permission_activity_microphone_per"
+                        app:drawableLeftCompat="@drawable/ic_microphone_hardware_icon" />
 
-        <Space
-            android:layout_width="match_parent"
-            android:layout_height="20dp"/>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="5dp"
+                        android:text="@string/permission_activity_microphone_after"/>
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
+                </LinearLayout>
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                android:text="@string/permission_activity_microphone_per"
-                app:drawableLeftCompat="@drawable/ic_microphone_hardware_icon" />
+            </LinearLayout>
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="5dp"
-                android:text="@string/permission_activity_microphone_after"/>
+        </RelativeLayout>
 
-        </LinearLayout>
-
-    </LinearLayout>
+    </ScrollView>
 
     <Button
         android:id="@+id/ask_for_permission_button"
@@ -116,6 +131,7 @@
         android:padding="5dp"
         android:paddingStart="30dp"
         android:paddingEnd="30dp"
+        android:layout_marginStart="20dp"
         android:textColor="@color/button_uniex_music_style_color"
         android:background="@drawable/button_uniex_music_style_background" />
 

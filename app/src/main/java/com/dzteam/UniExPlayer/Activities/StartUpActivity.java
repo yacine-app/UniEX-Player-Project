@@ -3,18 +3,22 @@ package com.dzteam.UniExPlayer.Activities;
 import android.Manifest;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
 import android.graphics.drawable.Animatable2;
 import android.graphics.drawable.AnimatedVectorDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
+import android.widget.ScrollView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -31,10 +35,12 @@ public class StartUpActivity extends UniEXActivity implements View.OnClickListen
     private final String[] requiredPermissions = new String[]{Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.RECORD_AUDIO};
 
     private boolean permissionGranted = false;
+    private boolean notReadyToScroll = true;
 
     private Button acceptButton;
     private ImageView logoImage;
     private View firstView, secondView;
+    private ScrollView permissionRequiredScroll;
     private Handler handler = new Handler(Looper.getMainLooper());
 
     @Override
@@ -58,6 +64,7 @@ public class StartUpActivity extends UniEXActivity implements View.OnClickListen
         }
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -68,6 +75,15 @@ public class StartUpActivity extends UniEXActivity implements View.OnClickListen
         logoImage = findViewById(R.id.image_logo);
         firstView = findViewById(R.id.required_permission_layout);
         secondView = findViewById(R.id.optimal_permission_layout);
+        permissionRequiredScroll = findViewById(R.id.required_permission_scrollView);
+        permissionRequiredScroll.setFillViewport(true);
+        permissionRequiredScroll.setVerticalScrollBarEnabled(false);
+        permissionRequiredScroll.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                return notReadyToScroll;
+            }
+        });
         if(permissionGranted) logoImage.setBackgroundResource(R.drawable.animated_start_logo);
         AnimatedVectorDrawable animationDrawable = (AnimatedVectorDrawable) logoImage.getBackground();
         animationDrawable.registerAnimationCallback(new Animatable2.AnimationCallback() {
@@ -128,9 +144,26 @@ public class StartUpActivity extends UniEXActivity implements View.OnClickListen
                 .start();
     }
 
+    @Override
+    public void onConfigurationChanged(@NonNull Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE){
+            RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) permissionRequiredScroll.getLayoutParams();
+            params.removeRule(RelativeLayout.ABOVE);
+            params.addRule(RelativeLayout.START_OF, R.id.ask_for_permission_button);
+            permissionRequiredScroll.setLayoutParams(params);
+        } else if(newConfig.orientation == Configuration.ORIENTATION_PORTRAIT || newConfig.orientation == Configuration.ORIENTATION_UNDEFINED){
+            RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) permissionRequiredScroll.getLayoutParams();
+            params.removeRule(RelativeLayout.START_OF);
+            params.addRule(RelativeLayout.ABOVE, R.id.ask_for_permission_button);
+            permissionRequiredScroll.setLayoutParams(params);
+        }
+    }
+
     private void animationEnd4(){
         acceptButton.setClickable(true);
         acceptButton.setOnClickListener(this);
+        notReadyToScroll = false;
     }
 
     private void runMainActivity(){

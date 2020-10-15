@@ -37,7 +37,8 @@
 
         <activity android:name=".Activities.StartUpActivity"
             android:launchMode="singleTask"
-            android:theme="@style/AppTheme">
+            android:theme="@style/AppTheme"
+            android:configChanges="screenSize|orientation|screenLayout|smallestScreenSize|mcc|mnc|layoutDirection|keyboardHidden|keyboard|touchscreen|density|fontScale|locale|navigation|uiMode|colorMode">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
