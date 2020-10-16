@@ -31,10 +31,10 @@ public class MediaInfo {
         this.artist = artist;
         this.title = title;
         this.path = path;
-        mkPrepare();
+        mkPrepare(null);
     }
 
-    public static void fillListFromCursor(Cursor cursor, List<MediaInfo> mediaInfoList){
+    public static void fillListFromCursor(Cursor cursor, List<MediaInfo> mediaInfoList, Bitmap defaultIcon){
         int mediaId = cursor.getColumnIndex(MediaStore.Audio.Media._ID);
         int mediaTitle = cursor.getColumnIndex(MediaStore.Audio.Media.TITLE);
         int mediaArtist = cursor.getColumnIndex(MediaStore.Audio.Media.ARTIST);
@@ -52,12 +52,13 @@ public class MediaInfo {
 //.year = cursor.getInt(mediaYear);
             mediaInfo.albumArtist = cursor.getString(mediaAlbumArtist);
             //.e("50985er", String.valueOf(cursor.getString(mediaYear)));
-            mediaInfo.mkPrepare();
+            mediaInfo.mkPrepare(defaultIcon);
             mediaInfoList.add(mediaInfo);
         }while (cursor.moveToNext());
     }
 
-    private void mkPrepare(){
+    private void mkPrepare(Bitmap def){
+        //if (def == null)return;
         try {
             MediaMetadataRetriever retriever = new MediaMetadataRetriever();
             BitmapFactory.Options options = new BitmapFactory.Options();
@@ -65,6 +66,7 @@ public class MediaInfo {
             this.rawArt = retriever.getEmbeddedPicture();
             if (this.rawArt != null)
                 this.art = BitmapFactory.decodeByteArray(this.rawArt, 0, this.rawArt.length, options);
+            else this.art = def;
             retriever.close();
         }catch (NoSuchMethodError e){
             Log.e(this.getClass().getName(), "Error: ", e);

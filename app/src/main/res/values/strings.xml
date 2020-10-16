@@ -16,6 +16,9 @@
     <string name="menu_action_equalizer">Equalizer</string>
     <string name="menu_action_back">Back</string>
     <string name="menu_action_search">Search</string>
+    <string name="menu_action_settings">Settings</string>
+
+    <string name="text_message_no_default_equalizer">No default equalizer app was found!</string>
 
     <string name="notification_player_service">Player Service</string>
     <string name="permission_activity_text">UniEX Music need the following permission in order to operate:</string>

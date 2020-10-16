@@ -7,6 +7,7 @@ import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
+import android.media.audiofx.AudioEffect;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -15,20 +16,25 @@ import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
 import android.util.Log;
+import android.view.Display;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.Surface;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.annotation.RequiresPermission;
 import androidx.appcompat.widget.Toolbar;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.core.content.ContextCompat;
 
 import com.dzteam.UniExPlayer.Components.LoadInternalMedia;
@@ -49,30 +55,35 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior;
 
 import java.util.List;
 
-public class MainActivity extends UniEXActivity.MediaPlayerActivity implements View.OnClickListener, LoadInternalMedia.OnDoneListener, AdapterView.OnItemClickListener, OnCircularSeekBarChangeListener, View.OnLongClickListener {
+public class MainActivity extends UniEXActivity implements View.OnClickListener, LoadInternalMedia.OnDoneListener, AdapterView.OnItemClickListener, OnCircularSeekBarChangeListener, View.OnLongClickListener {
 
     public static final String ACTION_LAUNCH_PLAY_BACK = "ACTION_LAUNCH_PLAY_BACK";
     public static final String ACTION_LAUNCH_PLAY_BACK_IF_PLAYING = "ACTION_LAUNCH_PLAY_BACK_IF_PLAYING";
 
-    private boolean circularSeekBarChanging = false, bound = false;
+    private boolean circularSeekBarChanging = false, bound = false, updateLayoutFit = false;
     private int CIRCULAR_SEEK_BAR_UPDATE_DELAY = 300;
     private float CIRCULAR_PROGRESS = 0.0f;
     private int behaviorDefaultLaunch = BottomSheetBehavior.STATE_COLLAPSED;
     private int previousState = 0;
+    private int defaultPeekHeight = 55;
 
     private PlayerService playerService = null;
+    private Intent oldIntent;
     private Handler handler = new Handler(Looper.getMainLooper());
     private ListView listView;
-    private Toolbar mainActionBar;
+    private Display windowDisplayView;
+    private Toolbar mainActionBar, frameActionBar;
     private BarVisualizer barVisualizer;
     private MediaAdapterInfo mediaAdapterInfo;
-    private View includedLayout, mediaController, toolBarBehavior;
+    private View includedLayout;
+    private View mediaController;
+    private View firstViewChild;
     private BottomSheetBehavior bottomSheetBehavior;
     private TimeFormatter timeFormatter;
     private CircularSeekBar circularSeekBar;
     private ImageView mediaArt, frameArt;
     private TextView mediaTitle, mediaArtist, frameTitle, frameArtist, frameCurrentTime, frameDuration;
-    private ImageButton skipToPrevious, skipToNext, skipToPreviousFrame, skipToNextFrame, playPause, playPauseFrame, changeLoop, openQuickList;
+    private ImageButton playPause, playPauseFrame, changeLoop;
     private PlayerCore.OnPreparedListener onPreparedListener = new PlayerCore.OnPreparedListener() {
         @Override
         public void onPrepared() {
@@ -80,6 +91,8 @@ public class MainActivity extends UniEXActivity.MediaPlayerActivity implements V
             frameCurrentTime.setText(timeFormatter.getCurrentTime(0));
             frameDuration.setText(timeFormatter.getTotalTime());
             circularSeekBar.setProgress(0.0f);
+            updateUi(playerService.getMetaData());
+            playerService.setCurrentPlayIndex();
         }
     };
     private PlayerCore.OnLoopChangedListener onLoopChangedListener = new PlayerCore.OnLoopChangedListener() {
@@ -120,6 +133,7 @@ public class MainActivity extends UniEXActivity.MediaPlayerActivity implements V
             playerService.setCurrentPlayIndex();
             handler.postDelayed(runnable, CIRCULAR_SEEK_BAR_UPDATE_DELAY);
         }
+
     };
     private ServiceConnection connection = new ServiceConnection() {
         @Override
@@ -130,10 +144,8 @@ public class MainActivity extends UniEXActivity.MediaPlayerActivity implements V
             playerService.setCallBack(callback);
             playerService.setOnPreparedListener(onPreparedListener);
             playerService.setOnLoopChangedListener(onLoopChangedListener);
-            if(playerService.getMediaAdapterInfo() == null){
-                if(ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) prepareList();
-                else finish(getResources().getText(R.string.permission_non_granted_message));
-            }else {
+            if(playerService.getMediaAdapterInfo() == null) prepareList();
+            else {
                 playerService.updateMediaAdapterInfo();
                 updateUi(playerService.getMetaData());
                 onPreparedListener.onPrepared();
@@ -163,13 +175,25 @@ public class MainActivity extends UniEXActivity.MediaPlayerActivity implements V
                 frameCurrentTime.setText(timeFormatter.getCurrentTime(pos));
                 circularSeekBar.setProgress(pos * 100.0f / timeFormatter.getTotalTimeInt());
             }
-            handler.postDelayed(this, CIRCULAR_SEEK_BAR_UPDATE_DELAY);
+            if(playerService != null && playerService.isPlaying()) handler.postDelayed(this, CIRCULAR_SEEK_BAR_UPDATE_DELAY);
+        }
+    };
+    private Runnable runnable1 = new Runnable() {
+        @Override
+        public void run() {
+            updateLayoutFit = true;
+            setWithOrientation();
+            if(includedLayout.getAlpha() == 0.0f)
+                includedLayout.animate().alpha(1.0f).start();
+            handler.postDelayed(this, 100);
         }
     };
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS, WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
+        handler.postDelayed(runnable1, 100);
         prepareUi(0);
         if(!PlayerService.SERVICE_ALREADY_CREATED) startService(new Intent(this, PlayerService.class));
     }
@@ -183,9 +207,34 @@ public class MainActivity extends UniEXActivity.MediaPlayerActivity implements V
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater menuInflater = getMenuInflater();
-        menuInflater.inflate(R.menu.main_media_track_menu, menu);
-        //menuInflater.inflate(R.menu.main_media_track_menu_frame, menu);
+        if(circularSeekBarChanging)menuInflater.inflate(R.menu.main_media_track_menu, menu);
+        else menuInflater.inflate(R.menu.main_media_track_menu_frame, menu);
         return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId()){
+            case R.id.menu_volume:
+
+                break;
+            case R.id.menu_equalizer:
+                Intent intent = new Intent(AudioEffect.ACTION_DISPLAY_AUDIO_EFFECT_CONTROL_PANEL);
+                if(intent.resolveActivity(getPackageManager()) != null){
+                    startActivityForResult(intent, 0);
+                }else Toast.makeText(this, getText(R.string.text_message_no_default_equalizer), Toast.LENGTH_SHORT).show();
+                break;
+            case R.id.menu_search:
+                //TODO
+                break;
+            case R.id.menu_settings:
+                startActivity(new Intent(this, SettingsActivity.class));
+                break;
+            case R.id.menu_about:
+                startActivity(new Intent(this, AboutActivity.class));
+                break;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -238,6 +287,7 @@ public class MainActivity extends UniEXActivity.MediaPlayerActivity implements V
                 break;
             case R.id.open_quick_list_frame:
                 //TODO
+                //setWithOrientation();
                 break;
             case R.id.back_button_arrow_frame:
                 changeBehaviorState(BottomSheetBehavior.STATE_COLLAPSED);
@@ -250,6 +300,9 @@ public class MainActivity extends UniEXActivity.MediaPlayerActivity implements V
         if((BottomSheetBehavior.STATE_EXPANDED == bottomSheetBehavior.getState() || BottomSheetBehavior.STATE_DRAGGING == bottomSheetBehavior.getState()) && keyCode == KeyEvent.KEYCODE_BACK){
             bottomSheetBehavior.setDraggable(true);
             changeBehaviorState(BottomSheetBehavior.STATE_COLLAPSED);
+            return false;
+        }if(keyCode == KeyEvent.KEYCODE_VOLUME_UP || keyCode == KeyEvent.KEYCODE_VOLUME_DOWN || keyCode == KeyEvent.KEYCODE_VOLUME_MUTE){
+
             return false;
         }
         return super.onKeyDown(keyCode, event);
@@ -266,6 +319,7 @@ public class MainActivity extends UniEXActivity.MediaPlayerActivity implements V
             behaviorDefaultLaunch = BottomSheetBehavior.STATE_EXPANDED;
         else behaviorDefaultLaunch = bottomSheetBehavior.getState();
         handler.postDelayed(runnable, CIRCULAR_SEEK_BAR_UPDATE_DELAY);
+        handler.postDelayed(runnable1, 100);
     }
 
     @Override
@@ -278,6 +332,8 @@ public class MainActivity extends UniEXActivity.MediaPlayerActivity implements V
         }
         bound = false;
         handler.removeCallbacks(runnable);
+        handler.removeCallbacks(runnable1);
+        updateLayoutFit = false;
     }
 
     @Override
@@ -288,6 +344,9 @@ public class MainActivity extends UniEXActivity.MediaPlayerActivity implements V
         super.onDestroy();
         barVisualizer.release();
         if(playerService != null && !playerService.isPlaying()) startService(new Intent(this, PlayerService.class).setAction(PlayerService.ACTION_MEDIA_SERVICE_EXIT));
+        handler.removeCallbacks(runnable);
+        handler.removeCallbacks(runnable1);
+        updateLayoutFit = false;
     }
 
     @Override
@@ -297,9 +356,7 @@ public class MainActivity extends UniEXActivity.MediaPlayerActivity implements V
     }
 
     @Override
-    public void onStartTrackingTouch(@NonNull CircularSeekBar CircularSeekBar) {
-        circularSeekBarChanging = true;
-    }
+    public void onStartTrackingTouch(@NonNull CircularSeekBar CircularSeekBar) { circularSeekBarChanging = true; }
 
     @Override
     public void onStopTrackingTouch(@NonNull CircularSeekBar CircularSeekBar) {
@@ -323,7 +380,9 @@ public class MainActivity extends UniEXActivity.MediaPlayerActivity implements V
     }
 
     private void handleIntent(Intent intent){
-        if(intent != null && intent.getAction() != null){
+        if(intent == null || intent.equals(oldIntent))return;
+        oldIntent = intent;
+        if(intent.getAction() != null){
             switch (intent.getAction()) {
                 case ACTION_LAUNCH_PLAY_BACK:
                     behaviorDefaultLaunch = BottomSheetBehavior.STATE_EXPANDED;
@@ -343,20 +402,24 @@ public class MainActivity extends UniEXActivity.MediaPlayerActivity implements V
 
     @SuppressWarnings("deprecation")
     private void prepareUi(int state){
+        windowDisplayView = ((WindowManager) getSystemService(WINDOW_SERVICE)).getDefaultDisplay();
         if(getIntent() != null && ACTION_LAUNCH_PLAY_BACK.equals(getIntent().getAction()))
             behaviorDefaultLaunch = BottomSheetBehavior.STATE_EXPANDED;
 
         setContentView(R.layout.main_activity_layout);
 
         mainActionBar = findViewById(R.id.main_action_bar);
+        frameActionBar = findViewById(R.id.main_action_bar_frame);
 
-        skipToNext = findViewById(R.id.skip_to_next);
-        skipToPrevious = findViewById(R.id.skip_to_previous);
+        frameActionBar.setTitle("");
+
+        ImageButton skipToNext = findViewById(R.id.skip_to_next);
+        ImageButton skipToPrevious = findViewById(R.id.skip_to_previous);
         playPause = findViewById(R.id.play_pause);
-        skipToNextFrame = findViewById(R.id.skip_to_next_frame);
-        skipToPreviousFrame = findViewById(R.id.skip_to_previous_frame);
+        ImageButton skipToNextFrame = findViewById(R.id.skip_to_next_frame);
+        ImageButton skipToPreviousFrame = findViewById(R.id.skip_to_previous_frame);
         playPauseFrame = findViewById(R.id.play_pause_frame);
-        openQuickList = findViewById(R.id.open_quick_list_frame);
+        ImageButton openQuickList = findViewById(R.id.open_quick_list_frame);
         changeLoop = findViewById(R.id.change_loop_mode_frame);
 
         circularSeekBar = findViewById(R.id.seek_circular_bar_frame);
@@ -372,8 +435,9 @@ public class MainActivity extends UniEXActivity.MediaPlayerActivity implements V
         frameDuration = findViewById(R.id.duration_time_frame);
 
         mediaController = findViewById(R.id.media_controller);
-        toolBarBehavior = findViewById(R.id.main_action_bar_frame);
         includedLayout = findViewById(R.id.included_frame_layout);
+
+        if(previousState == BottomSheetBehavior.STATE_COLLAPSED) includedLayout.setAlpha(0.0f);
 
         if(barVisualizer != null){
             barVisualizer.release();
@@ -402,12 +466,16 @@ public class MainActivity extends UniEXActivity.MediaPlayerActivity implements V
             @Override
             public void onSlide(@NonNull View bottomSheet, float slideOffset) {
                 mediaController.setAlpha(1.0f - slideOffset);
-                toolBarBehavior.setAlpha(slideOffset);
-                mainActionBar.setAlpha(mediaController.getAlpha());
+                includedLayout.setAlpha(slideOffset);
+                //mainActionBar.setAlpha(mediaController.getAlpha());
             }
         });
 
+        defaultPeekHeight = bottomSheetBehavior.getPeekHeight();
+
         listView.setOnItemClickListener(this);
+
+        firstViewChild = findViewById(R.id.firstViewChild);
 
         bottomSheet.setOnClickListener(this);
         playPause.setOnClickListener(this);
@@ -433,8 +501,11 @@ public class MainActivity extends UniEXActivity.MediaPlayerActivity implements V
         if (bound && playerService != null && playerService.getMediaAdapterInfo() != null) listView.setAdapter(playerService.getMediaAdapterInfo());
     }
 
-    @RequiresPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
     private void prepareList(){
+        if(ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED) {
+            finish(getText(R.string.permission_non_granted_message));
+            return;
+        }
         LoadInternalMedia loadInternalMedia = new LoadInternalMedia(this);
         loadInternalMedia.setOnDoneListener(this);
         loadInternalMedia.execute();
@@ -467,29 +538,67 @@ public class MainActivity extends UniEXActivity.MediaPlayerActivity implements V
         switch (state){
             case BottomSheetBehavior.STATE_EXPANDED:
                 mediaController.setVisibility(View.GONE);
-                toolBarBehavior.setVisibility(View.VISIBLE);
+                frameActionBar.setVisibility(View.VISIBLE);
                 includedLayout.setVisibility(View.VISIBLE);
                 mediaController.animate().alpha(0.0f).start();
-                toolBarBehavior.animate().alpha(1.0f).start();
+                frameActionBar.animate().alpha(1.0f).start();
+                //includedLayout.animate().alpha(1.0f).start();
                 mainActionBar.setVisibility(View.GONE);
                 if(playerService != null && isPermissionGranted(Manifest.permission.RECORD_AUDIO)) barVisualizer.setAudioSessionId(playerService.getAudioSessionId());
                 circularSeekBarChanging = false;
+                setSupportActionBar(frameActionBar);
                 break;
             case BottomSheetBehavior.STATE_COLLAPSED:
                 mediaController.setVisibility(View.VISIBLE);
-                toolBarBehavior.setVisibility(View.GONE);
+                frameActionBar.setVisibility(View.GONE);
                 includedLayout.setVisibility(View.GONE);
                 mainActionBar.setVisibility(View.VISIBLE);
                 mediaController.animate().alpha(1.0f).start();
-                toolBarBehavior.animate().alpha(0.0f).start();
+                frameActionBar.animate().alpha(0.0f).start();
+                //includedLayout.animate().alpha(0.0f).start();
                 barVisualizer.release();
                 circularSeekBarChanging = true;
+                setSupportActionBar(mainActionBar);
                 break;
             case BottomSheetBehavior.STATE_DRAGGING:
+                if(circularSeekBarChanging) includedLayout.setAlpha(0.0f);
                 mainActionBar.setVisibility(View.VISIBLE);
                 mediaController.setVisibility(View.VISIBLE);
-                toolBarBehavior.setVisibility(View.VISIBLE);
+                frameActionBar.setVisibility(View.VISIBLE);
                 includedLayout.setVisibility(View.VISIBLE);
+                break;
+        }
+    }
+
+    public void setWithOrientation(){
+        if(!updateLayoutFit)return;
+        CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) firstViewChild.getLayoutParams();
+        switch (windowDisplayView.getRotation()){
+            case Surface.ROTATION_0:
+            case Surface.ROTATION_180:
+                includedLayout.setPadding(0, getStatusBarHeight(), 0, getNavigationBarHeight());
+                bottomSheetBehavior.setPeekHeight(getNavigationBarHeight() + mediaController.getHeight());
+                mediaController.setPadding(0, 0, 0, 0);
+                params.topMargin = getStatusBarHeight();
+                firstViewChild.setLayoutParams(params);
+                break;
+            case Surface.ROTATION_270:
+                includedLayout.setPadding(getNavigationBarWidth(), getStatusBarHeight(), 0, 0);
+                bottomSheetBehavior.setPeekHeight(defaultPeekHeight);
+                mediaController.setPadding(getNavigationBarWidth(), 0, 0, 0);
+                params.rightMargin = 0;
+                params.topMargin = getStatusBarHeight();
+                params.leftMargin = getNavigationBarWidth();
+                firstViewChild.setLayoutParams(params);
+                break;
+            case Surface.ROTATION_90:
+                includedLayout.setPadding(0, getStatusBarHeight(), getNavigationBarWidth(), 0);
+                bottomSheetBehavior.setPeekHeight(defaultPeekHeight);
+                mediaController.setPadding(0, 0, getNavigationBarWidth(), 0);
+                params.topMargin = getStatusBarHeight();
+                params.rightMargin = getNavigationBarWidth();
+                params.leftMargin = 0;
+                firstViewChild.setLayoutParams(params);
                 break;
         }
     }
@@ -506,4 +615,5 @@ public class MainActivity extends UniEXActivity.MediaPlayerActivity implements V
             }
         }
     }
+
 }

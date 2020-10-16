@@ -275,6 +275,8 @@ public class PlayerService extends MediaBrowserServiceCompat implements PlayerCo
 
     public boolean isPlaying(){ return playerCore.isPlaying(); }
 
+    public boolean isReady(){ return playerCore.isReady(); }
+
     public int getLoopState(){ return playerCore.getLoopState(); }
 
     public void skipTo(int pos){ playerCore.skipTo(pos); }

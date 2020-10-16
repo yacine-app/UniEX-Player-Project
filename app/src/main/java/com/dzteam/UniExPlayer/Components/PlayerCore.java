@@ -172,9 +172,10 @@ public class PlayerCore implements AudioManager.OnAudioFocusChangeListener {
     }
 
     public void skipToNext(){
+        boolean wasPlaying = isPlaying();
         CURRENT_POSITION = CURRENT_POSITION + 1 >= items.size()? 0 : CURRENT_POSITION + 1;
         this.setMediaSource(items.get(CURRENT_POSITION).getDescription().getMediaUri());
-        if(!cannotBePlayed) play();
+        if(!cannotBePlayed && wasPlaying) play();
         if(!callbacks.isEmpty())
             for(MediaSessionCompat.Callback a: callbacks)
                 a.onSkipToNext();
@@ -185,9 +186,10 @@ public class PlayerCore implements AudioManager.OnAudioFocusChangeListener {
             seekTo(0L);
             return;
         }
+        boolean wasPlaying = isPlaying();
         CURRENT_POSITION = CURRENT_POSITION - 1 < 0? items.size() - 1 : CURRENT_POSITION - 1;
         this.setMediaSource(items.get(CURRENT_POSITION).getDescription().getMediaUri());
-        if(!cannotBePlayed) play();
+        if(!cannotBePlayed && wasPlaying) play();
         if(!callbacks.isEmpty())
             for(MediaSessionCompat.Callback a: callbacks)
                 a.onSkipToPrevious();
@@ -197,7 +199,7 @@ public class PlayerCore implements AudioManager.OnAudioFocusChangeListener {
         wasPlaying = isPlaying();
         this.mediaPlayer.pause();
         this.mediaSession.setPlaybackState(playBackStateBuilder
-                .setState(PlaybackStateCompat.STATE_PAUSED, this.mediaPlayer.getCurrentPosition(), PLAY_BACK_SPEED)
+                .setState(PlaybackStateCompat.STATE_PAUSED, getCurrentPosition(), PLAY_BACK_SPEED)
                 .build());
         this.mediaSession.setMetadata(getMetaData());
         if(!callbacks.isEmpty())
@@ -214,7 +216,7 @@ public class PlayerCore implements AudioManager.OnAudioFocusChangeListener {
         if(!ready) setMediaSource(items.get(CURRENT_POSITION).getDescription().getMediaUri());
         this.mediaPlayer.start();
         this.mediaSession.setPlaybackState(playBackStateBuilder
-                .setState(PlaybackStateCompat.STATE_PLAYING, this.mediaPlayer.getCurrentPosition(), PLAY_BACK_SPEED)
+                .setState(PlaybackStateCompat.STATE_PLAYING, getCurrentPosition(), PLAY_BACK_SPEED)
                 .build());
         this.mediaSession.setMetadata(getMetaData());
         requestAudioFocus();
@@ -227,7 +229,7 @@ public class PlayerCore implements AudioManager.OnAudioFocusChangeListener {
         wasPlaying = isPlaying();
         this.mediaPlayer.stop();
         this.mediaSession.setPlaybackState(playBackStateBuilder
-                .setState(PlaybackStateCompat.STATE_STOPPED, this.mediaPlayer.getCurrentPosition(), PLAY_BACK_SPEED)
+                .setState(PlaybackStateCompat.STATE_STOPPED, getCurrentPosition(), PLAY_BACK_SPEED)
                 .build());
         this.mediaSession.setMetadata(getMetaData());
         if(!callbacks.isEmpty())
@@ -262,6 +264,8 @@ public class PlayerCore implements AudioManager.OnAudioFocusChangeListener {
         ready = false;
         this.mediaPlayer.reset();
     }
+
+    public void setPlayBackSpeed(float speed) { this.PLAY_BACK_SPEED = Math.max(Math.min(speed, 0.25f), 4.0f); }
 
     public void setErrorListener(ErrorListener errorListener) { this.errorListener = errorListener; }
 
@@ -303,6 +307,8 @@ public class PlayerCore implements AudioManager.OnAudioFocusChangeListener {
         }catch (IllegalStateException e){ Log.e(this.getClass().getName(), "", e); }
         return res;
     }
+
+    public boolean isReady() { return ready; }
 
     public int getCurrentPlayIndex(){ return this.CURRENT_POSITION; }
 
@@ -352,6 +358,7 @@ public class PlayerCore implements AudioManager.OnAudioFocusChangeListener {
                     case LOOP_STATE_ALL:
                         if(!ready)break;
                         skipToNext();
+                        play();
                         if(CURRENT_POSITION <= 0){
                             stop();
                             reset();
@@ -360,6 +367,7 @@ public class PlayerCore implements AudioManager.OnAudioFocusChangeListener {
                         break;
                     case LOOP_STATE_ALL_REPEAT:
                         skipToNext();
+                        play();
                         break;
                     case LOOP_STATE_ONE_REPEAT:
                         seekTo(0L);

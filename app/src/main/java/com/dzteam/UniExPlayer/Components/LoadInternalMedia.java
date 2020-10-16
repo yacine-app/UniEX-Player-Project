@@ -32,10 +32,9 @@ public class LoadInternalMedia implements Runnable {
 
     public void setContentResolver(ContentResolver contentResolver) { this.contentResolver = contentResolver; }
 
-    @RequiresPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
     public LoadInternalMedia(@NonNull Context context){
         setContentResolver(context.getContentResolver());
-        defaultIcon = BitmapFactory.decodeResource(context.getResources(), R.raw.ic_track_media);
+        defaultIcon = BitmapFactory.decodeResource(context.getResources(), R.raw.logo10_15_82143);
     }
 
     public void setOnDoneListener(OnDoneListener onDoneListener) { this.onDoneListener = onDoneListener; }
@@ -55,7 +54,7 @@ public class LoadInternalMedia implements Runnable {
         String sortOrder = MediaStore.Audio.Media.TITLE + " ASC";
         Cursor cursor = contentResolver.query(uri, null, selection, null, sortOrder);
         if(cursor != null && cursor.moveToFirst()){
-            MediaInfo.fillListFromCursor(cursor, result);
+            MediaInfo.fillListFromCursor(cursor, result, defaultIcon);
             Log.e("ZEZFGTZERGGRH", String.valueOf(result.size()));
             cursor.close();
         }

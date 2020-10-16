@@ -30,10 +30,15 @@ public abstract class UniEXActivity extends AppCompatActivity {
     //TODO
 
     private View currentContentView = null;
+    private int navigationBarHeight, navigationBarWidth, statusBarHeight;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if(navigationBarWidth != 0 && navigationBarHeight != 0 && statusBarHeight != 0)return;
+        navigationBarHeight = getResources().getDimensionPixelSize(getResources().getIdentifier("navigation_bar_height", "dimen", "android"));
+        navigationBarWidth = getResources().getDimensionPixelSize(getResources().getIdentifier("navigation_bar_width", "dimen", "android"));
+        statusBarHeight = getResources().getDimensionPixelSize(getResources().getIdentifier("status_bar_height", "dimen", "android"));
         //getWindow().setNavigationBarColor(0x0FFFFFF);
     }
 
@@ -57,6 +62,18 @@ public abstract class UniEXActivity extends AppCompatActivity {
 
     public boolean isPermissionGranted(String permission){
         return ContextCompat.checkSelfPermission(this, permission) == PackageManager.PERMISSION_GRANTED;
+    }
+
+    public int getNavigationBarHeight(){
+        return navigationBarHeight;
+    }
+
+    public int getNavigationBarWidth(){
+        return navigationBarWidth;
+    }
+
+    public int getStatusBarHeight(){
+        return statusBarHeight;
     }
 
     public void finish(@NonNull String message){

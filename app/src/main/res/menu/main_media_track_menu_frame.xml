@@ -1,15 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <item app:showAsAction="always"
-        android:title="@string/menu_action_volume"
-        android:icon="@drawable/ic_volume_action_icon"/>
+<item app:showAsAction="always"
+    android:id="@+id/menu_volume"
+    android:title="@string/menu_action_volume"
+    android:icon="@drawable/ic_volume_action_icon"/>
 
-    <item app:showAsAction="ifRoom"
-        android:title="@string/menu_action_equalizer"
-        android:icon="@drawable/ic_equalizer_action_icon"/>
+<item app:showAsAction="ifRoom"
+    android:id="@+id/menu_equalizer"
+    android:title="@string/menu_action_equalizer"
+    android:icon="@drawable/ic_equalizer_action_icon"/>
 
-    <item android:title="@string/menu_action_about"/>
+<item
+    android:id="@+id/menu_settings"
+    android:title="@string/menu_action_settings"/>
+
+<item
+    android:id="@+id/menu_about"
+    android:title="@string/menu_action_about"/>
 
 </menu>

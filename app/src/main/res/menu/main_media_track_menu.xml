@@ -2,13 +2,21 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item app:showAsAction="always"
+        android:id="@+id/menu_search"
         android:title="@string/menu_action_search"
         android:icon="@drawable/ic_search_action_icon"/>
 
     <item
+        android:id="@+id/menu_equalizer"
         android:title="@string/menu_action_equalizer"
         android:icon="@drawable/ic_equalizer_action_icon"/>
 
-    <item android:title="@string/menu_action_about"/>
+    <item
+        android:id="@+id/menu_settings"
+        android:title="@string/menu_action_settings"/>
+
+    <item
+        android:id="@+id/menu_about"
+        android:title="@string/menu_action_about"/>
 
 </menu>
