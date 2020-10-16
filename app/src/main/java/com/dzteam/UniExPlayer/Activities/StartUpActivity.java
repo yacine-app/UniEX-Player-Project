@@ -10,6 +10,7 @@ import android.content.res.Configuration;
 import android.graphics.drawable.Animatable2;
 import android.graphics.drawable.AnimatedVectorDrawable;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -60,7 +61,7 @@ public class StartUpActivity extends UniEXActivity implements View.OnClickListen
 
                 break;
             case R.id.ask_for_permission_button:
-                requestPermissions(requiredPermissions, 1);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) requestPermissions(requiredPermissions, 1);
                 break;
         }
     }
@@ -77,31 +78,32 @@ public class StartUpActivity extends UniEXActivity implements View.OnClickListen
         permissionAlreadyGranted = isPermissionGranted(Manifest.permission.READ_EXTERNAL_STORAGE);
         setTheme(R.style.AppTheme);
         setContentView(R.layout.permission_required_activity);
-        acceptButton = findViewById(R.id.ask_for_permission_button);
-        logoImage = findViewById(R.id.image_logo);
-        firstView = findViewById(R.id.required_permission_layout);
-        secondView = findViewById(R.id.optimal_permission_layout);
-        permissionRequiredScroll = findViewById(R.id.required_permission_scrollView);
-        permissionRequiredScroll.setFillViewport(true);
-        permissionRequiredScroll.setVerticalScrollBarEnabled(false);
-        permissionRequiredScroll.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                return notReadyToScroll;
-            }
-        });
-        if(permissionAlreadyGranted) logoImage.setBackgroundResource(R.drawable.animated_start_logo);
-        AnimatedVectorDrawable animationDrawable = (AnimatedVectorDrawable) logoImage.getBackground();
-        animationDrawable.registerAnimationCallback(new Animatable2.AnimationCallback() {
-            @Override
-            public void onAnimationEnd(Drawable drawable) {
-                super.onAnimationEnd(drawable);
-                animationEnd2();
-            }
-        });
-        animationDrawable.start();
-        logoImage.setOnClickListener(this);
-
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+            acceptButton = findViewById(R.id.ask_for_permission_button);
+            logoImage = findViewById(R.id.image_logo);
+            firstView = findViewById(R.id.required_permission_layout);
+            secondView = findViewById(R.id.optimal_permission_layout);
+            permissionRequiredScroll = findViewById(R.id.required_permission_scrollView);
+            permissionRequiredScroll.setFillViewport(true);
+            permissionRequiredScroll.setVerticalScrollBarEnabled(false);
+            permissionRequiredScroll.setOnTouchListener(new View.OnTouchListener() {
+                @Override
+                public boolean onTouch(View v, MotionEvent event) {
+                    return notReadyToScroll;
+                }
+            });
+            if(permissionAlreadyGranted) logoImage.setBackgroundResource(R.drawable.animated_start_logo);
+            AnimatedVectorDrawable animationDrawable = (AnimatedVectorDrawable) logoImage.getBackground();
+            animationDrawable.registerAnimationCallback(new Animatable2.AnimationCallback() {
+                @Override
+                public void onAnimationEnd(Drawable drawable) {
+                    super.onAnimationEnd(drawable);
+                    animationEnd2();
+                }
+            });
+            animationDrawable.start();
+            logoImage.setOnClickListener(this);
+        }else runMainActivity();
     }
 
     private void animationEnd2(){
