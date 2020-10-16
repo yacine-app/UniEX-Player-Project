@@ -183,7 +183,7 @@ public class MainActivity extends UniEXActivity implements View.OnClickListener,
         public void run() {
             updateLayoutFit = true;
             setWithOrientation();
-            if(includedLayout.getAlpha() == 0.0f)
+            if(includedLayout.getAlpha() == 0.0f && bottomSheetBehavior.getState() == BottomSheetBehavior.STATE_EXPANDED)
                 includedLayout.animate().alpha(1.0f).start();
             handler.postDelayed(this, 100);
         }
