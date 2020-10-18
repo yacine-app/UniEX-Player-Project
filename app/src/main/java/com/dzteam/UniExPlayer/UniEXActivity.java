@@ -31,6 +31,7 @@ public abstract class UniEXActivity extends AppCompatActivity {
 
     private View currentContentView = null;
     private int navigationBarHeight, navigationBarWidth, statusBarHeight;
+    private boolean navigationBarShown = false;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -39,6 +40,7 @@ public abstract class UniEXActivity extends AppCompatActivity {
         navigationBarHeight = getResources().getDimensionPixelSize(getResources().getIdentifier("navigation_bar_height", "dimen", "android"));
         navigationBarWidth = getResources().getDimensionPixelSize(getResources().getIdentifier("navigation_bar_width", "dimen", "android"));
         statusBarHeight = getResources().getDimensionPixelSize(getResources().getIdentifier("status_bar_height", "dimen", "android"));
+        navigationBarShown = getResources().getBoolean(getResources().getIdentifier("config_showNavigationBar", "bool", "android"));
         //getWindow().setNavigationBarColor(0x0FFFFFF);
     }
 
@@ -64,13 +66,11 @@ public abstract class UniEXActivity extends AppCompatActivity {
         return ContextCompat.checkSelfPermission(this, permission) == PackageManager.PERMISSION_GRANTED;
     }
 
-    public int getNavigationBarHeight(){
-        return navigationBarHeight;
-    }
+    public boolean isNavigationBarShown() { return navigationBarShown; }
 
-    public int getNavigationBarWidth(){
-        return navigationBarWidth;
-    }
+    public int getNavigationBarHeight(){ return navigationBarShown ? navigationBarHeight : 0; }
+
+    public int getNavigationBarWidth(){ return navigationBarShown ? navigationBarWidth : 0; }
 
     public int getStatusBarHeight(){
         return statusBarHeight;

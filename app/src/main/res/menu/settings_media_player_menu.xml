@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/menu_open_source"
+        android:title="@string/menu_action_open_source"/>
+
+    <item
+        android:id="@+id/menu_licence"
+        android:title="@string/menu_action_licence"/>
+
+</menu>

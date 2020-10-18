@@ -29,31 +29,37 @@
 
     </androidx.appcompat.widget.Toolbar>
 
-    <ImageView
-        android:id="@+id/media_info_frame_art"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_margin="30dp"
-        app:layout_constraintStart_toStartOf="parent"
+    <androidx.cardview.widget.CardView
+        android:id="@+id/media_info_frame_art_card"
+        android:layout_width="200dp"
+        android:layout_height="200dp"
+        app:cardBackgroundColor="@android:color/transparent"
+        app:cardElevation="0dp"
         app:layout_constraintTop_toBottomOf="@id/main_action_bar_frame"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toStartOf="@id/media_info_layout_container_frame"
-        android:layout_marginTop="?attr/actionBarSize"/>
-
-    <com.gauravk.audiovisualizer.visualizer.BarVisualizer
-        android:id="@+id/visualizerView"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_margin="10dp"
-        android:layout_marginBottom="20dp"
-        android:layout_marginTop="?attr/actionBarSize"
-        app:avSpeed="medium"
-        app:avColor="@color/colorMainTheme"
-        app:avDensity="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/main_action_bar_frame"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/media_info_layout_container_frame" />
+        app:cardCornerRadius="100dp">
+
+        <ImageView
+            android:id="@+id/media_info_frame_art"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="centerCrop"/>
+
+    </androidx.cardview.widget.CardView>
+
+    <com.gauravk.audiovisualizer.visualizer.CircleLineVisualizer
+        android:id="@+id/visualizerView"
+        android:layout_width="380dp"
+        android:layout_height="380dp"
+        app:avSpeed="slow"
+        app:avColor="@color/colorMainTheme"
+        app:avDensity="0.74"
+        app:layout_constraintTop_toBottomOf="@id/main_action_bar_frame"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/media_info_layout_container_frame"
+        app:layout_constraintBottom_toBottomOf="parent"/>
 
     <LinearLayout
         android:id="@+id/media_info_layout_container_frame"
@@ -61,7 +67,7 @@
         android:layout_height="wrap_content"
         android:padding="10dp"
         android:orientation="vertical"
-        app:layout_constraintStart_toEndOf="@id/media_info_frame_art"
+        app:layout_constraintStart_toEndOf="@id/visualizerView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toTopOf="@id/media_controller_frame">
 
@@ -105,7 +111,7 @@
         android:layout_width="0dp"
         android:layout_height="170dp"
         android:layout_marginBottom="15dp"
-        app:layout_constraintStart_toEndOf="@id/media_info_frame_art"
+        app:layout_constraintStart_toEndOf="@id/visualizerView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent">
 

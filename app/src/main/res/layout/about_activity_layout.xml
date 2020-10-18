@@ -1,10 +1,241 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@android:color/white"
     android:fitsSystemWindows="true">
 
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/main_action_bar"
+        style="@style/ThemeOverlay.AppCompat.ActionBar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@android:color/white"
+        app:constraintSet="@style/ThemeOverlay.AppCompat.ActionBar"
+        app:layout_constraintTop_toTopOf="parent"
+        android:elevation="4dp"
+        app:title="@string/menu_action_about" />
 
+    <ScrollView
+        android:id="@+id/required_permission_scrollView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="?attr/actionBarSize"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/main_action_bar">
+
+        <LinearLayout
+            android:id="@+id/required_permission_scrollView_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <ImageView
+                android:id="@+id/image_logo"
+                android:layout_width="200dp"
+                android:layout_height="200dp"
+                android:contentDescription="@string/app_name"
+                android:background="@drawable/animated_start_logo_first"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:layout_marginStart="30dp"
+                android:layout_marginEnd="30dp"
+                android:layout_marginBottom="3dp"
+                android:textSize="19sp"
+                android:textAlignment="center"
+                android:gravity="center"
+                android:text="@string/about_activity_text_first"/>
+
+            <TextView
+                android:id="@+id/version_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="19sp"
+                android:layout_marginBottom="10dp"
+                android:textAlignment="center"
+                android:gravity="center"
+                android:text="@string/about_activity_text_version"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="21sp"
+                android:paddingTop="3dp"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="10dp"
+                android:gravity="center"
+                android:textAlignment="center"
+                android:background="@drawable/permission_layout_design_text"
+                android:text="@string/about_activity_text_second"/>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/github_button"
+                android:layout_width="120dp"
+                android:layout_height="wrap_content"
+                android:padding="5dp"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:background="@drawable/button_uniex_music_style_background">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_toStartOf="@id/github_icon"
+                    android:text="@string/about_activity_text_github"
+                    android:layout_marginStart="5dp"
+                    android:textColor="@color/button_uniex_music_style_color"
+                    android:textSize="19sp"
+                    app:layout_constraintEnd_toStartOf="@id/github_icon"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"/>
+
+                <ImageView
+                    android:id="@+id/github_icon"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:text="@string/about_activity_text_github"
+                    android:textSize="19sp"
+                    android:layout_alignParentEnd="true"
+                    android:src="@drawable/iconmonstr_github_1"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:tint="@color/button_uniex_music_style_color" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="10dp"/>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/twitter_button"
+                android:layout_width="120dp"
+                android:layout_height="wrap_content"
+                android:padding="5dp"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:background="@drawable/button_uniex_music_style_background">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:gravity="center_vertical"
+                    android:text="@string/about_activity_text_twitter"
+                    android:layout_marginStart="5dp"
+                    android:textColor="@color/button_uniex_music_style_color"
+                    android:textSize="19sp"
+                    app:layout_constraintEnd_toStartOf="@id/twitter_icon"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"/>
+
+                <ImageView
+                    android:id="@+id/twitter_icon"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:text="@string/about_activity_text_github"
+                    android:textSize="19sp"
+                    android:layout_alignParentEnd="true"
+                    android:src="@drawable/twitter_icon"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:tint="@color/button_uniex_music_style_color" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="10dp"/>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/website_button"
+                android:layout_width="120dp"
+                android:layout_height="wrap_content"
+                android:padding="5dp"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:background="@drawable/button_uniex_music_style_background">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:gravity="center_vertical"
+                    android:text="@string/about_activity_text_website"
+                    android:layout_marginStart="5dp"
+                    android:textColor="@color/button_uniex_music_style_color"
+                    android:textSize="19sp"
+                    app:layout_constraintEnd_toStartOf="@id/website_icon"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"/>
+
+                <ImageView
+                    android:id="@+id/website_icon"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:text="@string/about_activity_text_github"
+                    android:textSize="19sp"
+                    android:layout_alignParentEnd="true"
+                    android:src="@drawable/world_wide_web"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:tint="@color/button_uniex_music_style_color" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <!--
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="10dp"/>
+
+            <RelativeLayout
+                android:layout_width="120dp"
+                android:layout_height="wrap_content"
+                android:padding="5dp"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp"
+                android:background="@drawable/button_uniex_music_style_background">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_toStartOf="@id/facebook_icon"
+                    android:layout_alignParentStart="true"
+                    android:gravity="center_vertical"
+                    android:text="@string/about_activity_text_github"
+                    android:layout_marginStart="5dp"
+                    android:textSize="19sp"/>
+
+                <ImageView
+                    android:id="@+id/facebook_icon"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:text="@string/about_activity_text_github"
+                    android:textSize="19sp"
+                    android:layout_alignParentEnd="true"
+                    android:src="@drawable/iconmonstr_github_1"
+                    app:tint="@color/colorMainTheme" />
+
+            </RelativeLayout>
+            -->
+
+        </LinearLayout>
+
+    </ScrollView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

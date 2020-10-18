@@ -1,6 +1,5 @@
 package com.dzteam.UniExPlayer.Components;
 
-import android.Manifest;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.database.Cursor;
@@ -11,7 +10,6 @@ import android.provider.MediaStore;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.RequiresPermission;
 
 import com.dzteam.UniExPlayer.R;
 
@@ -34,7 +32,7 @@ public class LoadInternalMedia implements Runnable {
 
     public LoadInternalMedia(@NonNull Context context){
         setContentResolver(context.getContentResolver());
-        defaultIcon = BitmapFactory.decodeResource(context.getResources(), R.raw.logo10_15_82143);
+        defaultIcon = BitmapFactory.decodeResource(context.getResources(), R.raw.default_media_icon);
     }
 
     public void setOnDoneListener(OnDoneListener onDoneListener) { this.onDoneListener = onDoneListener; }

@@ -142,7 +142,7 @@ public class PlayerService extends MediaBrowserServiceCompat implements PlayerCo
                 .setStyle(new androidx.media.app.NotificationCompat.MediaStyle()
                         .setMediaSession(playerCore.getMediaSession().getSessionToken())
                         .setShowActionsInCompactView(1, 2, 3))
-                .setLargeIcon(BitmapFactory.decodeResource(getResources(), R.raw.ic_track_media))
+                .setLargeIcon(BitmapFactory.decodeResource(getResources(), R.raw.default_media_icon))
                 .addAction(rewindAction)
                 .addAction(skipToPreviousAction)
                 .addAction(pauseAction)

@@ -2,6 +2,7 @@
 <androidx.coordinatorlayout.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
@@ -68,18 +69,30 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <ImageView
-                android:id="@+id/media_info_art"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:layout_alignParentStart="true"/>
+            <androidx.cardview.widget.CardView
+                android:id="@+id/media_info_art_card"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                app:cardBackgroundColor="@android:color/transparent"
+                app:cardElevation="0dp"
+                app:cardCornerRadius="24dp"
+                android:layout_margin="1dp"
+                android:layout_alignParentStart="true">
+
+                <ImageView
+                    android:id="@+id/media_info_art"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:scaleType="centerCrop"/>
+
+            </androidx.cardview.widget.CardView>
 
             <LinearLayout
                 android:id="@+id/media_info"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
-                android:layout_toEndOf="@+id/media_info_art"
+                android:layout_toEndOf="@+id/media_info_art_card"
                 android:layout_toStartOf="@id/media_actions"
                 android:orientation="vertical"
                 android:layout_marginStart="5dp"
@@ -160,6 +173,30 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"/>
 
+
+    </FrameLayout>
+
+    <FrameLayout
+        android:id="@+id/volume_panel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="?attr/actionBarSize"
+        android:alpha="0"
+        android:visibility="gone"
+
+        style="@style/Widget.MaterialComponents.ExtendedFloatingActionButton">
+
+        <com.github.stefanodp91.android.circularseekbar.CircularSeekBar
+            android:id="@+id/volume_panel_controller"
+            android:layout_width="170dp"
+            android:layout_height="170dp"
+            android:layout_gravity="center"
+            android:textAlignment="center"
+            app:cs_text_size="18sp"
+            app:cs_dynamic_text_color="true"
+            app:cs_arcRadius="70dp"
+            app:cs_text="10"/>
 
     </FrameLayout>
 
