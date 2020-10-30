@@ -4,7 +4,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fitsSystemWindows="true"
+    android:fitsSystemWindows="false"
     android:background="@android:color/white"
     android:id="@+id/mainView">
 
@@ -60,6 +60,7 @@
         app:behavior_peekHeight="55dp"
         app:layout_dodgeInsetEdges="all"
         android:focusableInTouchMode="true"
+        android:elevation="4dp"
         android:focusable="true"
         android:clickable="true">
 

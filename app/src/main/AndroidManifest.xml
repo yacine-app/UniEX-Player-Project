@@ -1,6 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="com.dzteam.UniExPlayer"
+    package="com.yacineApp.uniEXMusic"
     android:installLocation="auto"
     android:isFeatureSplit="false"
     android:sharedUserId="com.dzteam.UniEXPlayer"
@@ -31,11 +31,12 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="false"
         android:theme="@style/AppTheme"
+        android:hardwareAccelerated="true"
         android:requestLegacyExternalStorage="true"
         android:fullBackupContent="@xml/backup_descriptor"
-        android:name=".ApplicationSetup">
+        android:name="com.yacineApp.uniEXMusic.ApplicationSetup">
 
-        <activity android:name=".Activities.StartUpActivity"
+        <activity android:name="com.yacineApp.uniEXMusic.Activities.StartUpActivity"
             android:launchMode="singleTask"
             android:theme="@style/AppTheme"
             android:configChanges="screenSize|orientation|screenLayout|smallestScreenSize|mcc|mnc|layoutDirection|keyboardHidden|keyboard|touchscreen|density|fontScale|locale|navigation|uiMode|colorMode">
@@ -46,18 +47,19 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".Activities.MainActivity"
-            android:launchMode="singleTask"
+        <activity android:name="com.yacineApp.uniEXMusic.Activities.MainActivity"
+            android:launchMode="singleTop"
+            android:hardwareAccelerated="true"
             android:configChanges="screenSize|orientation|screenLayout|smallestScreenSize|mcc|mnc|layoutDirection|keyboardHidden|keyboard|touchscreen|density|fontScale|locale|navigation|uiMode|colorMode"
             android:theme="@style/AppTheme">
 
         </activity>
 
-        <activity android:name=".Activities.AboutActivity">
+        <activity android:name="com.yacineApp.uniEXMusic.Activities.AboutActivity">
 
         </activity>
 
-        <activity android:name=".Activities.SettingsActivity">
+        <activity android:name="com.yacineApp.uniEXMusic.Activities.SettingsActivity">
 
         </activity>
 
@@ -67,14 +69,14 @@
             </intent-filter>
         </receiver>
 
-        <receiver android:name=".Receivers.MediaControlReceiver">
+        <receiver android:name="com.yacineApp.uniEXMusic.Receivers.MediaControlReceiver">
             <intent-filter>
                 <action android:name="android.media.AUDIO_BECOMING_NOISY"/>
                 <action android:name="android.intent.action.HEADSET_PLUG"/>
             </intent-filter>
         </receiver>
 
-        <service android:name=".Services.PlayerService"
+        <service android:name="com.yacineApp.uniEXMusic.Services.PlayerService"
             android:exported="true"
             android:label="@string/uniex_playback_service_label"
             android:foregroundServiceType="mediaPlayback"

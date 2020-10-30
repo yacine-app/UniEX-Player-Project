@@ -1,2 +1,2 @@
 include ':app'
-rootProject.name = "UniEX Player"
+rootProject.name = "UniEX Music"

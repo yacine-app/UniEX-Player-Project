@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/test">
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_alignParentStart="true"
+        android:layout_marginStart="15dp"
+        android:layout_centerVertical="true"
+        android:layout_toStartOf="@id/media_art_notification">
+
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
+                android:layout_toStartOf="@id/close_action_notification"
+                android:gravity="center_vertical"
+                tools:ignore="UseCompoundDrawables">
+
+                <ImageView
+                    android:layout_width="19dp"
+                    android:layout_height="19dp"
+                    android:src="@drawable/ic_notification_uniex_logo"/>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/app_name"
+                    android:textSize="13sp"
+                    android:gravity="center_vertical" />
+
+            </LinearLayout>
+
+            <ImageButton
+                android:id="@+id/close_action_notification"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_alignParentEnd="true"
+                android:layout_marginEnd="20dp"
+                android:background="@drawable/ic_close_action_icon"/>
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/media_title_notification"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="marquee"
+                android:singleLine="true"
+                android:scrollHorizontally="false"
+                android:marqueeRepeatLimit="marquee_forever"
+                android:layout_alignParentEnd="true"
+                android:textSize="16sp"
+                android:text="@string/unknown_media_info">
+
+                <requestFocus />
+
+            </TextView>
+
+            <TextView
+                android:id="@+id/media_artist_notification"
+                android:layout_width="match_parent"
+                android:layout_height="30dp"
+                android:gravity="center_vertical"
+                android:layout_below="@id/media_title_notification"
+                android:layout_alignParentStart="true"
+                android:singleLine="true"
+                android:text="@string/unknown_media_info"/>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_centerHorizontal="true"
+                android:layout_below="@id/media_artist_notification">
+
+                <ImageButton
+                    android:id="@+id/rewind_action_notification"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:src="@drawable/ic_rewind_icon"
+                    android:background="@android:color/transparent"/>
+
+                <ImageButton
+                    android:id="@+id/skip_to_previous_action_notification"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_marginStart="10dp"
+                    android:src="@drawable/ic_backward_icon"
+                    android:background="@android:color/transparent"/>
+
+                <ImageButton
+                    android:id="@+id/play_pause_action_notification"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginEnd="10dp"
+                    android:src="@drawable/ic_play_icon"
+                    android:background="@android:color/transparent"/>
+
+                <ImageButton
+                    android:id="@+id/skip_to_next_action_notification"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:src="@drawable/ic_forward_icon"
+                    android:layout_marginEnd="10dp"
+                    android:background="@android:color/transparent" />
+
+                <ImageButton
+                    android:id="@+id/fast_forward_action_notification"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:src="@drawable/ic_seek_forward_icon"
+                    android:background="@android:color/transparent"/>
+
+            </LinearLayout>
+
+        </RelativeLayout>
+
+    </LinearLayout>
+
+    <ImageView
+        android:id="@+id/media_art_notification"
+        android:layout_width="130dp"
+        android:layout_height="130dp"
+        android:scaleType="centerCrop"
+        android:src="@drawable/logo_start_splash_screen"
+        android:layout_alignParentEnd="true"/>
+
+</RelativeLayout>
