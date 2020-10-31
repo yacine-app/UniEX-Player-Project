@@ -3,6 +3,7 @@ package com.yacineApp.uniEXMusic.components;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.provider.MediaStore;
@@ -70,7 +71,7 @@ public class MediaInfo {
             if (this.rawArt != null)
                 this.art = BitmapFactory.decodeByteArray(this.rawArt, 0, this.rawArt.length, options);
             else this.art = def;
-            this.colorResult = ColorPicker.valueOf(this.art);
+            this.colorResult = this.rawArt != null ? ColorPicker.valueOf(this.art) : ColorPicker.valueOf(0x0FFEF9A7E, 0x0FF040404);
             retriever.close();
         }catch (NoSuchMethodError e){
             Log.e(this.getClass().getName(), "Error: ", e);

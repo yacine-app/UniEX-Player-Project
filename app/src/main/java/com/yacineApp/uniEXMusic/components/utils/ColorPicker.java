@@ -1,6 +1,7 @@
 package com.yacineApp.uniEXMusic.components.utils;
 
 import android.graphics.Bitmap;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 
@@ -15,6 +16,7 @@ public class ColorPicker {
     public static class ColorResult {
         private int highColor, lowColor;
         private boolean isLight;
+        private ColorResult(){}
         private ColorResult(@NonNull int[] a){
             //TODO
             Arrays.sort(a);
@@ -28,9 +30,10 @@ public class ColorPicker {
                         b++;
                         if (i + 1 >= a.length) break;
                     }
-                }catch (ArrayIndexOutOfBoundsException e){ break; }
+                }catch (ArrayIndexOutOfBoundsException e){ }
                 l[v] = new int[]{a[i++], b};
             }
+            l = Arrays.copyOf(l, v);
             Arrays.sort(l, new Comparator<int[]>() {
                 @Override
                 public int compare(int[] o1, int[] o2) {
@@ -54,8 +57,17 @@ public class ColorPicker {
         float r = ((color >> 24) & 0xFF);
         float g = ((color >> 16) & 0xFF);
         float b = ((color >>  8) & 0xFF);
-        float l = r * 0.2126f + g * 0.7152f + b * 0.0722f;
-        return l <= 168.0f;
+        float l = (r * 299.0f + g * 587.0f + b * 114.0f) / 1000.0f;
+        return l <= 169.5f;
+    }
+
+    @NonNull
+    public static ColorResult valueOf(int highColor, int lowColor){
+        ColorResult colorResult = new ColorResult();
+        colorResult.isLight = isLightColor(highColor);
+        colorResult.highColor = highColor;
+        colorResult.lowColor = lowColor;
+        return colorResult;
     }
 
     @NonNull
@@ -77,7 +89,11 @@ public class ColorPicker {
             for(;i < colors.length;i++) {
                 final int color = bitmap.getPixel(i % bitmap.getWidth(), i / bitmap.getHeight());
                 float a = ((color >> 24) & 0xFF) / 255.0f;
-                if(a >= 0.9f) colors[i] = color;
+
+                if(a == 1.0f){
+                    colors[i] = color;
+                    Log.e("ssfbheok", String.valueOf(color));
+                }
             }
             if(onDoneListener != null) onDoneListener.onDone(new ColorResult(colors));
             bitmap.recycle();
@@ -85,7 +101,7 @@ public class ColorPicker {
     };
 
     public ColorPicker(@NonNull Bitmap image){
-        bitmap = Bitmap.createScaledBitmap(image, 68, 68, true);
+        bitmap = Bitmap.createScaledBitmap(image, 82, 82, true);
         this.colors = new int[bitmap.getWidth() * bitmap.getHeight()];
         this.thread = new Thread(runnable);
     }

@@ -649,7 +649,7 @@ public class MainActivity extends UniEXActivity.UniEXMusicActivity implements Vi
         frameTitle.setSelected(true);
         mediaTitle.setSelected(true);
         int l = metaData.getColorResult().getHighColor();
-        int[] r = new int[]{0x0FFFFFFFF, l};
+        int[] r = new int[]{Color.WHITE, l};
         circleLineVisualizer.setColor(l);
         if(ColorPicker.isLightColor(l)){
             if(bottomSheetBehavior.getState() != BottomSheetBehavior.STATE_COLLAPSED) getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
@@ -662,6 +662,7 @@ public class MainActivity extends UniEXActivity.UniEXMusicActivity implements Vi
             frameArtist.setTextColor(Color.LTGRAY);
             frameCurrentTime.setTextColor(Color.LTGRAY);
             frameDuration.setTextColor(Color.LTGRAY);
+            circularSeekBar.setColorList(new int[]{Color.LTGRAY, Color.LTGRAY});
             //Toast.makeText(getApplicationContext(), "Light", Toast.LENGTH_SHORT).show();
         }else{
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -676,6 +677,7 @@ public class MainActivity extends UniEXActivity.UniEXMusicActivity implements Vi
             frameArtist.setTextColor(Color.DKGRAY);
             frameCurrentTime.setTextColor(Color.DKGRAY);
             frameDuration.setTextColor(Color.DKGRAY);
+            circularSeekBar.setColorList(new int[]{Color.DKGRAY, Color.DKGRAY});
         }
         GradientDrawable gradientDrawable = new GradientDrawable(GradientDrawable.Orientation.TL_BR,
                 r);
