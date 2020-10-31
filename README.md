@@ -14,6 +14,7 @@ this project is for learning purposes.
  * change package name from "com.dzteam.UniExPlayer" to "com.yacineApp.uniEXMusic".
  * bug fixes and performance improvements.
  * change from default android media style notification to a custom view.
+ * add change app color depends on media art ( still testing ).
 
 ### v0.0.1-alpha.2:
 #### Download link:
