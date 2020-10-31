@@ -14,7 +14,7 @@ public class ColorPicker {
 
     public static class ColorResult {
         private int highColor, lowColor;
-        private boolean isLight = false;
+        private boolean isLight;
         private ColorResult(@NonNull int[] a){
             //TODO
             Arrays.sort(a);
