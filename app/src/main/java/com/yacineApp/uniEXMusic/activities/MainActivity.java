@@ -13,6 +13,7 @@ import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
 import android.media.AudioManager;
 import android.media.audiofx.AudioEffect;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -663,7 +664,9 @@ public class MainActivity extends UniEXActivity.UniEXMusicActivity implements Vi
             frameDuration.setTextColor(Color.LTGRAY);
             //Toast.makeText(getApplicationContext(), "Light", Toast.LENGTH_SHORT).show();
         }else{
-            getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR | View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR | View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
+            }else getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
             if(playerService.isPlaying()) playPauseFrame.setBackgroundResource(R.drawable.ic_pause_action_icon);
             else playPauseFrame.setBackgroundResource(R.drawable.ic_play_action_icon);
             skipToNextFrame.setBackgroundResource(R.drawable.ic_skip_to_next_action_icon);
@@ -720,7 +723,7 @@ public class MainActivity extends UniEXActivity.UniEXMusicActivity implements Vi
                 frameActionBar.animate().alpha(1.0f).start();
                 mainActionBar.setVisibility(View.GONE);
                 if(mediaInfo != null){
-                    if(mediaInfo.getColorResult().isLightColor() && windowDisplayView.getRotation() != Surface.ROTATION_270){
+                    if(mediaInfo.getColorResult().isLightColor() && windowDisplayView.getRotation() != Surface.ROTATION_270 || Build.VERSION.SDK_INT < Build.VERSION_CODES.O){
                         getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
                     }
                     else {
@@ -742,7 +745,9 @@ public class MainActivity extends UniEXActivity.UniEXMusicActivity implements Vi
                 frameActionBar.animate().alpha(0.0f).start();
                 circleLineVisualizer.release();
                 circularSeekBarChanging = true;
-                getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR | View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR | View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
+                }
                 setSupportActionBar(mainActionBar);
                 break;
             case BottomSheetBehavior.STATE_DRAGGING:
@@ -751,7 +756,9 @@ public class MainActivity extends UniEXActivity.UniEXMusicActivity implements Vi
                 mediaController.setVisibility(View.VISIBLE);
                 frameActionBar.setVisibility(View.VISIBLE);
                 includedLayout.setVisibility(View.VISIBLE);
-                getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR | View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR | View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
+                }
                 break;
         }
     }
