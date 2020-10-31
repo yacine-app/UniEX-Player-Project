@@ -1,10 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="100dp"
-    android:background="@drawable/test">
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <ImageView
+        android:id="@+id/image_color_theme_notification"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="fitXY"
+        android:src="@drawable/test"/>
 
     <LinearLayout
         android:layout_width="wrap_content"
@@ -31,11 +37,14 @@
                 tools:ignore="UseCompoundDrawables">
 
                 <ImageView
+                    android:id="@+id/app_name_icon_notification"
                     android:layout_width="19dp"
                     android:layout_height="19dp"
-                    android:src="@drawable/ic_notification_uniex_logo"/>
+                    android:src="@drawable/ic_notification_uniex_logo"
+                    app:tint="?android:textColor" />
 
                 <TextView
+                    android:id="@+id/app_name_notification"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="@string/app_name"
@@ -89,7 +98,7 @@
                 android:id="@+id/skip_to_previous_action_notification"
                 android:layout_width="30dp"
                 android:layout_height="30dp"
-                android:src="@drawable/ic_backward_icon"
+                android:src="@drawable/ic_skip_to_previous_action_icon"
                 android:background="@android:color/transparent"
                 android:layout_below="@id/media_title_notification"
                 android:layout_toStartOf="@id/play_pause_action_notification"/>
@@ -100,7 +109,7 @@
                 android:layout_height="30dp"
                 android:layout_marginStart="10dp"
                 android:layout_marginEnd="10dp"
-                android:src="@drawable/ic_play_icon"
+                android:src="@drawable/ic_play_action_icon"
                 android:background="@android:color/transparent"
                 android:layout_below="@id/media_title_notification"
                 android:layout_toStartOf="@id/skip_to_next_action_notification"/>
@@ -109,7 +118,7 @@
                 android:id="@+id/skip_to_next_action_notification"
                 android:layout_width="30dp"
                 android:layout_height="30dp"
-                android:src="@drawable/ic_forward_icon"
+                android:src="@drawable/ic_skip_to_next_action_icon"
                 android:layout_below="@id/media_title_notification"
                 android:background="@android:color/transparent"
                 android:layout_marginEnd="20dp"

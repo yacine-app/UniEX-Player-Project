@@ -36,7 +36,7 @@
         android:fullBackupContent="@xml/backup_descriptor"
         android:name="com.yacineApp.uniEXMusic.ApplicationSetup">
 
-        <activity android:name="com.yacineApp.uniEXMusic.Activities.StartUpActivity"
+        <activity android:name="com.yacineApp.uniEXMusic.activities.StartUpActivity"
             android:launchMode="singleTask"
             android:theme="@style/AppTheme"
             android:configChanges="screenSize|orientation|screenLayout|smallestScreenSize|mcc|mnc|layoutDirection|keyboardHidden|keyboard|touchscreen|density|fontScale|locale|navigation|uiMode|colorMode">
@@ -47,7 +47,7 @@
             </intent-filter>
         </activity>
 
-        <activity android:name="com.yacineApp.uniEXMusic.Activities.MainActivity"
+        <activity android:name="com.yacineApp.uniEXMusic.activities.MainActivity"
             android:launchMode="singleTop"
             android:hardwareAccelerated="true"
             android:configChanges="screenSize|orientation|screenLayout|smallestScreenSize|mcc|mnc|layoutDirection|keyboardHidden|keyboard|touchscreen|density|fontScale|locale|navigation|uiMode|colorMode"
@@ -55,11 +55,11 @@
 
         </activity>
 
-        <activity android:name="com.yacineApp.uniEXMusic.Activities.AboutActivity">
+        <activity android:name="com.yacineApp.uniEXMusic.activities.AboutActivity">
 
         </activity>
 
-        <activity android:name="com.yacineApp.uniEXMusic.Activities.SettingsActivity">
+        <activity android:name="com.yacineApp.uniEXMusic.activities.SettingsActivity">
 
         </activity>
 
@@ -69,14 +69,14 @@
             </intent-filter>
         </receiver>
 
-        <receiver android:name="com.yacineApp.uniEXMusic.Receivers.MediaControlReceiver">
+        <receiver android:name="com.yacineApp.uniEXMusic.receivers.MediaControlReceiver">
             <intent-filter>
                 <action android:name="android.media.AUDIO_BECOMING_NOISY"/>
                 <action android:name="android.intent.action.HEADSET_PLUG"/>
             </intent-filter>
         </receiver>
 
-        <service android:name="com.yacineApp.uniEXMusic.Services.PlayerService"
+        <service android:name="com.yacineApp.uniEXMusic.services.PlayerService"
             android:exported="true"
             android:label="@string/uniex_playback_service_label"
             android:foregroundServiceType="mediaPlayback"

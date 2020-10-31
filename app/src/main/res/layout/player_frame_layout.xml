@@ -132,7 +132,7 @@
             android:id="@+id/skip_to_previous_frame"
             android:layout_width="50dp"
             android:layout_height="50dp"
-            android:background="@drawable/ic_backward_icon"
+            android:background="@drawable/ic_skip_to_previous_action_icon"
             android:layout_toStartOf="@id/seek_circular_bar_frame_layout"
             android:layout_centerVertical="true"
             style="@style/Widget.AppCompat.ActionButton"/>
@@ -159,7 +159,7 @@
             android:layout_width="80dp"
             android:layout_height="80dp"
             android:layout_centerInParent="true"
-            android:background="@drawable/ic_play_icon"
+            android:background="@drawable/ic_play_action_icon"
             style="@style/Widget.AppCompat.ActionButton"/>
 
         <ImageButton
@@ -168,7 +168,7 @@
             android:layout_height="50dp"
             android:layout_centerVertical="true"
             android:layout_toEndOf="@id/seek_circular_bar_frame_layout"
-            android:background="@drawable/ic_forward_icon"
+            android:background="@drawable/ic_skip_to_next_action_icon"
             style="@style/Widget.AppCompat.ActionButton"/>
 
         <ImageButton

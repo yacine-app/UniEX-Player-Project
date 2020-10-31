@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@android:color/white"
-    android:fitsSystemWindows="false"
+    android:fitsSystemWindows="true"
     android:id="@+id/mainView">
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -142,21 +142,21 @@
                         android:id="@+id/skip_to_previous"
                         android:layout_width="50dp"
                         android:layout_height="50dp"
-                        android:src="@drawable/ic_backward_icon"
+                        android:src="@drawable/ic_skip_to_previous_action_icon"
                         style="@style/Widget.MaterialComponents.ExtendedFloatingActionButton.Icon"/>
 
                     <ImageButton
                         android:id="@+id/play_pause"
                         android:layout_width="50dp"
                         android:layout_height="50dp"
-                        android:src="@drawable/ic_play_icon"
+                        android:src="@drawable/ic_play_action_icon"
                         style="@style/Widget.MaterialComponents.ExtendedFloatingActionButton.Icon"/>
 
                     <ImageButton
                         android:id="@+id/skip_to_next"
                         android:layout_width="50dp"
                         android:layout_height="50dp"
-                        android:src="@drawable/ic_forward_icon"
+                        android:src="@drawable/ic_skip_to_next_action_icon"
                         style="@style/Widget.MaterialComponents.ExtendedFloatingActionButton.Icon"/>
 
                 </LinearLayout>

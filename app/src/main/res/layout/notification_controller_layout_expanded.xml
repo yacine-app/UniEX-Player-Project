@@ -1,10 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:background="@drawable/test">
+    android:layout_height="wrap_content">
+
+    <ImageView
+        android:id="@+id/image_color_theme_notification"
+        android:layout_width="match_parent"
+        android:layout_height="130dp"
+        android:scaleType="fitXY"
+        android:src="@drawable/test"/>
 
     <LinearLayout
         android:layout_width="wrap_content"
@@ -30,11 +37,14 @@
                 tools:ignore="UseCompoundDrawables">
 
                 <ImageView
+                    android:id="@+id/app_name_icon_notification"
                     android:layout_width="19dp"
                     android:layout_height="19dp"
-                    android:src="@drawable/ic_notification_uniex_logo"/>
+                    android:src="@drawable/ic_notification_uniex_logo"
+                    app:tint="?android:textColor" />
 
                 <TextView
+                    android:id="@+id/app_name_notification"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="@string/app_name"
@@ -94,7 +104,7 @@
                     android:id="@+id/rewind_action_notification"
                     android:layout_width="30dp"
                     android:layout_height="30dp"
-                    android:src="@drawable/ic_rewind_icon"
+                    android:src="@drawable/ic_rewind_action_icon"
                     android:background="@android:color/transparent"/>
 
                 <ImageButton
@@ -102,7 +112,7 @@
                     android:layout_width="30dp"
                     android:layout_height="30dp"
                     android:layout_marginStart="10dp"
-                    android:src="@drawable/ic_backward_icon"
+                    android:src="@drawable/ic_skip_to_previous_action_icon"
                     android:background="@android:color/transparent"/>
 
                 <ImageButton
@@ -111,14 +121,14 @@
                     android:layout_height="30dp"
                     android:layout_marginStart="10dp"
                     android:layout_marginEnd="10dp"
-                    android:src="@drawable/ic_play_icon"
+                    android:src="@drawable/ic_play_action_icon"
                     android:background="@android:color/transparent"/>
 
                 <ImageButton
                     android:id="@+id/skip_to_next_action_notification"
                     android:layout_width="30dp"
                     android:layout_height="30dp"
-                    android:src="@drawable/ic_forward_icon"
+                    android:src="@drawable/ic_skip_to_next_action_icon"
                     android:layout_marginEnd="10dp"
                     android:background="@android:color/transparent" />
 
@@ -126,7 +136,7 @@
                     android:id="@+id/fast_forward_action_notification"
                     android:layout_width="30dp"
                     android:layout_height="30dp"
-                    android:src="@drawable/ic_seek_forward_icon"
+                    android:src="@drawable/ic_fast_forward_action_icon"
                     android:background="@android:color/transparent"/>
 
             </LinearLayout>

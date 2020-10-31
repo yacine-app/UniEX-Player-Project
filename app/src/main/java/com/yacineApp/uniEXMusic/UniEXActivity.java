@@ -24,6 +24,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.media.session.MediaButtonReceiver;
 
+import com.yacineApp.uniEXMusic.components.utils.ColorPicker;
+
 public abstract class UniEXActivity extends AppCompatActivity {
 
     private View currentContentView;
