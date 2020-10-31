@@ -2,6 +2,7 @@ package com.yacineApp.uniEXMusic.components.utils;
 
 import android.graphics.Bitmap;
 
+import androidx.annotation.ColorInt;
 import androidx.annotation.NonNull;
 
 import java.util.Arrays;
@@ -44,7 +45,9 @@ public class ColorPicker {
             isLight = ColorPicker.isLightColor(this.highColor);
         }
         @SuppressWarnings("unused")
+        @ColorInt
         public int getLowColor() { return lowColor; }
+        @ColorInt
         public int getHighColor() { return highColor; }
         public boolean isLightColor() { return isLight; }
     }
@@ -53,7 +56,7 @@ public class ColorPicker {
         void onDone(ColorResult colorResult);
     }
 
-    public static boolean isLightColor(int color){
+    public static boolean isLightColor(@ColorInt int color){
         float r = ((color >> 24) & 0xFF);
         float g = ((color >> 16) & 0xFF);
         float b = ((color >>  8) & 0xFF);
@@ -62,7 +65,7 @@ public class ColorPicker {
     }
 
     @NonNull
-    public static ColorResult valueOf(int highColor, int lowColor){
+    public static ColorResult valueOf(@ColorInt int highColor, @ColorInt int lowColor){
         ColorResult colorResult = new ColorResult();
         colorResult.isLight = isLightColor(highColor);
         colorResult.highColor = highColor;

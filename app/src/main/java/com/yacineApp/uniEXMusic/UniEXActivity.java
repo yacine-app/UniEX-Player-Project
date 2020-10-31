@@ -82,7 +82,7 @@ public abstract class UniEXActivity extends AppCompatActivity {
                 case Surface.ROTATION_0:
                     activityInsetsRect.top = addTop;
                 case Surface.ROTATION_180:
-                    activityInsetsRect.bottom = navHeight + addBottom;
+                    activityInsetsRect.bottom = navBarShown ? navHeight + addBottom : 0;
                     break;
                 case Surface.ROTATION_90:
                     activityInsetsRect.top = (displayCutout != null? addTop : 0) + statusHeight;
