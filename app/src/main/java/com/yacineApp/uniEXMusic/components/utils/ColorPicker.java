@@ -1,7 +1,6 @@
 package com.yacineApp.uniEXMusic.components.utils;
 
 import android.graphics.Bitmap;
-import android.util.Log;
 
 import androidx.annotation.NonNull;
 
@@ -30,7 +29,7 @@ public class ColorPicker {
                         b++;
                         if (i + 1 >= a.length) break;
                     }
-                }catch (ArrayIndexOutOfBoundsException e){ }
+                }catch (ArrayIndexOutOfBoundsException ignored){ }
                 l[v] = new int[]{a[i++], b};
             }
             l = Arrays.copyOf(l, v);
@@ -44,6 +43,7 @@ public class ColorPicker {
             highColor = l[80 * v / 100][0];
             isLight = ColorPicker.isLightColor(this.highColor);
         }
+        @SuppressWarnings("unused")
         public int getLowColor() { return lowColor; }
         public int getHighColor() { return highColor; }
         public boolean isLightColor() { return isLight; }
@@ -89,11 +89,7 @@ public class ColorPicker {
             for(;i < colors.length;i++) {
                 final int color = bitmap.getPixel(i % bitmap.getWidth(), i / bitmap.getHeight());
                 float a = ((color >> 24) & 0xFF) / 255.0f;
-
-                if(a == 1.0f){
-                    colors[i] = color;
-                    Log.e("ssfbheok", String.valueOf(color));
-                }
+                if(a == 1.0f) colors[i] = color;
             }
             if(onDoneListener != null) onDoneListener.onDone(new ColorResult(colors));
             bitmap.recycle();
@@ -105,6 +101,8 @@ public class ColorPicker {
         this.colors = new int[bitmap.getWidth() * bitmap.getHeight()];
         this.thread = new Thread(runnable);
     }
+    @SuppressWarnings("unused")
     public synchronized void start(){ thread.start(); }
+    @SuppressWarnings("unused")
     public void setOnDoneListener(OnDoneListener onDoneListener) { this.onDoneListener = onDoneListener; }
 }
