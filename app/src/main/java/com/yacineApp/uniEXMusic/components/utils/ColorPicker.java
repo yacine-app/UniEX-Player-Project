@@ -85,7 +85,7 @@ public class ColorPicker {
     };
 
     public ColorPicker(@NonNull Bitmap image){
-        bitmap = Bitmap.createScaledBitmap(image, 125, 125, true);
+        bitmap = Bitmap.createScaledBitmap(image, 68, 68, true);
         this.colors = new int[bitmap.getWidth() * bitmap.getHeight()];
         this.thread = new Thread(runnable);
     }
