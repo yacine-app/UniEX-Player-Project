@@ -9,14 +9,25 @@ import java.util.Arrays;
 import java.util.Comparator;
 
 /**
- * ColorPicker from image source
+ * ColorPicker from image source.
+ * @author yacine-app
+ * @version 1.0
+ * @see ColorInt
  */
 public class ColorPicker {
 
+    /**
+     * ColorResult that gives the most and the least color that are used within bitmap image source.
+     */
     public static class ColorResult {
         private int highColor, lowColor;
         private boolean isLight;
         private ColorResult(){}
+
+        /**
+         *
+         * @param a is an colors array that is returned from image pixels.
+         */
         private ColorResult(@NonNull int[] a){
             //TODO
             Arrays.sort(a);
@@ -44,18 +55,42 @@ public class ColorPicker {
             highColor = l[80 * v / 100][0];
             isLight = ColorPicker.isLightColor(this.highColor);
         }
+
+        /**
+         *
+         * @return int the least color that is in image source from its colors array.
+         */
         @SuppressWarnings("unused")
         @ColorInt
         public int getLowColor() { return lowColor; }
+        /**
+         *
+         * @return int the most color that is in image source from its colors array.
+         */
         @ColorInt
         public int getHighColor() { return highColor; }
+        /**
+         *
+         * @return boolean get if the color is light or no.
+         */
         public boolean isLightColor() { return isLight; }
     }
 
     public interface OnDoneListener {
+        /**
+         *
+         * @param colorResult color result from ColorPicker.
+         * @see ColorResult
+         */
         void onDone(ColorResult colorResult);
     }
 
+    /**
+     * get if color given is light or no.
+     * @param color color set as integer.
+     * @return return true if color is light or false if no so.
+     * @see ColorInt
+     */
     public static boolean isLightColor(@ColorInt int color){
         float r = ((color >> 24) & 0xFF);
         float g = ((color >> 16) & 0xFF);
@@ -64,6 +99,14 @@ public class ColorPicker {
         return l <= 169.5f;
     }
 
+    /**
+     * get the ColorResult from given high or low color that you choose.
+     * @param highColor set the high color to create ColorResult.
+     * @param lowColor set the low color to create ColorResult.
+     * @return return ColorResult from given high or low color that you choose.
+     * @see ColorResult
+     * @see ColorInt
+     */
     @NonNull
     public static ColorResult valueOf(@ColorInt int highColor, @ColorInt int lowColor){
         ColorResult colorResult = new ColorResult();
@@ -73,6 +116,13 @@ public class ColorPicker {
         return colorResult;
     }
 
+    /**
+     * get the ColorResult from given bitmap source.
+     * @param bitmap set the high color to create ColorResult.
+     * @return return ColorResult from given bitmap source.
+     * @see ColorResult
+     * @see Bitmap
+     */
     @NonNull
     public static ColorResult valueOf(@NonNull Bitmap bitmap){
         ColorPicker colorPicker = new ColorPicker(bitmap);
@@ -99,6 +149,12 @@ public class ColorPicker {
         }
     };
 
+    /**
+     * ColorPicker class that return ColorResult class from given bitmap source, and run it into an other thread after you call start() method.
+     * @param image bitmap source to pick color from it.
+     * @see ColorResult
+     * @see Bitmap
+     */
     public ColorPicker(@NonNull Bitmap image){
         bitmap = Bitmap.createScaledBitmap(image, 82, 82, true);
         this.colors = new int[bitmap.getWidth() * bitmap.getHeight()];
@@ -106,6 +162,12 @@ public class ColorPicker {
     }
     @SuppressWarnings("unused")
     public synchronized void start(){ thread.start(); }
+
+    /**
+     * @param onDoneListener set onDone listener that's called back when done picking color.
+     * @see OnDoneListener
+     * @see ColorResult
+     */
     @SuppressWarnings("unused")
     public void setOnDoneListener(OnDoneListener onDoneListener) { this.onDoneListener = onDoneListener; }
 }
