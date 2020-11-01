@@ -206,6 +206,7 @@ public class MainActivity extends UniEXActivity.UniEXMusicActivity implements Vi
         }
     };
 
+    @SuppressWarnings("unused")
     private Runnable runnable2 = new Runnable() {
         @Override
         public void run() {
@@ -630,6 +631,7 @@ public class MainActivity extends UniEXActivity.UniEXMusicActivity implements Vi
         loadInternalMedia.execute();
     }
 
+    @SuppressWarnings("deprecation")
     private void updateUi(@Nullable MediaInfo metaData){
         if(metaData == null)return;
         if(playerService.isPlaying()){
@@ -684,34 +686,9 @@ public class MainActivity extends UniEXActivity.UniEXMusicActivity implements Vi
         gradientDrawable.setGradientRadius(0.0f);
         includedLayout.setBackground(gradientDrawable);
         onLoopChangedListener.onChanged(playerService.getLoopState());
-        /*ColorPicker colorPicker = new ColorPicker(art);
-        colorPicker.setOnDoneListener(new ColorPicker.OnDoneListener() {
-            @Override
-            public void onDone(final ColorPicker.ColorResult colorResult) {
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        //frameActionBar.setBackgroundColor(colorResult.getLowColor());
-                        //mainActionBar.setBackgroundColor(colorResult.getHighColor());
-                        //Toast.makeText(getApplicationContext(), "Low Color: " + String.format("#%06X", colorResult.getLowColor()) + ", High Color: " + colorResult.getHighColor(), Toast.LENGTH_SHORT).show();
-                        int l = colorResult.getHighColor();
-                        int[] r = new int[]{0x0FFFFFFFF, l};
-                        circleLineVisualizer.setColor(l);
-                        if(ColorPicker.isLightColor(l)){
-                            getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
-                            Toast.makeText(getApplicationContext(), "Light", Toast.LENGTH_SHORT).show();
-                        }else getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR | View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
-                        GradientDrawable gradientDrawable = new GradientDrawable(GradientDrawable.Orientation.TL_BR,
-                                r);
-                        gradientDrawable.setGradientRadius(0.0f);
-                        includedLayout.setBackground(gradientDrawable);
-                    }
-                });
-            }
-        });
-        colorPicker.start();*/
     }
 
+    @SuppressWarnings("deprecation")
     private void organizeBottomSheet(int state){
         if(playerService == null)return;
         MediaInfo mediaInfo = playerService.getMediaInfo();

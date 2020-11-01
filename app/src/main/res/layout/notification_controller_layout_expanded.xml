@@ -18,6 +18,8 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:layout_alignParentStart="true"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"
         android:layout_marginStart="15dp"
         android:layout_centerVertical="true"
         android:layout_toStartOf="@id/media_art_notification">
@@ -59,7 +61,9 @@
                 android:layout_height="30dp"
                 android:layout_alignParentEnd="true"
                 android:layout_marginEnd="20dp"
-                android:background="@drawable/ic_close_action_icon"/>
+                android:scaleType="centerCrop"
+                android:src="@drawable/ic_close_action_icon"
+                android:background="?android:attr/selectableItemBackground"/>
 
         </RelativeLayout>
 
@@ -98,46 +102,52 @@
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:layout_centerHorizontal="true"
+                android:gravity="center_vertical"
                 android:layout_below="@id/media_artist_notification">
 
                 <ImageButton
                     android:id="@+id/rewind_action_notification"
-                    android:layout_width="30dp"
-                    android:layout_height="30dp"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:scaleType="centerCrop"
                     android:src="@drawable/ic_rewind_action_icon"
-                    android:background="@android:color/transparent"/>
+                    android:background="?android:attr/selectableItemBackground"/>
 
                 <ImageButton
                     android:id="@+id/skip_to_previous_action_notification"
-                    android:layout_width="30dp"
-                    android:layout_height="30dp"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
                     android:layout_marginStart="10dp"
+                    android:scaleType="centerCrop"
                     android:src="@drawable/ic_skip_to_previous_action_icon"
-                    android:background="@android:color/transparent"/>
+                    android:background="?android:attr/selectableItemBackground"/>
 
                 <ImageButton
                     android:id="@+id/play_pause_action_notification"
-                    android:layout_width="30dp"
-                    android:layout_height="30dp"
+                    android:layout_width="34dp"
+                    android:layout_height="34dp"
+                    android:scaleType="centerCrop"
                     android:layout_marginStart="10dp"
                     android:layout_marginEnd="10dp"
                     android:src="@drawable/ic_play_action_icon"
-                    android:background="@android:color/transparent"/>
+                    android:background="?android:attr/selectableItemBackground"/>
 
                 <ImageButton
                     android:id="@+id/skip_to_next_action_notification"
-                    android:layout_width="30dp"
-                    android:layout_height="30dp"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:scaleType="centerCrop"
                     android:src="@drawable/ic_skip_to_next_action_icon"
                     android:layout_marginEnd="10dp"
-                    android:background="@android:color/transparent" />
+                    android:background="?android:attr/selectableItemBackground"/>
 
                 <ImageButton
                     android:id="@+id/fast_forward_action_notification"
-                    android:layout_width="30dp"
-                    android:layout_height="30dp"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:scaleType="centerCrop"
                     android:src="@drawable/ic_fast_forward_action_icon"
-                    android:background="@android:color/transparent"/>
+                    android:background="?android:attr/selectableItemBackground"/>
 
             </LinearLayout>
 
@@ -151,6 +161,7 @@
         android:layout_height="130dp"
         android:scaleType="centerCrop"
         android:src="@drawable/logo_start_splash_screen"
+        android:background="#66FEFEFE"
         android:layout_alignParentEnd="true"/>
 
 </RelativeLayout>

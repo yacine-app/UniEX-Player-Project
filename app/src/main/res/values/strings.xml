@@ -19,12 +19,17 @@
     <string name="menu_action_settings">Settings</string>
     <string name="menu_action_open_source">Open Source</string>
     <string name="menu_action_licence">Licence</string>
+
     <string name="about_activity_text_first">UniEX Music created by yacine-app</string>
     <string name="about_activity_text_second">You can find me on:</string>
     <string name="about_activity_text_github">Github</string>
     <string name="about_activity_text_twitter">Twitter</string>
     <string name="about_activity_text_website">Website</string>
     <string name="about_activity_text_version">Version: %s</string>
+
+    <!--
+
+    -->
 
     <string name="about_activity_text_no_default_web_browser">No web browser was found!</string>
 

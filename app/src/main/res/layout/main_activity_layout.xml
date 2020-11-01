@@ -62,7 +62,8 @@
         app:behavior_peekHeight="55dp"
         android:focusableInTouchMode="true"
         android:focusable="true"
-        android:clickable="true">
+        android:clickable="true"
+        android:soundEffectsEnabled="false">
 
         <RelativeLayout
             android:id="@+id/media_controller"

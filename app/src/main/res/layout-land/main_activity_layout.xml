@@ -63,7 +63,8 @@
         android:focusableInTouchMode="true"
         android:elevation="4dp"
         android:focusable="true"
-        android:clickable="true">
+        android:clickable="true"
+        android:soundEffectsEnabled="false">
 
         <RelativeLayout
             android:id="@+id/media_controller"

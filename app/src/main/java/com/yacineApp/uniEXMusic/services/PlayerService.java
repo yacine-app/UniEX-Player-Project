@@ -1,6 +1,9 @@
 package com.yacineApp.uniEXMusic.services;
 
+import android.app.KeyguardManager;
 import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.ServiceInfo;
@@ -29,6 +32,7 @@ import androidx.media.session.MediaButtonReceiver;
 
 import com.yacineApp.uniEXMusic.activities.MainActivity;
 import com.yacineApp.uniEXMusic.ApplicationSetup;
+import com.yacineApp.uniEXMusic.activities.ScreenLockPlayerActivity;
 import com.yacineApp.uniEXMusic.components.MediaAdapterInfo;
 import com.yacineApp.uniEXMusic.components.MediaInfo;
 import com.yacineApp.uniEXMusic.components.PlayerCore;
@@ -41,6 +45,19 @@ import java.util.List;
 public class PlayerService extends MediaBrowserServiceCompat implements PlayerCore.ErrorListener {
 
     public class SBinder extends Binder { public PlayerService getService(){ return PlayerService.this; } }
+
+    public class CanLaunchLookScreenActivityReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if(intent == null || intent.getAction() == null) return;
+            try {
+                if (Intent.ACTION_SCREEN_ON.equals(intent.getAction())) {
+                    if (!keyguardManager.isKeyguardSecure() && isPlaying())
+                        PendingIntent.getActivity(context, 0, new Intent(context, ScreenLockPlayerActivity.class), PendingIntent.FLAG_UPDATE_CURRENT).send();
+                }
+            } catch (PendingIntent.CanceledException ignored) {}
+        }
+    }
 
     public static final int NOTIFICATION_ID = 0x058;
 
@@ -55,8 +72,10 @@ public class PlayerService extends MediaBrowserServiceCompat implements PlayerCo
     private boolean bound = false;
     private int[] loopStates = new int[]{PlayerCore.LOOP_STATE_ALL, PlayerCore.LOOP_STATE_ALL_REPEAT, PlayerCore.LOOP_STATE_ONE_REPEAT};
     private int currentLoopIndex = 0;
+    private KeyguardManager keyguardManager;
     private MediaControlReceiver mediaControlReceiver = new MediaControlReceiver();
-    private IntentFilter intentFilter = new IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY);
+    private IntentFilter intentFilterBecomeNoisy = new IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY);
+    private IntentFilter intentFilterScreenOn = new IntentFilter(Intent.ACTION_SCREEN_ON);
     private NotificationCompat.Builder notificationBuilder = null;
     private PlayerCore playerCore;
     private MediaAdapterInfo mediaAdapterInfo;
@@ -64,6 +83,7 @@ public class PlayerService extends MediaBrowserServiceCompat implements PlayerCo
     private List<MediaInfo> mediaInfoList;
     private PendingIntent rewindAction, skipToPreviousAction, playPauseAction, skipToNextAction, fastForwardAction, closeAction;
     private SBinder sBinder = new SBinder();
+    private CanLaunchLookScreenActivityReceiver screenOnReceiver = new CanLaunchLookScreenActivityReceiver();
     private MediaSessionCompat.Callback mediaCallBack = new MediaSessionCompat.Callback() {
 
         @Override
@@ -82,13 +102,17 @@ public class PlayerService extends MediaBrowserServiceCompat implements PlayerCo
         public void onPlay() {
             super.onPlay();
             updateNotification();
-            registerReceiver(mediaControlReceiver, intentFilter);
+            registerReceiver(mediaControlReceiver, intentFilterBecomeNoisy);
+            registerReceiver(screenOnReceiver, intentFilterScreenOn);
         }
 
         @Override
         public void onStop() {
             super.onStop();
-            try { unregisterReceiver(mediaControlReceiver); }
+            try {
+                unregisterReceiver(mediaControlReceiver);
+                unregisterReceiver(screenOnReceiver);
+            }
             catch (IllegalArgumentException e){
                 Log.e(this.getClass().getName(), "call Context#unregisterReceiver() ", e);
             }
@@ -131,6 +155,7 @@ public class PlayerService extends MediaBrowserServiceCompat implements PlayerCo
     @Override
     public void onCreate() {
         super.onCreate();
+        keyguardManager = (KeyguardManager) getSystemService(KEYGUARD_SERVICE);
         SERVICE_ALREADY_CREATED = true;
         playerCore = new PlayerCore(this);
         playerCore.setErrorListener(this);
@@ -255,7 +280,7 @@ public class PlayerService extends MediaBrowserServiceCompat implements PlayerCo
             collapsedRemoveView.setTextColor(R.id.media_title_notification, Color.WHITE);
             collapsedRemoveView.setTextColor(R.id.media_artist_notification, Color.WHITE);
             collapsedRemoveView.setTextColor(R.id.app_name_notification, Color.WHITE);
-            collapsedRemoveView.setInt(R.id.close_action_notification, "setBackgroundResource", R.drawable.ic_close_action_icon_holo_dark);
+            collapsedRemoveView.setImageViewResource(R.id.close_action_notification, R.drawable.ic_close_action_icon_holo_dark);
             collapsedRemoveView.setImageViewResource(R.id.skip_to_previous_action_notification, R.drawable.ic_skip_to_previous_action_icon_holo_dark);
             collapsedRemoveView.setImageViewResource(R.id.skip_to_next_action_notification, R.drawable.ic_skip_to_next_action_icon_holo_dark);
             collapsedRemoveView.setImageViewResource(R.id.app_name_icon_notification, R.drawable.ic_notification_uniex_logo_holo_dark);
@@ -264,7 +289,7 @@ public class PlayerService extends MediaBrowserServiceCompat implements PlayerCo
             expandedRemoveView.setTextColor(R.id.media_title_notification, Color.WHITE);
             expandedRemoveView.setTextColor(R.id.media_artist_notification, Color.WHITE);
             expandedRemoveView.setTextColor(R.id.app_name_notification, Color.WHITE);
-            expandedRemoveView.setInt(R.id.close_action_notification, "setBackgroundResource", R.drawable.ic_close_action_icon_holo_dark);
+            expandedRemoveView.setImageViewResource(R.id.close_action_notification, R.drawable.ic_close_action_icon_holo_dark);
             expandedRemoveView.setImageViewResource(R.id.skip_to_previous_action_notification, R.drawable.ic_skip_to_previous_action_icon_holo_dark);
             expandedRemoveView.setImageViewResource(R.id.skip_to_next_action_notification, R.drawable.ic_skip_to_next_action_icon_holo_dark);
             expandedRemoveView.setImageViewResource(R.id.rewind_action_notification, R.drawable.ic_rewind_action_icon_holo_dark);
@@ -274,7 +299,7 @@ public class PlayerService extends MediaBrowserServiceCompat implements PlayerCo
             collapsedRemoveView.setTextColor(R.id.media_title_notification, Color.BLACK);
             collapsedRemoveView.setTextColor(R.id.media_artist_notification, Color.DKGRAY);
             collapsedRemoveView.setTextColor(R.id.app_name_notification, Color.BLACK);
-            collapsedRemoveView.setInt(R.id.close_action_notification, "setBackgroundResource", R.drawable.ic_close_action_icon);
+            collapsedRemoveView.setImageViewResource(R.id.close_action_notification, R.drawable.ic_close_action_icon);
             collapsedRemoveView.setImageViewResource(R.id.skip_to_previous_action_notification, R.drawable.ic_skip_to_previous_action_icon);
             collapsedRemoveView.setImageViewResource(R.id.skip_to_next_action_notification, R.drawable.ic_skip_to_next_action_icon);
             collapsedRemoveView.setImageViewResource(R.id.app_name_icon_notification, R.drawable.ic_notification_uniex_logo);
@@ -283,7 +308,7 @@ public class PlayerService extends MediaBrowserServiceCompat implements PlayerCo
             expandedRemoveView.setTextColor(R.id.media_title_notification, Color.BLACK);
             expandedRemoveView.setTextColor(R.id.media_artist_notification, Color.DKGRAY);
             expandedRemoveView.setTextColor(R.id.app_name_notification, Color.BLACK);
-            expandedRemoveView.setInt(R.id.close_action_notification, "setBackgroundResource", R.drawable.ic_close_action_icon);
+            expandedRemoveView.setImageViewResource(R.id.close_action_notification, R.drawable.ic_close_action_icon);
             expandedRemoveView.setImageViewResource(R.id.skip_to_previous_action_notification, R.drawable.ic_skip_to_previous_action_icon);
             expandedRemoveView.setImageViewResource(R.id.skip_to_next_action_notification, R.drawable.ic_skip_to_next_action_icon);
             expandedRemoveView.setImageViewResource(R.id.rewind_action_notification, R.drawable.ic_rewind_action_icon);
