@@ -209,7 +209,6 @@ public class ScreenLockPlayerActivity extends UniEXActivity.UniEXMusicActivity i
         super.onCreate(savedInstanceState);
         activity = this;
         keyguardManager = (KeyguardManager) getSystemService(KEYGUARD_SERVICE);
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
         onConfigurationChanged(getResources().getConfiguration());
     }
 
@@ -265,6 +264,7 @@ public class ScreenLockPlayerActivity extends UniEXActivity.UniEXMusicActivity i
     @Override
     public void onConfigurationChanged(@NonNull Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
         defaultDisplay = ((WindowManager) getSystemService(WINDOW_SERVICE)).getDefaultDisplay();
         setContentView(R.layout.player_frame_layout);
         playerFrameLayout = findViewById(R.id.playerFrameLayout);
