@@ -126,13 +126,13 @@ public class MainActivity extends UniEXActivity.UniEXMusicActivity implements Vi
             }
             switch (loopState){
                 case PlayerCore.LOOP_STATE_ALL:
-                    changeLoop.setBackgroundResource(all_once);
+                    changeLoop.setImageResource(all_once);
                     break;
                 case PlayerCore.LOOP_STATE_ALL_REPEAT:
-                    changeLoop.setBackgroundResource(all_repeat);
+                    changeLoop.setImageResource(all_repeat);
                     break;
                 case PlayerCore.LOOP_STATE_ONE_REPEAT:
-                    changeLoop.setBackgroundResource(once);
+                    changeLoop.setImageResource(once);
                     break;
             }
         }
@@ -653,11 +653,11 @@ public class MainActivity extends UniEXActivity.UniEXMusicActivity implements Vi
         circleLineVisualizer.setColor(l);
         if(ColorPicker.isLightColor(l)){
             if(bottomSheetBehavior.getState() != BottomSheetBehavior.STATE_COLLAPSED) getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
-            if(playerService.isPlaying()) playPauseFrame.setBackgroundResource(R.drawable.ic_pause_action_icon_holo_dark);
-            else playPauseFrame.setBackgroundResource(R.drawable.ic_play_action_icon_holo_dark);
-            skipToNextFrame.setBackgroundResource(R.drawable.ic_skip_to_next_action_icon_holo_dark);
-            skipToPreviousFrame.setBackgroundResource(R.drawable.ic_skip_to_previous_action_icon_holo_dark);
-            openQuickList.setBackgroundResource(R.drawable.ic_media_list_icon_holo_dark);
+            if(playerService.isPlaying()) playPauseFrame.setImageResource(R.drawable.ic_pause_action_icon_holo_dark);
+            else playPauseFrame.setImageResource(R.drawable.ic_play_action_icon_holo_dark);
+            skipToNextFrame.setImageResource(R.drawable.ic_skip_to_next_action_icon_holo_dark);
+            skipToPreviousFrame.setImageResource(R.drawable.ic_skip_to_previous_action_icon_holo_dark);
+            openQuickList.setImageResource(R.drawable.ic_media_list_icon_holo_dark);
             frameTitle.setTextColor(Color.WHITE);
             frameArtist.setTextColor(Color.LTGRAY);
             frameCurrentTime.setTextColor(Color.LTGRAY);
@@ -668,11 +668,11 @@ public class MainActivity extends UniEXActivity.UniEXMusicActivity implements Vi
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR | View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
             }else getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
-            if(playerService.isPlaying()) playPauseFrame.setBackgroundResource(R.drawable.ic_pause_action_icon);
-            else playPauseFrame.setBackgroundResource(R.drawable.ic_play_action_icon);
-            skipToNextFrame.setBackgroundResource(R.drawable.ic_skip_to_next_action_icon);
-            skipToPreviousFrame.setBackgroundResource(R.drawable.ic_skip_to_previous_action_icon);
-            openQuickList.setBackgroundResource(R.drawable.ic_media_list_icon);
+            if(playerService.isPlaying()) playPauseFrame.setImageResource(R.drawable.ic_pause_action_icon);
+            else playPauseFrame.setImageResource(R.drawable.ic_play_action_icon);
+            skipToNextFrame.setImageResource(R.drawable.ic_skip_to_next_action_icon);
+            skipToPreviousFrame.setImageResource(R.drawable.ic_skip_to_previous_action_icon);
+            openQuickList.setImageResource(R.drawable.ic_media_list_icon);
             frameTitle.setTextColor(Color.BLACK);
             frameArtist.setTextColor(Color.DKGRAY);
             frameCurrentTime.setTextColor(Color.DKGRAY);

@@ -146,21 +146,21 @@
                         android:layout_width="50dp"
                         android:layout_height="50dp"
                         android:src="@drawable/ic_skip_to_previous_action_icon"
-                        style="@style/Widget.MaterialComponents.ExtendedFloatingActionButton.Icon"/>
+                        android:background="?attr/selectableItemBackgroundBorderless"/>
 
                     <ImageButton
                         android:id="@+id/play_pause"
                         android:layout_width="50dp"
                         android:layout_height="50dp"
                         android:src="@drawable/ic_play_action_icon"
-                        style="@style/Widget.MaterialComponents.ExtendedFloatingActionButton.Icon"/>
+                        android:background="?attr/selectableItemBackgroundBorderless"/>
 
                     <ImageButton
                         android:id="@+id/skip_to_next"
                         android:layout_width="50dp"
                         android:layout_height="50dp"
                         android:src="@drawable/ic_skip_to_next_action_icon"
-                        style="@style/Widget.MaterialComponents.ExtendedFloatingActionButton.Icon"/>
+                        android:background="?attr/selectableItemBackgroundBorderless"/>
 
                 </LinearLayout>
 

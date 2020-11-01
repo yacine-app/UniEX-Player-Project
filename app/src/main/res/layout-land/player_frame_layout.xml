@@ -25,7 +25,7 @@
             android:layout_height="?attr/actionBarSize"
             android:layout_gravity="start"
             android:src="@drawable/ic_back_arrow_action_icon"
-            style="@style/Widget.MaterialComponents.Button"/>
+            android:background="?attr/selectableItemBackgroundBorderless"/>
 
     </androidx.appcompat.widget.Toolbar>
 
@@ -132,17 +132,19 @@
             android:layout_alignParentBottom="true"
             android:layout_marginEnd="30dp"
             android:layout_toStartOf="@id/seek_circular_bar_frame_layout"
-            android:background="@drawable/ic_media_list_icon"
-            style="@style/Widget.AppCompat.ActionButton"/>
+            android:scaleType="centerCrop"
+            android:src="@drawable/ic_media_list_icon"
+            android:background="?attr/selectableItemBackgroundBorderless"/>
 
         <ImageButton
             android:id="@+id/skip_to_previous_frame"
             android:layout_width="50dp"
             android:layout_height="50dp"
-            android:background="@drawable/ic_skip_to_previous_action_icon"
+            android:scaleType="centerCrop"
+            android:src="@drawable/ic_skip_to_previous_action_icon"
             android:layout_toStartOf="@id/seek_circular_bar_frame_layout"
             android:layout_centerVertical="true"
-            style="@style/Widget.AppCompat.ActionButton"/>
+            android:background="?attr/selectableItemBackgroundBorderless"/>
 
         <LinearLayout
             android:id="@+id/seek_circular_bar_frame_layout"
@@ -166,8 +168,9 @@
             android:layout_width="80dp"
             android:layout_height="80dp"
             android:layout_centerInParent="true"
-            android:background="@drawable/ic_play_action_icon"
-            style="@style/Widget.AppCompat.ActionButton"/>
+            android:src="@drawable/ic_play_action_icon"
+            android:scaleType="centerCrop"
+            android:background="?attr/selectableItemBackgroundBorderless"/>
 
         <ImageButton
             android:id="@+id/skip_to_next_frame"
@@ -175,8 +178,9 @@
             android:layout_height="50dp"
             android:layout_centerVertical="true"
             android:layout_toEndOf="@id/seek_circular_bar_frame_layout"
-            android:background="@drawable/ic_skip_to_next_action_icon"
-            style="@style/Widget.AppCompat.ActionButton"/>
+            android:scaleType="centerCrop"
+            android:src="@drawable/ic_skip_to_next_action_icon"
+            android:background="?attr/selectableItemBackgroundBorderless"/>
 
         <ImageButton
             android:id="@+id/change_loop_mode_frame"
@@ -185,8 +189,9 @@
             android:layout_alignParentBottom="true"
             android:layout_marginStart="30dp"
             android:layout_toEndOf="@id/seek_circular_bar_frame_layout"
-            android:background="@drawable/ic_play_all_once_icon"
-            style="@style/Widget.AppCompat.ActionButton"/>
+            android:scaleType="centerCrop"
+            android:src="@drawable/ic_play_all_once_icon"
+            android:background="?attr/selectableItemBackgroundBorderless" />
 
         <TextView
             android:id="@+id/duration_time_frame"

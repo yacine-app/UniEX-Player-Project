@@ -16,6 +16,13 @@
 
     </style>
 
+    <style name="AppTheme.MediaDialog" parent="Theme.AppCompat.Light.Dialog">
+        <item name="windowNoTitle">true</item>
+        <item name="android:windowMinWidthMajor">97%</item>
+        <item name="android:windowMinWidthMinor">97%</item>
+        <item name="android:windowBackground">@drawable/dialog_rounded_shape</item>
+    </style>
+
     <style name="AppTheme.NoDisplay" parent="@android:style/Theme.NoDisplay"/>
 
 </resources>
