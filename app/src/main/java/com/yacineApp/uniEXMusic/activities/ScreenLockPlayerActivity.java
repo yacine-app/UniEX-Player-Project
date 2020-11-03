@@ -49,6 +49,7 @@ import com.yacineApp.uniEXMusic.services.PlayerService;
 public class ScreenLockPlayerActivity extends UniEXActivity.UniEXMusicActivity implements View.OnClickListener, OnCircularSeekBarChangeListener {
 
     public static final String CLOSE_LOOK_SCREEN_ACTIVITY = "CLOSE_LOOK_SCREEN_ACTIVITY";
+    public static boolean IS_ACTIVITY_RUNNING = false;
 
     private boolean circularSeekBarChanging = false;
     private int CIRCULAR_SEEK_BAR_UPDATE_DELAY = 300;
@@ -209,6 +210,7 @@ public class ScreenLockPlayerActivity extends UniEXActivity.UniEXMusicActivity i
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        IS_ACTIVITY_RUNNING = true;
         activity = this;
         keyguardManager = (KeyguardManager) getSystemService(KEYGUARD_SERVICE);
         onConfigurationChanged(getResources().getConfiguration());
@@ -259,6 +261,12 @@ public class ScreenLockPlayerActivity extends UniEXActivity.UniEXMusicActivity i
             Log.e(this.getClass().getName(), "Error: ", e);
         }
         handler.removeCallbacks(runnable);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        IS_ACTIVITY_RUNNING = false;
     }
 
     @SuppressLint("ClickableViewAccessibility")
