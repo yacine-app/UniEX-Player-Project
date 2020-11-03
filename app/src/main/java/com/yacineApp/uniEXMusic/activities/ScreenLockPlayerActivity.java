@@ -212,6 +212,7 @@ public class ScreenLockPlayerActivity extends UniEXActivity.UniEXMusicActivity i
         super.onCreate(savedInstanceState);
         IS_ACTIVITY_RUNNING = true;
         activity = this;
+
         keyguardManager = (KeyguardManager) getSystemService(KEYGUARD_SERVICE);
         onConfigurationChanged(getResources().getConfiguration());
     }
@@ -246,7 +247,7 @@ public class ScreenLockPlayerActivity extends UniEXActivity.UniEXMusicActivity i
     @Override
     protected void onResume() {
         super.onResume();
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
+        //getWindow().addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
         bindService(new Intent(this, PlayerService.class), connection, BIND_ADJUST_WITH_ACTIVITY);
         handler.postDelayed(runnable, CIRCULAR_SEEK_BAR_UPDATE_DELAY);
     }
@@ -274,7 +275,7 @@ public class ScreenLockPlayerActivity extends UniEXActivity.UniEXMusicActivity i
     @Override
     public void onConfigurationChanged(@NonNull Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED | WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
         defaultDisplay = ((WindowManager) getSystemService(WINDOW_SERVICE)).getDefaultDisplay();
         setContentView(R.layout.player_frame_layout);
         playerFrameLayout = findViewById(R.id.playerFrameLayout);

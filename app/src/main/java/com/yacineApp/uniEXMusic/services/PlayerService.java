@@ -52,7 +52,7 @@ public class PlayerService extends MediaBrowserServiceCompat implements PlayerCo
             if(intent == null || intent.getAction() == null) return;
             Intent activity = new Intent(getApplicationContext(), ScreenLockPlayerActivity.class);
             try {
-                if (Intent.ACTION_SCREEN_ON.equals(intent.getAction())) {
+                if (Intent.ACTION_SCREEN_OFF.equals(intent.getAction())) {
                     if (!keyguardManager.isKeyguardSecure() && isPlaying()){
                         if(ScreenLockPlayerActivity.IS_ACTIVITY_RUNNING) PendingIntent.getActivity(getApplicationContext(), 0, activity, PendingIntent.FLAG_UPDATE_CURRENT).send();
                         else startActivity(activity.setAction(null).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
@@ -81,7 +81,7 @@ public class PlayerService extends MediaBrowserServiceCompat implements PlayerCo
     private KeyguardManager keyguardManager;
     private MediaControlReceiver mediaControlReceiver = new MediaControlReceiver();
     private IntentFilter intentFilterBecomeNoisy = new IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY);
-    private IntentFilter intentFilterScreenOn = new IntentFilter(Intent.ACTION_SCREEN_ON);
+    private IntentFilter intentFilterScreenOn = new IntentFilter(Intent.ACTION_SCREEN_OFF);
     private IntentFilter intentFilterUserPresent = new IntentFilter(Intent.ACTION_USER_PRESENT);
     private NotificationCompat.Builder notificationBuilder = null;
     private PlayerCore playerCore;
