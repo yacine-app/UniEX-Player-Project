@@ -15,6 +15,7 @@ this project is for learning purposes.
  * bug fixes and performance improvements.
  * change from default android media style notification to a custom view.
  * add change app color depends on media art ( still testing ).
+ * add lock screen media controller ( still testing ).
 
 ### v0.0.1-alpha.2:
 #### Download link:
