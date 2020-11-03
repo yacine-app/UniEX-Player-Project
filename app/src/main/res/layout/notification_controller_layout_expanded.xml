@@ -107,16 +107,16 @@
 
                 <ImageButton
                     android:id="@+id/rewind_action_notification"
-                    android:layout_width="32dp"
-                    android:layout_height="32dp"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
                     android:scaleType="centerCrop"
                     android:src="@drawable/ic_rewind_action_icon"
                     android:background="?android:attr/selectableItemBackground"/>
 
                 <ImageButton
                     android:id="@+id/skip_to_previous_action_notification"
-                    android:layout_width="32dp"
-                    android:layout_height="32dp"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
                     android:layout_marginStart="10dp"
                     android:scaleType="centerCrop"
                     android:src="@drawable/ic_skip_to_previous_action_icon"
@@ -124,8 +124,8 @@
 
                 <ImageButton
                     android:id="@+id/play_pause_action_notification"
-                    android:layout_width="34dp"
-                    android:layout_height="34dp"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
                     android:scaleType="centerCrop"
                     android:layout_marginStart="10dp"
                     android:layout_marginEnd="10dp"
@@ -134,8 +134,8 @@
 
                 <ImageButton
                     android:id="@+id/skip_to_next_action_notification"
-                    android:layout_width="32dp"
-                    android:layout_height="32dp"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
                     android:scaleType="centerCrop"
                     android:src="@drawable/ic_skip_to_next_action_icon"
                     android:layout_marginEnd="10dp"
@@ -143,8 +143,8 @@
 
                 <ImageButton
                     android:id="@+id/fast_forward_action_notification"
-                    android:layout_width="32dp"
-                    android:layout_height="32dp"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
                     android:scaleType="centerCrop"
                     android:src="@drawable/ic_fast_forward_action_icon"
                     android:background="?android:attr/selectableItemBackground"/>

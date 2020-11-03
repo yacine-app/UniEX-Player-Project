@@ -54,6 +54,9 @@ public class PlayerService extends MediaBrowserServiceCompat implements PlayerCo
                 if (Intent.ACTION_SCREEN_ON.equals(intent.getAction())) {
                     if (!keyguardManager.isKeyguardSecure() && isPlaying())
                         PendingIntent.getActivity(context, 0, new Intent(context, ScreenLockPlayerActivity.class), PendingIntent.FLAG_UPDATE_CURRENT).send();
+                }else if (Intent.ACTION_USER_PRESENT.equals(intent.getAction())) {
+                    if (keyguardManager.isKeyguardSecure())
+                        PendingIntent.getActivity(context, 0, new Intent(context, ScreenLockPlayerActivity.class).setAction(ScreenLockPlayerActivity.CLOSE_LOOK_SCREEN_ACTIVITY), PendingIntent.FLAG_UPDATE_CURRENT).send();
                 }
             } catch (PendingIntent.CanceledException ignored) {}
         }
@@ -76,6 +79,7 @@ public class PlayerService extends MediaBrowserServiceCompat implements PlayerCo
     private MediaControlReceiver mediaControlReceiver = new MediaControlReceiver();
     private IntentFilter intentFilterBecomeNoisy = new IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY);
     private IntentFilter intentFilterScreenOn = new IntentFilter(Intent.ACTION_SCREEN_ON);
+    private IntentFilter intentFilterUserPresent = new IntentFilter(Intent.ACTION_USER_PRESENT);
     private NotificationCompat.Builder notificationBuilder = null;
     private PlayerCore playerCore;
     private MediaAdapterInfo mediaAdapterInfo;
@@ -104,6 +108,7 @@ public class PlayerService extends MediaBrowserServiceCompat implements PlayerCo
             updateNotification();
             registerReceiver(mediaControlReceiver, intentFilterBecomeNoisy);
             registerReceiver(screenOnReceiver, intentFilterScreenOn);
+            registerReceiver(screenOnReceiver, intentFilterUserPresent);
         }
 
         @Override

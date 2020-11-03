@@ -48,6 +48,8 @@ import com.yacineApp.uniEXMusic.services.PlayerService;
 
 public class ScreenLockPlayerActivity extends UniEXActivity.UniEXMusicActivity implements View.OnClickListener, OnCircularSeekBarChangeListener {
 
+    public static final String CLOSE_LOOK_SCREEN_ACTIVITY = "CLOSE_LOOK_SCREEN_ACTIVITY";
+
     private boolean circularSeekBarChanging = false;
     private int CIRCULAR_SEEK_BAR_UPDATE_DELAY = 300;
     private float CIRCULAR_PROGRESS = 0.0f;
@@ -242,6 +244,7 @@ public class ScreenLockPlayerActivity extends UniEXActivity.UniEXMusicActivity i
     @Override
     protected void onResume() {
         super.onResume();
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
         bindService(new Intent(this, PlayerService.class), connection, BIND_ADJUST_WITH_ACTIVITY);
         handler.postDelayed(runnable, CIRCULAR_SEEK_BAR_UPDATE_DELAY);
     }
@@ -258,7 +261,6 @@ public class ScreenLockPlayerActivity extends UniEXActivity.UniEXMusicActivity i
         handler.removeCallbacks(runnable);
     }
 
-    float rx = 0, ry = 0, x = 0, y = 0;
     @SuppressLint("ClickableViewAccessibility")
     @SuppressWarnings("deprecation")
     @Override
@@ -319,7 +321,7 @@ public class ScreenLockPlayerActivity extends UniEXActivity.UniEXMusicActivity i
         });
 
         playerFrameLayout.setOnTouchListener(new View.OnTouchListener() {
-            private float r = 0.0f;
+            private float r = 0.0f, rx = 0, ry = 0;
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 switch (event.getAction()){
@@ -328,9 +330,7 @@ public class ScreenLockPlayerActivity extends UniEXActivity.UniEXMusicActivity i
                         ry = event.getY();
                         break;
                     case MotionEvent.ACTION_MOVE:
-                        x = event.getX();
-                        y = event.getY();
-                        r = (float) Math.sqrt(Math.pow(rx - x, 2) + Math.pow(ry - y, 2));
+                        r = (float) Math.sqrt(Math.pow(rx - event.getX(), 2) + Math.pow(ry - event.getY(), 2));
                         setViewsAlpha(1.0f - r / 360.0f, false);
                         break;
                     case MotionEvent.ACTION_UP:
@@ -362,12 +362,12 @@ public class ScreenLockPlayerActivity extends UniEXActivity.UniEXMusicActivity i
         mediaControllerFrame.setAlpha(alpha);
     }
 
-    /*@Override
+    @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
         if(intent == null)return;
-        if(CLOSE_LOOK_SCREEN_ACTIVITY.equals(intent.getAction())) finish();
-    }*/
+        if(CLOSE_LOOK_SCREEN_ACTIVITY.equals(intent.getAction())) finish("Done!");
+    }
 
     @Override
     public void onProgressChange(CircularSeekBar circularSeekBar, float progress) {

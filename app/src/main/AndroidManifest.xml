@@ -64,7 +64,7 @@
             android:noHistory="true"
             android:resizeableActivity="false"
             android:windowSoftInputMode="adjustNothing"
-            android:launchMode="singleInstance"
+            android:launchMode="singleTop"
             android:excludeFromRecents="true"
             android:configChanges="orientation|keyboardHidden|uiMode"
             android:theme="@style/AppTheme">

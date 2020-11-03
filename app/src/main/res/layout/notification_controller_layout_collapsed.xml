@@ -59,6 +59,7 @@
                 android:layout_height="30dp"
                 android:layout_alignParentEnd="true"
                 android:layout_marginEnd="20dp"
+                android:scaleType="centerCrop"
                 android:background="?android:attr/selectableItemBackground"
                 android:src="@drawable/ic_close_action_icon"/>
 
@@ -106,8 +107,8 @@
 
             <ImageButton
                 android:id="@+id/play_pause_action_notification"
-                android:layout_width="35dp"
-                android:layout_height="35dp"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
                 android:scaleType="centerCrop"
                 android:layout_marginStart="10dp"
                 android:layout_marginEnd="10dp"
