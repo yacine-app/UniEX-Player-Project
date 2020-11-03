@@ -1,5 +1,6 @@
 package com.yacineApp.uniEXMusic.services;
 
+import android.annotation.SuppressLint;
 import android.app.KeyguardManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
@@ -16,6 +17,7 @@ import android.media.AudioManager;
 import android.os.Binder;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.os.PowerManager;
 import android.support.v4.media.MediaBrowserCompat;
 import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaSessionCompat;
@@ -79,6 +81,8 @@ public class PlayerService extends MediaBrowserServiceCompat implements PlayerCo
     private int[] loopStates = new int[]{PlayerCore.LOOP_STATE_ALL, PlayerCore.LOOP_STATE_ALL_REPEAT, PlayerCore.LOOP_STATE_ONE_REPEAT};
     private int currentLoopIndex = 0;
     private KeyguardManager keyguardManager;
+    private PowerManager powerManager;
+    private PowerManager.WakeLock wakeLock;
     private MediaControlReceiver mediaControlReceiver = new MediaControlReceiver();
     private IntentFilter intentFilterBecomeNoisy = new IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY);
     private IntentFilter intentFilterScreenOn = new IntentFilter(Intent.ACTION_SCREEN_OFF);
@@ -160,10 +164,14 @@ public class PlayerService extends MediaBrowserServiceCompat implements PlayerCo
         return START_STICKY;
     }
 
+    @SuppressLint("WakelockTimeout")
     @Override
     public void onCreate() {
         super.onCreate();
         keyguardManager = (KeyguardManager) getSystemService(KEYGUARD_SERVICE);
+        powerManager = (PowerManager) getSystemService(POWER_SERVICE);
+        wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, getPackageName() + "::" + this.getClass().getName());
+        wakeLock.acquire();
         SERVICE_ALREADY_CREATED = true;
         playerCore = new PlayerCore(this);
         playerCore.setErrorListener(this);
@@ -203,6 +211,7 @@ public class PlayerService extends MediaBrowserServiceCompat implements PlayerCo
     public void onDestroy() {
         super.onDestroy();
         playerCore.release();
+        wakeLock.release();
         SERVICE_ALREADY_CREATED = false;
     }
 
