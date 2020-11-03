@@ -50,16 +50,16 @@ public class PlayerService extends MediaBrowserServiceCompat implements PlayerCo
         @Override
         public void onReceive(Context context, Intent intent) {
             if(intent == null || intent.getAction() == null) return;
-            Intent activity = new Intent(getApplicationContext(), ScreenLockPlayerActivity.class);
+            Intent activity = new Intent(context, ScreenLockPlayerActivity.class);
             try {
                 if (Intent.ACTION_SCREEN_OFF.equals(intent.getAction())) {
                     if (!keyguardManager.isKeyguardSecure() && isPlaying()){
-                        if(ScreenLockPlayerActivity.IS_ACTIVITY_RUNNING) PendingIntent.getActivity(getApplicationContext(), 0, activity, PendingIntent.FLAG_UPDATE_CURRENT).send();
-                        else startActivity(activity.setAction(null).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+                        if(ScreenLockPlayerActivity.IS_ACTIVITY_RUNNING) PendingIntent.getActivity(context, 0, activity, PendingIntent.FLAG_UPDATE_CURRENT).send();
+                        else context.startActivity(activity.setAction(null).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_NO_HISTORY | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP));
                     }
                 }else if (Intent.ACTION_USER_PRESENT.equals(intent.getAction())) {
                     if (keyguardManager.isKeyguardSecure())
-                        PendingIntent.getActivity(getApplicationContext(), 0, activity.setAction(ScreenLockPlayerActivity.CLOSE_LOOK_SCREEN_ACTIVITY), PendingIntent.FLAG_UPDATE_CURRENT).send();
+                        PendingIntent.getActivity(context, 0, activity.setAction(ScreenLockPlayerActivity.CLOSE_LOOK_SCREEN_ACTIVITY), PendingIntent.FLAG_UPDATE_CURRENT).send();
                 }
             } catch (PendingIntent.CanceledException ignored) { }
         }

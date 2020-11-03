@@ -64,6 +64,8 @@
             android:resizeableActivity="false"
             android:windowSoftInputMode="adjustNothing"
             android:launchMode="singleInstance"
+            android:clearTaskOnLaunch="true"
+            android:showWhenLocked="true"
             android:taskAffinity=""
             android:excludeFromRecents="true"
             android:configChanges="orientation|keyboardHidden|uiMode"
