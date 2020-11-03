@@ -348,6 +348,7 @@ public class MainActivity extends UniEXActivity.UniEXMusicActivity implements Vi
     @Override
     protected void onResume() {
         super.onResume();
+        if(bottomSheetBehavior.getState() == BottomSheetBehavior.STATE_EXPANDED && playerService != null) circleLineVisualizer.setAudioSessionId(playerService.getAudioSessionId());
         bindService(new Intent(this, PlayerService.class), connection, BIND_ADJUST_WITH_ACTIVITY);
         if(getIntent() != null && ACTION_LAUNCH_PLAY_BACK.equals(getIntent().getAction()))
             behaviorDefaultLaunch = BottomSheetBehavior.STATE_EXPANDED;
@@ -359,7 +360,8 @@ public class MainActivity extends UniEXActivity.UniEXMusicActivity implements Vi
     @Override
     protected void onPause() {
         super.onPause();
-        try {
+        if(bottomSheetBehavior.getState() == BottomSheetBehavior.STATE_EXPANDED && playerService != null) circleLineVisualizer.release();
+            try {
             unbindService(connection);
         }catch (IllegalArgumentException e){
             Log.e(this.getClass().getName(), "Error: ", e);
