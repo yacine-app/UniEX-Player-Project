@@ -2,14 +2,11 @@
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="63dp"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/media_info_item_list"
-    android:backgroundTint="@color/colorAccent"
-    android:background="?android:attr/selectableItemBackground"
-    android:clickable="true"
-    android:focusable="true"
-    android:padding="7dp">
+    android:padding="7dp"
+    android:background="?android:attr/selectableItemBackground">
 
     <androidx.cardview.widget.CardView
         android:id="@+id/art_image_list_card"
@@ -23,8 +20,8 @@
 
         <ImageView
             android:id="@+id/art_image_list"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
             android:scaleType="centerCrop"/>
 
     </androidx.cardview.widget.CardView>

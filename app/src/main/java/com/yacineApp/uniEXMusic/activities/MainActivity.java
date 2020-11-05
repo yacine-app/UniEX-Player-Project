@@ -354,9 +354,9 @@ public class MainActivity extends UniEXActivity.UniEXMusicActivity implements Vi
         super.onResume();
         if(bottomSheetBehavior.getState() == BottomSheetBehavior.STATE_EXPANDED && playerService != null) circleLineVisualizer.setAudioSessionId(playerService.getAudioSessionId());
         bindService(new Intent(this, PlayerService.class), connection, BIND_ADJUST_WITH_ACTIVITY);
-        if(getIntent() != null && ACTION_LAUNCH_PLAY_BACK.equals(getIntent().getAction()))
-            behaviorDefaultLaunch = BottomSheetBehavior.STATE_EXPANDED;
-        else behaviorDefaultLaunch = bottomSheetBehavior.getState();
+//        if(getIntent() != null && ACTION_LAUNCH_PLAY_BACK.equals(getIntent().getAction()))
+//            behaviorDefaultLaunch = BottomSheetBehavior.STATE_EXPANDED;
+//        else behaviorDefaultLaunch = bottomSheetBehavior.getState();
         handler.postDelayed(runnable, CIRCULAR_SEEK_BAR_UPDATE_DELAY);
         //handler.postDelayed(runnable1, LAYOUT_CHANGES_UPDATE_DELAY);
     }
@@ -563,6 +563,10 @@ public class MainActivity extends UniEXActivity.UniEXMusicActivity implements Vi
 
         listView.setLayoutManager(new LinearLayoutManager(this));
 
+        listView.setItemViewCacheSize(20);
+        listView.setDrawingCacheEnabled(true);
+        listView.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_HIGH);
+
         listView.addOnItemTouchListener(new RecycleOnItemClickListener(listView) {
             @Override
             public void onItemClick(@NonNull View view, int position) {
@@ -653,6 +657,12 @@ public class MainActivity extends UniEXActivity.UniEXMusicActivity implements Vi
             finish(getText(R.string.permission_non_granted_message));
             return;
         }
+        /*mediaAdapterInfo = new MediaAdapterInfo(listView);
+        if(playerService != null){
+            mediaAdapterInfo.setSelectedIndex(new MediaAdapterInfo.Index(playerService.getCurrentPlayIndex()));
+            playerService.setMediaQueue(mediaAdapterInfo);
+        }
+        listView.setAdapter(mediaAdapterInfo);*/
         LoadInternalMedia loadInternalMedia = new LoadInternalMedia(this);
         loadInternalMedia.setOnDoneListener(this);
         loadInternalMedia.execute();
@@ -669,7 +679,7 @@ public class MainActivity extends UniEXActivity.UniEXMusicActivity implements Vi
         Bitmap art = metaData.getArt();
         CharSequence title = metaData.getTitle();
         CharSequence artist = metaData.getArtist();
-        mediaArt.setImageBitmap(art);
+        mediaArt.setImageBitmap(metaData.getSmallArt());
         frameArt.setImageBitmap(art);
         mediaTitle.setText(title);
         frameTitle.setText(title);

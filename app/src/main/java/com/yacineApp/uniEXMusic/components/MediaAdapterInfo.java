@@ -1,8 +1,14 @@
 package com.yacineApp.uniEXMusic.components;
 
+import android.content.ContentResolver;
 import android.content.Context;
+import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Typeface;
+import android.net.Uri;
+import android.provider.MediaStore;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,11 +16,14 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.yacineApp.uniEXMusic.R;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class MediaAdapterInfo extends RecyclerView.Adapter<MediaAdapterInfo.ViewHolder> {
@@ -28,16 +37,15 @@ public class MediaAdapterInfo extends RecyclerView.Adapter<MediaAdapterInfo.View
         TextView title, artist;
         private ImageView art;
         private Context context;
-        private ConstraintLayout itemView;
         public ViewHolder(@NonNull ConstraintLayout itemView) {
             super(itemView);
-            this.itemView = itemView;
             context = itemView.getContext();
             art = itemView.findViewById(R.id.art_image_list);
             title = itemView.findViewById(R.id.media_info_title);
             artist = itemView.findViewById(R.id.media_info_artist);
             title.setTextColor(0x0FF252525);
             artist.setTextColor(0x0FF2F2F2F);
+            title.setTypeface(Typeface.defaultFromStyle(Typeface.NORMAL));
         }
         public Context getContext() { return context; }
         public void setArt(Bitmap art) { this.art.setImageBitmap(art); }
@@ -46,20 +54,33 @@ public class MediaAdapterInfo extends RecyclerView.Adapter<MediaAdapterInfo.View
 
     }
 
-    private List<MediaInfo> mediaInfoList = null;
+    private List<MediaInfo> mediaInfoList = new ArrayList<>();
     private Index index = null;
+    private RecyclerView recyclerView;
 
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         ConstraintLayout constraintLayout = (ConstraintLayout) LayoutInflater.from(parent.getContext()).inflate(R.layout.media_item_info_list_layout, parent, false);
+        /*LinearLayoutManager layoutManager = (LinearLayoutManager) recyclerView.getLayoutManager();
+        LoadInternalMedia loadInternalMedia = new LoadInternalMedia(parent.getContext());
+        loadInternalMedia.setMediaInfoList(mediaInfoList);
+        assert layoutManager != null;
+        loadInternalMedia.setLength(layoutManager.getHeight() / 63);
+        loadInternalMedia.setStart(layoutManager.findFirstVisibleItemPosition());
+        loadInternalMedia.setOnDoneListener(new LoadInternalMedia.OnDoneListener() {
+            @Override
+            public void onDone(@NonNull List<MediaInfo> mediaInfoList) {
+                MediaAdapterInfo.this.mediaInfoList = mediaInfoList;
+                notifyDataSetChanged();
+            }
+        });
+        loadInternalMedia.execute();*/
         return new ViewHolder(constraintLayout);
     }
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        ViewTag viewTag = (ViewTag) holder.itemView.getTag();
-        if(viewTag == null) holder.itemView.setTag(new ViewTag(holder.itemView, position));
         holder.title.setTextColor(0x0FF252525);
         holder.artist.setTextColor(0x0FF2F2F2F);
         holder.title.setTypeface(Typeface.defaultFromStyle(Typeface.NORMAL));
@@ -69,7 +90,7 @@ public class MediaAdapterInfo extends RecyclerView.Adapter<MediaAdapterInfo.View
             holder.artist.setTextColor(holder.getContext().getResources().getColor(R.color.colorMainTheme, null));
         }
         MediaInfo mediaInfo = mediaInfoList.get(position);
-        holder.setArt(mediaInfo.getArt());
+        holder.setArt(mediaInfo.getSmallArt());
         holder.setArtist(mediaInfo.getArtist());
         holder.setTitle(mediaInfo.getTitle());
     }
@@ -84,6 +105,10 @@ public class MediaAdapterInfo extends RecyclerView.Adapter<MediaAdapterInfo.View
     @SuppressWarnings("unused")
     public MediaAdapterInfo(){}
 
+    public MediaAdapterInfo(@NonNull RecyclerView recyclerView){
+        this.recyclerView = recyclerView;
+    }
+
     public List<MediaInfo> getMediaInfoList() { return mediaInfoList; }
 
     @SuppressWarnings("unused")
@@ -91,9 +116,11 @@ public class MediaAdapterInfo extends RecyclerView.Adapter<MediaAdapterInfo.View
 
     public void setMediaInfoList(List<MediaInfo> mediaInfoList) { this.mediaInfoList = mediaInfoList; }
 
-    public void setSelectedIndex(Index index){
+    public void setSelectedIndex(@NonNull Index index){
+        int lastIndex = this.index != null ? this.index.index : -1;
         if(index.index > -1) this.index = index;
-        this.notifyDataSetChanged();
+        this.notifyItemChanged(lastIndex);
+        this.notifyItemChanged(index.index);
     }
 
     @Override
@@ -101,8 +128,12 @@ public class MediaAdapterInfo extends RecyclerView.Adapter<MediaAdapterInfo.View
         return mediaInfoList.get(position).getId();
     }
 
-    public MediaInfo getItem(int position){ return mediaInfoList.get(position); }
+    @Nullable
+    public MediaInfo getItem(int position){
+        return mediaInfoList.size() == 0 ? null : mediaInfoList.get(position);
+    }
 
+    @SuppressWarnings("unused")
     protected static class ViewTag {
         private View view;
         private int pos;

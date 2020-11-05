@@ -23,10 +23,12 @@ public class LoadInternalMedia implements Runnable {
     }
 
     private boolean started = false;
+    private int start = 0, length = -1;
     private ContentResolver contentResolver;
     private OnDoneListener onDoneListener = null;
     private Bitmap defaultIcon;
     private Thread thread = new Thread(this);
+    private List<MediaInfo> result = new ArrayList<>();
 
     public void setContentResolver(ContentResolver contentResolver) { this.contentResolver = contentResolver; }
 
@@ -35,8 +37,11 @@ public class LoadInternalMedia implements Runnable {
         defaultIcon = BitmapFactory.decodeResource(context.getResources(), R.raw.default_media_icon);
     }
 
+    public void setLength(int length) { this.length = length; }
+    public void setStart(int start) { this.start = start; }
     public void setOnDoneListener(OnDoneListener onDoneListener) { this.onDoneListener = onDoneListener; }
     public void execute(){ if(!started) thread.start(); }
+    public void setMediaInfoList(List<MediaInfo> mediaInfoList) { this.result = mediaInfoList; }
 
     private void done(List<MediaInfo> result){
         if(onDoneListener != null) onDoneListener.onDone(result);
@@ -46,13 +51,12 @@ public class LoadInternalMedia implements Runnable {
     @Override
     public void run() {
         started = true;
-        List<MediaInfo> result = new ArrayList<>();
         Uri uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
         String selection = MediaStore.Audio.Media.IS_MUSIC + " != 0";
         String sortOrder = MediaStore.Audio.Media.TITLE + " ASC";
         Cursor cursor = contentResolver.query(uri, null, selection, null, sortOrder);
         if(cursor != null && cursor.moveToFirst()){
-            MediaInfo.fillListFromCursor(cursor, result, defaultIcon);
+            MediaInfo.fillListFromCursor(cursor, result, defaultIcon, start, length);
             Log.e("ZEZFGTZERGGRH", String.valueOf(result.size()));
             cursor.close();
         }
