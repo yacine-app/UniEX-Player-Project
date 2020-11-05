@@ -11,6 +11,7 @@ import android.support.v4.media.MediaDescriptionCompat;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.util.Log;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.yacineApp.uniEXMusic.components.utils.ColorPicker;
@@ -82,7 +83,7 @@ public class MediaInfo {
     public boolean isEnabled() { return enabled; }
 
     public long getId() { return id; }
-    @Nullable
+    @NonNull
     public Bitmap getArt() { return art; }
     @Nullable
     public byte[] getRawArt() { return rawArt; }

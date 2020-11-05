@@ -26,6 +26,7 @@ import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.Surface;
 import android.view.View;
 import android.view.WindowManager;
@@ -46,11 +47,14 @@ import androidx.core.content.ContextCompat;
 import androidx.core.view.OnApplyWindowInsetsListener;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.yacineApp.uniEXMusic.components.LoadInternalMedia;
 import com.yacineApp.uniEXMusic.components.MediaAdapterInfo;
 import com.yacineApp.uniEXMusic.components.MediaInfo;
 import com.yacineApp.uniEXMusic.components.PlayerCore;
+import com.yacineApp.uniEXMusic.components.RecycleOnItemClickListener;
 import com.yacineApp.uniEXMusic.components.utils.ColorPicker;
 import com.yacineApp.uniEXMusic.components.utils.TimeFormatter;
 import com.yacineApp.uniEXMusic.R;
@@ -66,7 +70,7 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior;
 
 import java.util.List;
 
-public class MainActivity extends UniEXActivity.UniEXMusicActivity implements View.OnClickListener, LoadInternalMedia.OnDoneListener, AdapterView.OnItemClickListener, OnCircularSeekBarChangeListener, View.OnLongClickListener {
+public class MainActivity extends UniEXActivity.UniEXMusicActivity implements View.OnClickListener, LoadInternalMedia.OnDoneListener, OnCircularSeekBarChangeListener, View.OnLongClickListener {
 
     public static final String ACTION_LAUNCH_PLAY_BACK = "ACTION_LAUNCH_PLAY_BACK";
     public static final String ACTION_LAUNCH_PLAY_BACK_IF_PLAYING = "ACTION_LAUNCH_PLAY_BACK_IF_PLAYING";
@@ -82,7 +86,7 @@ public class MainActivity extends UniEXActivity.UniEXMusicActivity implements Vi
     private PlayerService playerService = null;
     private Intent oldIntent;
     private Handler handler = new Handler(Looper.getMainLooper());
-    private ListView listView;
+    private RecyclerView listView;
     private Display windowDisplayView;
     private Toolbar mainActionBar, frameActionBar;
     private CircleLineVisualizer circleLineVisualizer;
@@ -284,15 +288,15 @@ public class MainActivity extends UniEXActivity.UniEXMusicActivity implements Vi
         });
     }
 
-    @Override
-    public void onItemClick(@NonNull AdapterView<?> parent, @NonNull View view, int position, long id) {
+    /*@Override
+    public void onItemClick(@NonNull View view, int position) {
         if(bound && playerService.getMediaAdapterInfo() != null)
             playerService.getMediaAdapterInfo().setSelectedIndex(new MediaAdapterInfo.Index(position));
         startService(
                 new Intent(this, PlayerService.class)
                         .setAction(PlayerService.ACTION_MEDIA_SERVICE_TO_ITEM)
                         .putExtra(PlayerService.EXTRA_MEDIA_SERVICE_TO_ITEM, position));
-    }
+    }*/
 
     @Override
     public void onClick(@NonNull View v) {
@@ -555,6 +559,27 @@ public class MainActivity extends UniEXActivity.UniEXMusicActivity implements Vi
 
         listView = findViewById(R.id.list);
 
+        listView.setHasFixedSize(true);
+
+        listView.setLayoutManager(new LinearLayoutManager(this));
+
+        listView.addOnItemTouchListener(new RecycleOnItemClickListener(listView) {
+            @Override
+            public void onItemClick(@NonNull View view, int position) {
+                if(bound && playerService.getMediaAdapterInfo() != null)
+                    playerService.getMediaAdapterInfo().setSelectedIndex(new MediaAdapterInfo.Index(position));
+                startService(
+                        new Intent(getApplicationContext(), PlayerService.class)
+                                .setAction(PlayerService.ACTION_MEDIA_SERVICE_TO_ITEM)
+                                .putExtra(PlayerService.EXTRA_MEDIA_SERVICE_TO_ITEM, position));
+            }
+
+            @Override
+            public void onLongItemClick(@NonNull View view, int position) {
+
+            }
+        });
+
         circularSeekBar.setIndicatorEnabled(false);
         FrameLayout bottomSheet = findViewById(R.id.frameLayout);
 
@@ -579,7 +604,7 @@ public class MainActivity extends UniEXActivity.UniEXMusicActivity implements Vi
 
         defaultPeekHeight = bottomSheetBehavior.getPeekHeight();
 
-        listView.setOnItemClickListener(this);
+        //listView.setOnItemClickListener(this);
 
         firstViewChild = findViewById(R.id.firstViewChild);
 

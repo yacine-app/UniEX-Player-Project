@@ -5,8 +5,11 @@ import android.graphics.Bitmap;
 import androidx.annotation.ColorInt;
 import androidx.annotation.NonNull;
 
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * ColorPicker from image source.
@@ -26,34 +29,29 @@ public class ColorPicker {
 
         /**
          *
-         * @param a is an colors array that is returned from image pixels.
+         * @param a is an colors hashMap that is returned from image pixels.
          */
-        private ColorResult(@NonNull int[] a){
-            //TODO
-            Arrays.sort(a);
-            int b, i, v;
-            int[][] l = new int[a.length][2];
-            for(i = 0, v = 0;i < a.length;v++){
-                b = 1;
-                try {
-                    while (a[i] == a[i + 1]) {
-                        i++;
-                        b++;
-                        if (i + 1 >= a.length) break;
-                    }
-                }catch (ArrayIndexOutOfBoundsException ignored){ }
-                l[v] = new int[]{a[i++], b};
-            }
-            l = Arrays.copyOf(l, v);
-            Arrays.sort(l, new Comparator<int[]>() {
+        private ColorResult(@NonNull HashMap<Integer, Integer> a) {
+            final Set<Map.Entry<Integer, Integer>> entries = a.entrySet();
+            Map.Entry<Integer, Integer> maxEntry, minEntry;
+
+            maxEntry = Collections.max(entries, new Comparator<Map.Entry<Integer, Integer>>() {
                 @Override
-                public int compare(int[] o1, int[] o2) {
-                    return o2[1] - o1[1];
+                public int compare(Map.Entry<Integer, Integer> o1, Map.Entry<Integer, Integer> o2) {
+                    return (o1.getKey().compareTo(o2.getKey()) - o1.getValue().compareTo(o2.getValue())) / 2 + entries.size() / 5;
                 }
             });
-            lowColor  = l[10 * v / 100][0];
-            highColor = l[80 * v / 100][0];
+
+            minEntry = Collections.min(entries, new Comparator<Map.Entry<Integer, Integer>>() {
+                @Override
+                public int compare(Map.Entry<Integer, Integer> o1, Map.Entry<Integer, Integer> o2) {
+                    return (o1.getKey().compareTo(o2.getKey()) - o1.getValue().compareTo(o2.getValue())) / 2 + entries.size() / 5;
+                }
+            });
+            highColor = maxEntry.getKey();
+            lowColor = minEntry.getKey();
             isLight = ColorPicker.isLightColor(this.highColor);
+            //Log.e(getClass().getName(), String.format("#%06X", highColor) + ", n: " + maxEntry.getValue() + ", index: " + pp++);
         }
 
         /**
@@ -92,11 +90,17 @@ public class ColorPicker {
      * @see ColorInt
      */
     public static boolean isLightColor(@ColorInt int color){
-        float r = ((color >> 24) & 0xFF);
-        float g = ((color >> 16) & 0xFF);
-        float b = ((color >>  8) & 0xFF);
-        float l = (r * 299.0f + g * 587.0f + b * 114.0f) / 1000.0f;
-        return l <= 169.5f;
+        return getLum(color) <= 169.5f;
+    }
+
+    public static float getLum(@ColorInt int color){
+        float[] c = toColor(color);
+        return (c[0] * 299.0f + c[1] * 587.0f + c[2] * 114.0f) / 1000.0f;
+    }
+
+    @NonNull
+    public static float[] toColor(@ColorInt int color){
+        return new float[]{(color & 0xFF0000) >>> 16, (color & 0xFF00  ) >>>  8, color & 0xFF};
     }
 
     /**
@@ -130,7 +134,7 @@ public class ColorPicker {
         return new ColorResult(colorPicker.colors);
     }
 
-    private int[] colors;
+    private HashMap<Integer, Integer> colors = new HashMap<>();
 
     private OnDoneListener onDoneListener;
     private Thread thread;
@@ -138,11 +142,15 @@ public class ColorPicker {
     private Runnable runnable = new Runnable() {
         @Override
         public void run() {
-            int i = 0;
-            for(;i < colors.length;i++) {
+            int i = 0, length = bitmap.getWidth() * bitmap.getHeight();
+            for(;i < length;i++) {
                 final int color = bitmap.getPixel(i % bitmap.getWidth(), i / bitmap.getHeight());
-                float a = ((color >> 24) & 0xFF) / 255.0f;
-                if(a == 1.0f) colors[i] = color;
+                float a = ((color & 0xFF000000) >>> 24) / 255.0f;
+                if(a == 1.0f) {
+                    Integer l = colors.get(color);
+                    if(l == null) colors.put(color, 1);
+                    else colors.put(color, l + 1);
+                }
             }
             if(onDoneListener != null) onDoneListener.onDone(new ColorResult(colors));
             bitmap.recycle();
@@ -157,7 +165,6 @@ public class ColorPicker {
      */
     public ColorPicker(@NonNull Bitmap image){
         bitmap = Bitmap.createScaledBitmap(image, 82, 82, true);
-        this.colors = new int[bitmap.getWidth() * bitmap.getHeight()];
         this.thread = new Thread(runnable);
     }
     @SuppressWarnings("unused")

@@ -38,7 +38,7 @@
             app:layout_constraintTop_toBottomOf="@id/main_action_bar"
             app:layout_constraintBottom_toBottomOf="parent">
 
-            <ListView
+            <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/list"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
@@ -55,11 +55,9 @@
         android:background="@android:color/white"
         app:layout_constraintBottom_toBottomOf="parent"
         style="?attr/bottomSheetStyle"
-        android:layout_margin="0dp"
         app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior"
         app:behavior_hideable="false"
         app:behavior_peekHeight="55dp"
-        app:layout_dodgeInsetEdges="all"
         android:focusableInTouchMode="true"
         android:elevation="4dp"
         android:focusable="true"
