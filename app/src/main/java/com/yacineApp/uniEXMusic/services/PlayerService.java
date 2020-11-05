@@ -55,7 +55,7 @@ public class PlayerService extends MediaBrowserServiceCompat implements PlayerCo
             Intent activity = new Intent(context, ScreenLockPlayerActivity.class);
             try {
                 if (Intent.ACTION_SCREEN_OFF.equals(intent.getAction())) {
-                    if (!keyguardManager.isKeyguardSecure() && isPlaying()) PendingIntent.getActivity(context, 0, activity, PendingIntent.FLAG_UPDATE_CURRENT).send();
+                    if (isPlaying() && !ScreenLockPlayerActivity.IS_ACTIVITY_RUNNING) PendingIntent.getActivity(context, 0, activity, PendingIntent.FLAG_UPDATE_CURRENT).send();
                 }else if (Intent.ACTION_USER_PRESENT.equals(intent.getAction())) {
                     if (keyguardManager.isKeyguardSecure() && ScreenLockPlayerActivity.IS_ACTIVITY_RUNNING)
                         PendingIntent.getActivity(context, 0, activity.setAction(ScreenLockPlayerActivity.CLOSE_LOOK_SCREEN_ACTIVITY), PendingIntent.FLAG_UPDATE_CURRENT).send();

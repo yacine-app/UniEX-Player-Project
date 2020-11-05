@@ -345,7 +345,7 @@ public class ScreenLockPlayerActivity extends UniEXActivity.UniEXMusicActivity i
                     case MotionEvent.ACTION_UP:
                         if(r > 360.0f) {
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) keyguardManager.requestDismissKeyguard(activity, null);
-                            finish();
+                            if(!keyguardManager.isDeviceLocked()) finish();
                         }else setViewsAlpha(1.0f, true);
                         break;
                 }
@@ -353,6 +353,12 @@ public class ScreenLockPlayerActivity extends UniEXActivity.UniEXMusicActivity i
             }
         });
 
+    }
+
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus) {
+        super.onWindowFocusChanged(hasFocus);
+        if(hasFocus) setViewsAlpha(1.0f, true);
     }
 
     private void setViewsAlpha(float alpha, boolean animated){
