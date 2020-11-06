@@ -16,6 +16,7 @@ this project is for learning purposes.
  * change from default android media style notification to a custom view.
  * add change app color depends on media art ( still testing ).
  * add lock screen media controller ( still testing ).
+ * app now will remember last played track with loop state and its playing position.
 
 ### v0.0.1-alpha.2:
 #### Download link:
