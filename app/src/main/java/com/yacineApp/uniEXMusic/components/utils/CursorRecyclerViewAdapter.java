@@ -75,15 +75,38 @@ public abstract class CursorRecyclerViewAdapter<VH extends RecyclerView.ViewHold
         public void onChanged() {
             super.onChanged();
             validId = true;
-            notifyDataSetChanged();
+            notifyItemRangeChanged(0, getItemCount());
         }
 
         @Override
         public void onInvalidated() {
             super.onInvalidated();
             validId = false;
-            notifyDataSetChanged();
+            notifyItemRangeChanged(0, getItemCount());
         }
+    }
+
+    public void changeCursor(@Nullable Cursor cursor){
+        Cursor old = swapCursor(cursor);
+        if(old != null) old.close();
+    }
+
+    @Nullable
+    private Cursor swapCursor(@Nullable Cursor newCursor){
+        if(newCursor == cursor) return null;
+        final  Cursor oldCursor = cursor;
+        if(oldCursor != null && dataSetObserver != null) cursor.unregisterDataSetObserver(dataSetObserver);
+        cursor = newCursor;
+        if(newCursor != null){
+            if(dataSetObserver != null) cursor.registerDataSetObserver(dataSetObserver);
+            rowIdColumn = newCursor.getColumnIndexOrThrow(MediaStore.Audio.Media._ID);
+            validId = true;
+        } else {
+            rowIdColumn = -1;
+            validId = false;
+        }
+        notifyItemRangeChanged(0, getItemCount());
+        return oldCursor;
     }
 
     @Nullable

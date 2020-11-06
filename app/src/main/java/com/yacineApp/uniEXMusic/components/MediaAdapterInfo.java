@@ -1,5 +1,6 @@
 package com.yacineApp.uniEXMusic.components;
 
+import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -58,6 +59,7 @@ public class MediaAdapterInfo extends CursorRecyclerViewAdapter<MediaAdapterInfo
     private MediaInfo.OnDonePreparingListener onDonePreparingListener = new MediaInfo.OnDonePreparingListener() {
         @Override
         public void onPrepared(@NonNull final MediaInfo mediaInfo, @NonNull final ViewHolder holder) {
+            if(activity == null) return;
             activity.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
@@ -77,7 +79,10 @@ public class MediaAdapterInfo extends CursorRecyclerViewAdapter<MediaAdapterInfo
     public MediaInfo getItem(int pos){
         Cursor cursor = getCursor();
         assert cursor != null;
-        if(!cursor.moveToPosition(pos)) return null;
+        if(!cursor.moveToPosition(pos)){
+            if(!cursor.moveToFirst()) return null;
+        }
+        if(mediaInfoList.size() != getItemCount()) setSize(getItemCount());
         MediaInfo mediaInfo = mediaInfoList.get(pos);
         if(mediaInfo == null){
             mediaInfo = MediaInfo.valueOf(cursor);
@@ -98,7 +103,7 @@ public class MediaAdapterInfo extends CursorRecyclerViewAdapter<MediaAdapterInfo
                         .build(), a.getId());
     }
 
-    private void setSize(int size){
+    public void setSize(int size){
         mediaInfoList = new ArrayList<>(Collections.<MediaInfo>nCopies(size, null));
     }
 
@@ -114,17 +119,17 @@ public class MediaAdapterInfo extends CursorRecyclerViewAdapter<MediaAdapterInfo
             holder.title.setTextColor(getContext().getResources().getColor(R.color.colorMainTheme, null));
             holder.artist.setTextColor(getContext().getResources().getColor(R.color.colorMainTheme, null));
         }
-        int pos = cursor.getPosition();
+        //int pos = cursor.getPosition();
         MediaInfo mediaInfo;
-        if (!MediaInfo.contains(mediaInfoList, getItemId(pos))) {
+        //if (!MediaInfo.contains(mediaInfoList, getItemId(pos))) {
             mediaInfo = MediaInfo.valueOf(cursor);
             mediaInfo.setOnDonePreparingListener(onDonePreparingListener);
             mediaInfo.prepareSync(defaultIcon, holder);
             mediaInfoList.add(mediaInfo);
-        }else mediaInfo = mediaInfoList.get(pos);
+        //}else mediaInfo = mediaInfoList.get(pos);
         holder.setArtist(mediaInfo.getArtist());
         holder.setTitle(mediaInfo.getTitle());
-        //mediaInfo = mediaInfoList.get(pos);
+        holder.setArt(mediaInfo.getSmallArt());
     }
 
     @SuppressWarnings("unused")
@@ -132,6 +137,17 @@ public class MediaAdapterInfo extends CursorRecyclerViewAdapter<MediaAdapterInfo
         super(activity, CursorRecyclerViewAdapter.createCursor(activity));
         this.activity = activity;
         defaultIcon = BitmapFactory.decodeResource(activity.getResources(), R.raw.default_media_icon);
+    }
+
+    public MediaAdapterInfo(@NonNull Context context){
+        super(context, CursorRecyclerViewAdapter.createCursor(context));
+        defaultIcon = BitmapFactory.decodeResource(context.getResources(), R.raw.default_media_icon);
+    }
+
+    public void setActivity(AppCompatActivity activity) {
+        this.activity = activity;
+        changeCursor(CursorRecyclerViewAdapter.createCursor(activity));
+        notifyItemRangeChanged(0, getItemCount());
     }
 
     public void setSelectedIndex(@NonNull Index index){

@@ -7,6 +7,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.content.pm.ServiceInfo;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -73,6 +74,10 @@ public class PlayerService extends MediaBrowserServiceCompat implements PlayerCo
     public static final String EXTRA_MEDIA_SERVICE_TO_ITEM  = "com.dzteam.UniExPlayer.Services.PlayerService.EXTRA_MEDIA_SERVICE_TO_ITEM";
     @SuppressWarnings("unused") public static final String MEDIA_ROOT_ID       = "com.dzteam.UniExPlayer.Services.PlayerService.MEDIA_ROOT_ID";
     @SuppressWarnings("unused") public static final String EMPTY_MEDIA_ROOT_ID = "com.dzteam.UniExPlayer.Services.PlayerService.EMPTY_MEDIA_ROOT_ID";
+    public static final String PLAYER_SETTINGS_TAG          = "com.dzteam.UniExPlayer.Services.PlayerService.PLAYER_SETTINGS_TAG";
+    public static final String PLAY_LIST_INDEX              = "com.dzteam.UniExPlayer.Services.PlayerService.PLAY_LIST_INDEX";
+    public static final String PLAYER_LOOP_STATE            = "com.dzteam.UniExPlayer.Services.PlayerService.PLAYER_LOOP_STATE";
+    public static final String PLAYER_LAST_TIME_POSITION    = "com.dzteam.UniExPlayer.Services.PlayerService.PLAYER_LAST_TIME_POSITION";
 
     private boolean bound = false;
     private int[] loopStates = new int[]{PlayerCore.LOOP_STATE_ALL, PlayerCore.LOOP_STATE_ALL_REPEAT, PlayerCore.LOOP_STATE_ONE_REPEAT};
@@ -88,9 +93,9 @@ public class PlayerService extends MediaBrowserServiceCompat implements PlayerCo
     private PlayerCore playerCore;
     private MediaAdapterInfo mediaAdapterInfo;
     private RemoteViews collapsedRemoveView, expandedRemoveView;
-    private List<MediaInfo> mediaInfoList;
     private PendingIntent rewindAction, skipToPreviousAction, playPauseAction, skipToNextAction, fastForwardAction, closeAction;
     private SBinder sBinder = new SBinder();
+    private SharedPreferences sharedPreferences;
     private CanLaunchLookScreenActivityReceiver screenOnReceiver = new CanLaunchLookScreenActivityReceiver();
     private MediaSessionCompat.Callback mediaCallBack = new MediaSessionCompat.Callback() {
 
@@ -122,9 +127,7 @@ public class PlayerService extends MediaBrowserServiceCompat implements PlayerCo
                 unregisterReceiver(mediaControlReceiver);
                 unregisterReceiver(screenOnReceiver);
             }
-            catch (IllegalArgumentException e){
-                Log.e(this.getClass().getName(), "call Context#unregisterReceiver() ", e);
-            }
+            catch (IllegalArgumentException ignored){ }
         }
 
         @Override
@@ -165,14 +168,21 @@ public class PlayerService extends MediaBrowserServiceCompat implements PlayerCo
     @Override
     public void onCreate() {
         super.onCreate();
+        mediaAdapterInfo = new MediaAdapterInfo(this);
         keyguardManager = (KeyguardManager) getSystemService(KEYGUARD_SERVICE);
         powerManager = (PowerManager) getSystemService(POWER_SERVICE);
         wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, getPackageName() + "::" + this.getClass().getName());
         wakeLock.acquire();
         SERVICE_ALREADY_CREATED = true;
         playerCore = new PlayerCore(this);
+        playerCore.setMediaAdapterInfo(mediaAdapterInfo);
+        sharedPreferences = getSharedPreferences(PLAYER_SETTINGS_TAG, Context.MODE_PRIVATE);
+        playerCore.skipTo(sharedPreferences.getInt(PLAY_LIST_INDEX, 0), false);
+        playerCore.setLoopState(sharedPreferences.getInt(PLAYER_LOOP_STATE, PlayerCore.LOOP_STATE_ALL));
+        playerCore.seekTo(sharedPreferences.getLong(PLAYER_LAST_TIME_POSITION, 0L));
+        //playerCore.setPlaylistLength(mediaAdapterInfo.getItemCount());
         playerCore.setErrorListener(this);
-        PendingIntent contentIntent = PendingIntent.getActivity(this, 0, new Intent(this, MainActivity.class).setAction(MainActivity.ACTION_LAUNCH_PLAY_BACK), PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent contentIntent = PendingIntent.getActivity(this, 0, new Intent(this, MainActivity.class).setAction(MainActivity.ACTION_LAUNCH_PLAY_BACK).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK), PendingIntent.FLAG_UPDATE_CURRENT);
 
         notificationBuilder = new NotificationCompat.Builder(this, ApplicationSetup.Notification.NOTIFICATION_PLAYER_SERVICE);
         expandedRemoveView = new RemoteViews(getPackageName(), R.layout.notification_controller_layout_expanded);
@@ -204,9 +214,15 @@ public class PlayerService extends MediaBrowserServiceCompat implements PlayerCo
         expandedRemoveView.setOnClickPendingIntent(R.id.close_action_notification, closeAction);
     }
 
+    @SuppressLint("CommitPrefEdits")
     @Override
     public void onDestroy() {
         super.onDestroy();
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putInt(PLAY_LIST_INDEX, getCurrentPlayIndex());
+        editor.putInt(PLAYER_LOOP_STATE, getLoopState());
+        editor.putLong(PLAYER_LAST_TIME_POSITION, (long) getCurrentPosition());
+        editor.apply();
         playerCore.release();
         wakeLock.release();
         SERVICE_ALREADY_CREATED = false;
@@ -222,7 +238,7 @@ public class PlayerService extends MediaBrowserServiceCompat implements PlayerCo
     }
 
     private void s(){
-        if (isPlaying()) startActivity(new Intent(this, MainActivity.class).setAction(MainActivity.ACTION_LAUNCH_PLAY_BACK));
+        if (isPlaying()) startActivity(new Intent(this, MainActivity.class).setAction(MainActivity.ACTION_LAUNCH_PLAY_BACK).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
     }
 
     @Override

@@ -74,6 +74,9 @@ public class PlayerCore implements AudioManager.OnAudioFocusChangeListener {
                     PlaybackStateCompat.ACTION_PLAY
                     | PlaybackStateCompat.ACTION_PAUSE
                     | PlaybackStateCompat.ACTION_PLAY_PAUSE
+                    | PlaybackStateCompat.ACTION_PLAY_FROM_MEDIA_ID
+                    | PlaybackStateCompat.ACTION_PLAY_FROM_SEARCH
+                    | PlaybackStateCompat.ACTION_PLAY_FROM_URI
                     | PlaybackStateCompat.ACTION_FAST_FORWARD
                     | PlaybackStateCompat.ACTION_REWIND
                     | PlaybackStateCompat.ACTION_SKIP_TO_NEXT
@@ -127,6 +130,7 @@ public class PlayerCore implements AudioManager.OnAudioFocusChangeListener {
 
     public void setMediaAdapterInfo(@NonNull MediaAdapterInfo adapterInfo) {
         mediaAdapterInfo = adapterInfo;
+        setPlaylistLength(mediaAdapterInfo.getItemCount());
         //mediaSession.setQueue(adapterInfo.getItem());
     }
 
@@ -274,6 +278,10 @@ public class PlayerCore implements AudioManager.OnAudioFocusChangeListener {
     public void setErrorListener(ErrorListener errorListener) { this.errorListener = errorListener; }
 
     public void skipTo(int position){
+        skipTo(position, true);
+    }
+
+    public void skipTo(int position, boolean autoPlay){
         if(position < 0 || position >= PLAYLIST_LENGTH)return;
         CURRENT_POSITION = position;
         setMediaSource(mediaAdapterInfo.getItemQueue(CURRENT_POSITION).getDescription().getMediaUri());
@@ -281,12 +289,12 @@ public class PlayerCore implements AudioManager.OnAudioFocusChangeListener {
                 .setState(PlaybackStateCompat.STATE_SKIPPING_TO_QUEUE_ITEM, this.mediaPlayer.getCurrentPosition(), 1.0f)
                 .build());
         this.mediaSession.setMetadata(getMetaData());
-        play();
+        if(autoPlay) play();
     }
 
     public void release(){
         stop();
-        this.mediaSession.release();
+        //this.mediaSession.release();
         this.mediaPlayer.reset();
         this.mediaPlayer.release();
         removeAllCallBacks();

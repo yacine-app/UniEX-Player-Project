@@ -18,6 +18,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
+import android.os.Parcelable;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
 import android.util.Log;
@@ -67,9 +68,7 @@ import com.github.stefanodp91.android.circularseekbar.OnCircularSeekBarChangeLis
 
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 
-import java.util.List;
-
-public class MainActivity extends UniEXActivity.UniEXMusicActivity implements View.OnClickListener, LoadInternalMedia.OnDoneListener, OnCircularSeekBarChangeListener, View.OnLongClickListener {
+public class MainActivity extends UniEXActivity.UniEXMusicActivity implements View.OnClickListener, OnCircularSeekBarChangeListener, View.OnLongClickListener {
 
     public static final String ACTION_LAUNCH_PLAY_BACK = "ACTION_LAUNCH_PLAY_BACK";
     public static final String ACTION_LAUNCH_PLAY_BACK_IF_PLAYING = "ACTION_LAUNCH_PLAY_BACK_IF_PLAYING";
@@ -81,7 +80,6 @@ public class MainActivity extends UniEXActivity.UniEXMusicActivity implements Vi
     private int behaviorDefaultLaunch = BottomSheetBehavior.STATE_COLLAPSED;
     private int previousState = 0;
     private int defaultPeekHeight = 55;
-    private int listViewScrollState = 0;
 
     private PlayerService playerService = null;
     private AppCompatActivity activity;
@@ -93,7 +91,7 @@ public class MainActivity extends UniEXActivity.UniEXMusicActivity implements Vi
     private CircleLineVisualizer circleLineVisualizer;
     private CardView mediaArtCard;
     private MediaAdapterInfo mediaAdapterInfo;
-    private Bundle savedState;
+    private Parcelable savedState;
     private View includedLayout;
     private View mediaController;
     private View firstViewChild;
@@ -176,7 +174,7 @@ public class MainActivity extends UniEXActivity.UniEXMusicActivity implements Vi
             playerService.setCallBack(callback);
             playerService.setOnPreparedListener(onPreparedListener);
             playerService.setOnLoopChangedListener(onLoopChangedListener);
-            if(playerService.getMediaAdapterInfo() == null) prepareList();
+            if(mediaAdapterInfo == null) prepareList();
             else {
                 playerService.updateMediaAdapterInfo();
                 updateUi(playerService.getMediaInfo());
@@ -232,7 +230,6 @@ public class MainActivity extends UniEXActivity.UniEXMusicActivity implements Vi
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        savedState = savedInstanceState;
         activity = this;
         prepareUi(0);
         if(!PlayerService.SERVICE_ALREADY_CREATED) startService(new Intent(this, PlayerService.class));
@@ -277,7 +274,7 @@ public class MainActivity extends UniEXActivity.UniEXMusicActivity implements Vi
         return super.onOptionsItemSelected(item);
     }
 
-    @Override
+    /*@Override
     public void onDone(@NonNull final List<MediaInfo> mediaInfoList) {
         runOnUiThread(new Runnable() {
             @Override
@@ -290,7 +287,7 @@ public class MainActivity extends UniEXActivity.UniEXMusicActivity implements Vi
                 recyclerView.setAdapter(mediaAdapterInfo);
             }
         });
-    }
+    }*/
 
     /*@Override
     public void onItemClick(@NonNull View view, int position) {
@@ -562,7 +559,7 @@ public class MainActivity extends UniEXActivity.UniEXMusicActivity implements Vi
 
         recyclerView = findViewById(R.id.list);
 
-        recyclerView.scrollTo(0, listViewScrollState);
+        /*recyclerView.scrollTo(0, listViewScrollState);
 
         listViewScrollState = recyclerView.getScrollY();
 
@@ -571,11 +568,18 @@ public class MainActivity extends UniEXActivity.UniEXMusicActivity implements Vi
             public void onScrollChange(View v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
                 listViewScrollState = scrollY;
             }
-        });
+        });*/
 
         recyclerView.setHasFixedSize(true);
 
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+
+        if(savedState != null)
+            layoutManager.onRestoreInstanceState(savedState);
+
+        savedState = layoutManager.onSaveInstanceState();
+
+        recyclerView.setLayoutManager(layoutManager);
 
         recyclerView.setItemViewCacheSize(20);
         recyclerView.setDrawingCacheEnabled(true);
@@ -679,11 +683,22 @@ public class MainActivity extends UniEXActivity.UniEXMusicActivity implements Vi
             playerService.setMediaQueue(mediaAdapterInfo);
         }
         listView.setAdapter(mediaAdapterInfo);*/
-        LoadInternalMedia loadInternalMedia = new LoadInternalMedia(this);
+        /*LoadInternalMedia loadInternalMedia = new LoadInternalMedia(this);
         loadInternalMedia.setStart(0);
         loadInternalMedia.setLength(1);
         loadInternalMedia.setOnDoneListener(this);
-        loadInternalMedia.execute();
+        loadInternalMedia.execute();*/
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if(playerService != null){
+                    mediaAdapterInfo = playerService.getMediaAdapterInfo();
+                    assert mediaAdapterInfo != null;
+                    mediaAdapterInfo.setActivity(activity);
+                    recyclerView.setAdapter(mediaAdapterInfo);
+                }
+            }
+        });
     }
 
     @SuppressWarnings("deprecation")
@@ -768,7 +783,7 @@ public class MainActivity extends UniEXActivity.UniEXMusicActivity implements Vi
                 }
                 if(playerService != null && isPermissionGranted(Manifest.permission.RECORD_AUDIO)) circleLineVisualizer.setAudioSessionId(playerService.getAudioSessionId());
                 circularSeekBarChanging = false;
-                //  setSupportActionBar(frameActionBar);
+                setSupportActionBar(frameActionBar);
                 break;
             case BottomSheetBehavior.STATE_COLLAPSED:
                 mediaController.setVisibility(View.VISIBLE);

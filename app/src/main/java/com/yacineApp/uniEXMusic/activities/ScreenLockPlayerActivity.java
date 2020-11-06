@@ -77,7 +77,7 @@ public class ScreenLockPlayerActivity extends UniEXActivity.UniEXMusicActivity i
                 int pos = playerService.getCurrentPosition();
                 frameCurrentTime.setText(timeFormatter.getCurrentTime(pos));
                 circularSeekBar.setProgress(pos * 100.0f / timeFormatter.getTotalTimeInt());
-                circleLineVisualizer.setRotation(pos / 110.0f);
+                //circleLineVisualizer.setRotation(pos / 110.0f);
             }
             if(playerService != null && playerService.isPlaying()) handler.postDelayed(this, CIRCULAR_SEEK_BAR_UPDATE_DELAY);
         }

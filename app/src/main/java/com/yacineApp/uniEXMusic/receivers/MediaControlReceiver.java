@@ -9,6 +9,8 @@ import android.support.v4.media.session.PlaybackStateCompat;
 
 import androidx.media.session.MediaButtonReceiver;
 
+import com.yacineApp.uniEXMusic.services.PlayerService;
+
 
 public class MediaControlReceiver extends BroadcastReceiver {
 
@@ -16,10 +18,8 @@ public class MediaControlReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         if(intent != null && AudioManager.ACTION_AUDIO_BECOMING_NOISY.equals(intent.getAction())){
             try {
-                MediaButtonReceiver.buildMediaButtonPendingIntent(context, PlaybackStateCompat.ACTION_PAUSE).send();
-            } catch (PendingIntent.CanceledException e) {
-                e.printStackTrace();
-            }
+                if(PlayerService.SERVICE_ALREADY_CREATED) MediaButtonReceiver.buildMediaButtonPendingIntent(context, PlaybackStateCompat.ACTION_PAUSE).send();
+            } catch (PendingIntent.CanceledException ignored) { }
         }
     }
 }
