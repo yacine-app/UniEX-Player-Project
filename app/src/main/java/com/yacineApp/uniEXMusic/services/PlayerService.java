@@ -288,7 +288,7 @@ public class PlayerService extends MediaBrowserServiceCompat implements PlayerCo
         collapsedRemoveView.setImageViewBitmap(R.id.image_color_theme_notification ,bitmap);
         expandedRemoveView.setImageViewBitmap(R.id.image_color_theme_notification ,bitmap);
 
-        int playPauseIcon = 0;
+        int playPauseIcon;
 
         if(colorResult.isLightColor()){
             collapsedRemoveView.setTextColor(R.id.media_title_notification, Color.WHITE);
@@ -368,13 +368,14 @@ public class PlayerService extends MediaBrowserServiceCompat implements PlayerCo
 
     public void setMediaQueue(@NonNull MediaAdapterInfo mediaAdapterInfo){
         this.mediaAdapterInfo = mediaAdapterInfo;
-        this.mediaInfoList = mediaAdapterInfo.getMediaInfoList();
-        playerCore.setQueueFromMediaAdapterInfo(mediaAdapterInfo);
+        //this.mediaInfoList = mediaAdapterInfo.getMediaInfoList();
+        playerCore.setMediaAdapterInfo(mediaAdapterInfo);
+        playerCore.setPlaylistLength(mediaAdapterInfo.getItemCount());
     }
 
     public void updateMediaAdapterInfo(){
-        this.mediaAdapterInfo = new MediaAdapterInfo(mediaInfoList);
-        this.mediaAdapterInfo.setSelectedIndex(new MediaAdapterInfo.Index(getCurrentPlayIndex()));
+        /*this.mediaAdapterInfo = new MediaAdapterInfo(mediaInfoList);
+        this.mediaAdapterInfo.setSelectedIndex(new MediaAdapterInfo.Index(getCurrentPlayIndex()));*/
     }
 
     public void changeLoopState(){
@@ -383,9 +384,6 @@ public class PlayerService extends MediaBrowserServiceCompat implements PlayerCo
     }
 
     private PendingIntent createPendingAction(long action){ return MediaButtonReceiver.buildMediaButtonPendingIntent(this, action); }
-
-    @Nullable
-    public MediaMetadataCompat getMetaData(){ return playerCore.getMetaData(); }
 
     @Nullable
     public MediaAdapterInfo getMediaAdapterInfo() { return mediaAdapterInfo; }

@@ -1,14 +1,12 @@
 package com.yacineApp.uniEXMusic.components;
 
-import android.content.ContentResolver;
-import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Typeface;
 import android.net.Uri;
-import android.provider.MediaStore;
-import android.util.Log;
+import android.support.v4.media.MediaDescriptionCompat;
+import android.support.v4.media.session.MediaSessionCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,16 +15,18 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.yacineApp.uniEXMusic.R;
+import com.yacineApp.uniEXMusic.components.utils.CursorRecyclerViewAdapter;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
-public class MediaAdapterInfo extends RecyclerView.Adapter<MediaAdapterInfo.ViewHolder> {
+public class MediaAdapterInfo extends CursorRecyclerViewAdapter<MediaAdapterInfo.ViewHolder> {
 
     public static class Index {
         private int index;
@@ -36,10 +36,8 @@ public class MediaAdapterInfo extends RecyclerView.Adapter<MediaAdapterInfo.View
     public static class ViewHolder extends RecyclerView.ViewHolder {
         TextView title, artist;
         private ImageView art;
-        private Context context;
-        public ViewHolder(@NonNull ConstraintLayout itemView) {
-            super(itemView);
-            context = itemView.getContext();
+        public ViewHolder(@NonNull ConstraintLayout constraintLayout) {
+            super(constraintLayout);
             art = itemView.findViewById(R.id.art_image_list);
             title = itemView.findViewById(R.id.media_info_title);
             artist = itemView.findViewById(R.id.media_info_artist);
@@ -47,7 +45,6 @@ public class MediaAdapterInfo extends RecyclerView.Adapter<MediaAdapterInfo.View
             artist.setTextColor(0x0FF2F2F2F);
             title.setTypeface(Typeface.defaultFromStyle(Typeface.NORMAL));
         }
-        public Context getContext() { return context; }
         public void setArt(Bitmap art) { this.art.setImageBitmap(art); }
         public void setArtist(String artist) { this.artist.setText(artist); }
         public void setTitle(String title) { this.title.setText(title); }
@@ -56,81 +53,92 @@ public class MediaAdapterInfo extends RecyclerView.Adapter<MediaAdapterInfo.View
 
     private List<MediaInfo> mediaInfoList = new ArrayList<>();
     private Index index = null;
-    private RecyclerView recyclerView;
+    private AppCompatActivity activity;
+    private Bitmap defaultIcon;
+    private MediaInfo.OnDonePreparingListener onDonePreparingListener = new MediaInfo.OnDonePreparingListener() {
+        @Override
+        public void onPrepared(@NonNull final MediaInfo mediaInfo, @NonNull final ViewHolder holder) {
+            activity.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    holder.setArt(mediaInfo.getSmallArt());
+                }
+            });
+        }
+    };
 
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        ConstraintLayout constraintLayout = (ConstraintLayout) LayoutInflater.from(parent.getContext()).inflate(R.layout.media_item_info_list_layout, parent, false);
-        /*LinearLayoutManager layoutManager = (LinearLayoutManager) recyclerView.getLayoutManager();
-        LoadInternalMedia loadInternalMedia = new LoadInternalMedia(parent.getContext());
-        loadInternalMedia.setMediaInfoList(mediaInfoList);
-        assert layoutManager != null;
-        loadInternalMedia.setLength(layoutManager.getHeight() / 63);
-        loadInternalMedia.setStart(layoutManager.findFirstVisibleItemPosition());
-        loadInternalMedia.setOnDoneListener(new LoadInternalMedia.OnDoneListener() {
-            @Override
-            public void onDone(@NonNull List<MediaInfo> mediaInfoList) {
-                MediaAdapterInfo.this.mediaInfoList = mediaInfoList;
-                notifyDataSetChanged();
-            }
-        });
-        loadInternalMedia.execute();*/
+        ConstraintLayout constraintLayout = (ConstraintLayout) LayoutInflater.from(getContext()).inflate(R.layout.media_item_info_list_layout, parent, false);
         return new ViewHolder(constraintLayout);
     }
 
+    public MediaInfo getItem(int pos){
+        Cursor cursor = getCursor();
+        assert cursor != null;
+        if(!cursor.moveToPosition(pos)) return null;
+        MediaInfo mediaInfo = mediaInfoList.get(pos);
+        if(mediaInfo == null){
+            mediaInfo = MediaInfo.valueOf(cursor);
+            mediaInfo.prepare(defaultIcon);
+            mediaInfoList.set(pos, mediaInfo);
+        }
+        return mediaInfo;
+    }
+
+    public MediaSessionCompat.QueueItem getItemQueue(int pos){
+        MediaInfo a = getItem(pos);
+        return new MediaSessionCompat.QueueItem(
+                new MediaDescriptionCompat.Builder()
+                        .setIconBitmap(a.getArt())
+                        .setTitle(a.getTitle())
+                        .setSubtitle(a.getArtist())
+                        .setMediaUri(Uri.parse(a.getPath()))
+                        .build(), a.getId());
+    }
+
+    private void setSize(int size){
+        mediaInfoList = new ArrayList<>(Collections.<MediaInfo>nCopies(size, null));
+    }
+
     @Override
-    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull ViewHolder holder, @Nullable Cursor cursor) {
+        if(cursor == null) return;
+        if(getItemCount() != mediaInfoList.size()) setSize(getItemCount());
         holder.title.setTextColor(0x0FF252525);
         holder.artist.setTextColor(0x0FF2F2F2F);
         holder.title.setTypeface(Typeface.defaultFromStyle(Typeface.NORMAL));
-        if(index != null && index.index == position){
+        if(index != null && index.index == cursor.getPosition()){
             holder.title.setTypeface(holder.title.getTypeface(), Typeface.BOLD);
-            holder.title.setTextColor(holder.getContext().getResources().getColor(R.color.colorMainTheme, null));
-            holder.artist.setTextColor(holder.getContext().getResources().getColor(R.color.colorMainTheme, null));
+            holder.title.setTextColor(getContext().getResources().getColor(R.color.colorMainTheme, null));
+            holder.artist.setTextColor(getContext().getResources().getColor(R.color.colorMainTheme, null));
         }
-        MediaInfo mediaInfo = mediaInfoList.get(position);
-        holder.setArt(mediaInfo.getSmallArt());
+        int pos = cursor.getPosition();
+        MediaInfo mediaInfo;
+        if (!MediaInfo.contains(mediaInfoList, getItemId(pos))) {
+            mediaInfo = MediaInfo.valueOf(cursor);
+            mediaInfo.setOnDonePreparingListener(onDonePreparingListener);
+            mediaInfo.prepareSync(defaultIcon, holder);
+            mediaInfoList.add(mediaInfo);
+        }else mediaInfo = mediaInfoList.get(pos);
         holder.setArtist(mediaInfo.getArtist());
         holder.setTitle(mediaInfo.getTitle());
+        //mediaInfo = mediaInfoList.get(pos);
     }
-
-    @Override
-    public int getItemCount() {
-        return mediaInfoList.size();
-    }
-
-    public MediaAdapterInfo(List<MediaInfo> mediaInfoList){ setMediaInfoList(mediaInfoList); }
 
     @SuppressWarnings("unused")
-    public MediaAdapterInfo(){}
-
-    public MediaAdapterInfo(@NonNull RecyclerView recyclerView){
-        this.recyclerView = recyclerView;
+    public MediaAdapterInfo(@NonNull AppCompatActivity activity){
+        super(activity, CursorRecyclerViewAdapter.createCursor(activity));
+        this.activity = activity;
+        defaultIcon = BitmapFactory.decodeResource(activity.getResources(), R.raw.default_media_icon);
     }
-
-    public List<MediaInfo> getMediaInfoList() { return mediaInfoList; }
-
-    @SuppressWarnings("unused")
-    public void clear(){ mediaInfoList.clear(); }
-
-    public void setMediaInfoList(List<MediaInfo> mediaInfoList) { this.mediaInfoList = mediaInfoList; }
 
     public void setSelectedIndex(@NonNull Index index){
         int lastIndex = this.index != null ? this.index.index : -1;
         if(index.index > -1) this.index = index;
         this.notifyItemChanged(lastIndex);
         this.notifyItemChanged(index.index);
-    }
-
-    @Override
-    public long getItemId(int position) {
-        return mediaInfoList.get(position).getId();
-    }
-
-    @Nullable
-    public MediaInfo getItem(int position){
-        return mediaInfoList.size() == 0 ? null : mediaInfoList.get(position);
     }
 
     @SuppressWarnings("unused")

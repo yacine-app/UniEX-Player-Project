@@ -20,18 +20,24 @@ import java.util.List;
 
 public class MediaInfo {
 
+    public interface OnDonePreparingListener {
+        void onPrepared(@NonNull MediaInfo mediaInfo, @NonNull MediaAdapterInfo.ViewHolder holder);
+    }
+
     private byte[] rawArt;
     private long id;
-    private int year = 0;
+    //private int year = 0;
     private Bitmap art = null;
     private Bitmap smallArt = null;
+    @SuppressWarnings("unused")
     private String title, path, artist, album = null, albumArtist = null, genre = null, comment = null, composer = null, lyrics = null, encoder = null, language = null;
     private boolean enabled = true;
     private ColorPicker.ColorResult colorResult;
+    private OnDonePreparingListener onDonePreparingListener;
 
     private MediaInfo(){}
 
-    public MediaInfo(long id, String title, String artist, String path){
+    public MediaInfo(long id, String title, String artist, String path) {
         this.id = id;
         this.artist = artist;
         this.title = title;
@@ -39,10 +45,55 @@ public class MediaInfo {
         mkPrepare(null);
     }
 
+    public void setOnDonePreparingListener(OnDonePreparingListener onDonePreparingListener) { this.onDonePreparingListener = onDonePreparingListener; }
+
+    @SuppressWarnings("deprecation")
+    @NonNull
+    public static MediaInfo valueOf(@Nullable Cursor cursor){
+        MediaInfo mediaInfo = new MediaInfo();
+        if(cursor == null) return mediaInfo;
+        int mediaId = cursor.getColumnIndex(MediaStore.Audio.Media._ID);
+        int mediaTitle = cursor.getColumnIndex(MediaStore.Audio.Media.TITLE);
+        int mediaArtist = cursor.getColumnIndex(MediaStore.Audio.Media.ARTIST);
+        int mediaAlbum = cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM);
+        int mediaPath = cursor.getColumnIndex(MediaStore.Audio.Media.DATA);
+        int mediaAlbumArtist = cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM_ARTIST);
+        mediaInfo.id = cursor.getLong(mediaId);
+        mediaInfo.title = cursor.getString(mediaTitle);
+        mediaInfo.artist = cursor.getString(mediaArtist);
+        mediaInfo.path = cursor.getString(mediaPath);
+        mediaInfo.album = cursor.getString(mediaAlbum);
+        //.year = cursor.getInt(mediaYear);
+        mediaInfo.albumArtist = cursor.getString(mediaAlbumArtist);
+        //.e("50985er", String.valueOf(cursor.getString(mediaYear)));
+        //mediaInfo.mkPrepare(defaultIcon);
+        //mediaInfoList.add(mediaInfo);
+        return mediaInfo;
+    }
+
+    protected void prepareSync(@Nullable final Bitmap def, @Nullable final MediaAdapterInfo.ViewHolder holder){
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                prepare(def);
+                if(onDonePreparingListener != null && holder != null) onDonePreparingListener.onPrepared(MediaInfo.this, holder);
+            }
+        }).start();
+    }
+
+    protected void prepare(@Nullable Bitmap def){ mkPrepare(def); }
+
+    @SuppressWarnings("unused")
     public static void fillListFromCursor(@NonNull Cursor cursor, @NonNull List<MediaInfo> mediaInfoList, @Nullable Bitmap defaultIcon) {
         fillListFromCursor(cursor, mediaInfoList, defaultIcon, 0, -1);
     }
 
+    public static boolean contains(@NonNull List<MediaInfo> mediaInfoList, long id){
+        for(MediaInfo m: mediaInfoList) if(m != null && m.id == id) return true;
+        return false;
+    }
+
+    @SuppressWarnings("deprecation")
     public static void fillListFromCursor(@NonNull Cursor cursor, @NonNull List<MediaInfo> mediaInfoList, @Nullable Bitmap defaultIcon, int start, int length){
         int mediaId = cursor.getColumnIndex(MediaStore.Audio.Media._ID);
         int mediaTitle = cursor.getColumnIndex(MediaStore.Audio.Media.TITLE);
@@ -105,8 +156,8 @@ public class MediaInfo {
     @Nullable
     @SuppressWarnings("unused")
     public byte[] getRawArt() { return rawArt; }
-    @SuppressWarnings("unused")
-    public int getYear() { return year; }
+    //@SuppressWarnings("unused")
+    //public int getYear() { return year; }
     @SuppressWarnings("unused")
     public String getAlbumArtist() { return albumArtist; }
     public String getTitle() { return title; }
@@ -117,6 +168,7 @@ public class MediaInfo {
     @SuppressWarnings("unused")
     protected void setArt(Bitmap art) { this.art = art; }
 
+    @SuppressWarnings("unused")
     public static List<MediaSessionCompat.QueueItem> fromMediaInfoList(List<MediaInfo> mediaInfoList){
         List<MediaSessionCompat.QueueItem> items = new ArrayList<>();
         for(MediaInfo a: mediaInfoList){

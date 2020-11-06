@@ -57,7 +57,7 @@ class MediaCallBack extends MediaSessionCompat.Callback {
     @Override
     public void onSkipToQueueItem(long id) {
         super.onSkipToQueueItem(id);
-        this.core.skipToQueueItem(id);
+        //this.core.skipToQueueItem(id);
     }
 
     @Override

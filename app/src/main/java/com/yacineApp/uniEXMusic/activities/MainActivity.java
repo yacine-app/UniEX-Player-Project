@@ -26,22 +26,21 @@ import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.Surface;
 import android.view.View;
 import android.view.WindowManager;
-import android.widget.AdapterView;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.cardview.widget.CardView;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.core.content.ContextCompat;
 import androidx.core.view.OnApplyWindowInsetsListener;
@@ -82,16 +81,19 @@ public class MainActivity extends UniEXActivity.UniEXMusicActivity implements Vi
     private int behaviorDefaultLaunch = BottomSheetBehavior.STATE_COLLAPSED;
     private int previousState = 0;
     private int defaultPeekHeight = 55;
+    private int listViewScrollState = 0;
 
     private PlayerService playerService = null;
+    private AppCompatActivity activity;
     private Intent oldIntent;
     private Handler handler = new Handler(Looper.getMainLooper());
-    private RecyclerView listView;
+    private RecyclerView recyclerView;
     private Display windowDisplayView;
     private Toolbar mainActionBar, frameActionBar;
     private CircleLineVisualizer circleLineVisualizer;
     private CardView mediaArtCard;
     private MediaAdapterInfo mediaAdapterInfo;
+    private Bundle savedState;
     private View includedLayout;
     private View mediaController;
     private View firstViewChild;
@@ -180,7 +182,7 @@ public class MainActivity extends UniEXActivity.UniEXMusicActivity implements Vi
                 updateUi(playerService.getMediaInfo());
                 onPreparedListener.onPrepared();
             }
-            listView.setAdapter(playerService.getMediaAdapterInfo());
+            recyclerView.setAdapter(playerService.getMediaAdapterInfo());
             onPreparedListener.onPrepared();
             changeBehaviorState(behaviorDefaultLaunch);
             bound = true;
@@ -204,7 +206,7 @@ public class MainActivity extends UniEXActivity.UniEXMusicActivity implements Vi
                 int pos = playerService.getCurrentPosition();
                 frameCurrentTime.setText(timeFormatter.getCurrentTime(pos));
                 circularSeekBar.setProgress(pos * 100.0f / timeFormatter.getTotalTimeInt());
-                circleLineVisualizer.setRotation(pos / 110.0f);
+                //circleLineVisualizer.setRotation(pos / 110.0f);
             }
             if(playerService != null && playerService.isPlaying()) handler.postDelayed(this, CIRCULAR_SEEK_BAR_UPDATE_DELAY);
         }
@@ -230,6 +232,8 @@ public class MainActivity extends UniEXActivity.UniEXMusicActivity implements Vi
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        savedState = savedInstanceState;
+        activity = this;
         prepareUi(0);
         if(!PlayerService.SERVICE_ALREADY_CREATED) startService(new Intent(this, PlayerService.class));
     }
@@ -278,12 +282,12 @@ public class MainActivity extends UniEXActivity.UniEXMusicActivity implements Vi
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                mediaAdapterInfo = new MediaAdapterInfo(mediaInfoList);
+                mediaAdapterInfo = new MediaAdapterInfo(activity);
                 if(playerService != null){
                     mediaAdapterInfo.setSelectedIndex(new MediaAdapterInfo.Index(playerService.getCurrentPlayIndex()));
                     playerService.setMediaQueue(mediaAdapterInfo);
                 }
-                listView.setAdapter(mediaAdapterInfo);
+                recyclerView.setAdapter(mediaAdapterInfo);
             }
         });
     }
@@ -358,6 +362,7 @@ public class MainActivity extends UniEXActivity.UniEXMusicActivity implements Vi
 //            behaviorDefaultLaunch = BottomSheetBehavior.STATE_EXPANDED;
 //        else behaviorDefaultLaunch = bottomSheetBehavior.getState();
         handler.postDelayed(runnable, CIRCULAR_SEEK_BAR_UPDATE_DELAY);
+        if(circleLineVisualizer != null && bound) circleLineVisualizer.setAudioSessionId(playerService.getAudioSessionId());
         //handler.postDelayed(runnable1, LAYOUT_CHANGES_UPDATE_DELAY);
     }
 
@@ -372,6 +377,7 @@ public class MainActivity extends UniEXActivity.UniEXMusicActivity implements Vi
         }
         bound = false;
         handler.removeCallbacks(runnable);
+        circleLineVisualizer.release();
     }
 
     @Override
@@ -547,30 +553,38 @@ public class MainActivity extends UniEXActivity.UniEXMusicActivity implements Vi
 
         if(previousState == BottomSheetBehavior.STATE_COLLAPSED) includedLayout.setAlpha(0.0f);
 
-        if(circleLineVisualizer != null){
-            circleLineVisualizer.release();
-        }
+        if(circleLineVisualizer != null) circleLineVisualizer.release();
 
         circleLineVisualizer = findViewById(R.id.visualizerView);
 
-        if(circleLineVisualizer != null && playerService != null && isPermissionGranted(Manifest.permission.RECORD_AUDIO)){
+        if(circleLineVisualizer != null && playerService != null && isPermissionGranted(Manifest.permission.RECORD_AUDIO))
             circleLineVisualizer.setAudioSessionId(playerService.getAudioSessionId());
-        }
 
-        listView = findViewById(R.id.list);
+        recyclerView = findViewById(R.id.list);
 
-        listView.setHasFixedSize(true);
+        recyclerView.scrollTo(0, listViewScrollState);
 
-        listView.setLayoutManager(new LinearLayoutManager(this));
+        listViewScrollState = recyclerView.getScrollY();
 
-        listView.setItemViewCacheSize(20);
-        listView.setDrawingCacheEnabled(true);
-        listView.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_HIGH);
+        recyclerView.setOnScrollChangeListener(new View.OnScrollChangeListener() {
+            @Override
+            public void onScrollChange(View v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
+                listViewScrollState = scrollY;
+            }
+        });
 
-        listView.addOnItemTouchListener(new RecycleOnItemClickListener(listView) {
+        recyclerView.setHasFixedSize(true);
+
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+
+        recyclerView.setItemViewCacheSize(20);
+        recyclerView.setDrawingCacheEnabled(true);
+        recyclerView.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_HIGH);
+
+        recyclerView.addOnItemTouchListener(new RecycleOnItemClickListener(recyclerView) {
             @Override
             public void onItemClick(@NonNull View view, int position) {
-                if(bound && playerService.getMediaAdapterInfo() != null)
+                if (bound && playerService.getMediaAdapterInfo() != null)
                     playerService.getMediaAdapterInfo().setSelectedIndex(new MediaAdapterInfo.Index(position));
                 startService(
                         new Intent(getApplicationContext(), PlayerService.class)
@@ -616,7 +630,7 @@ public class MainActivity extends UniEXActivity.UniEXMusicActivity implements Vi
             @Override
             public WindowInsetsCompat onApplyWindowInsets(View v, WindowInsetsCompat insets) {
                 WindowInsetsCompat windowInsets = insets.replaceSystemWindowInsets(getCorrectSystemRect());
-                mediaController.setPadding(windowInsets.getSystemWindowInsetLeft(), mediaController.getPaddingTop(), windowInsets.getSystemWindowInsetRight(), mediaController.getPaddingBottom());
+                mediaController.setPadding(windowInsets.getSystemWindowInsetLeft(), 0, windowInsets.getSystemWindowInsetRight(), 0);
                 CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) firstViewChild.getLayoutParams();
                 params.bottomMargin = windowInsets.getSystemWindowInsetBottom() + bottomSheetBehavior.getPeekHeight();
                 params.topMargin = windowInsets.getSystemWindowInsetTop();
@@ -649,7 +663,9 @@ public class MainActivity extends UniEXActivity.UniEXMusicActivity implements Vi
 
         if(timeFormatter != null) frameDuration.setText(timeFormatter.getTotalTime());
 
-        if (bound && playerService != null && playerService.getMediaAdapterInfo() != null) listView.setAdapter(playerService.getMediaAdapterInfo());
+        //if (bound && playerService != null && playerService.getMediaAdapterInfo() != null) listView.setAdapter(playerService.getMediaAdapterInfo());
+        //mediaAdapterInfo = new MediaAdapterInfo(getApplicationContext());
+        //listView.setAdapter(mediaAdapterInfo);
     }
 
     private void prepareList(){
@@ -664,6 +680,8 @@ public class MainActivity extends UniEXActivity.UniEXMusicActivity implements Vi
         }
         listView.setAdapter(mediaAdapterInfo);*/
         LoadInternalMedia loadInternalMedia = new LoadInternalMedia(this);
+        loadInternalMedia.setStart(0);
+        loadInternalMedia.setLength(1);
         loadInternalMedia.setOnDoneListener(this);
         loadInternalMedia.execute();
     }
@@ -750,7 +768,7 @@ public class MainActivity extends UniEXActivity.UniEXMusicActivity implements Vi
                 }
                 if(playerService != null && isPermissionGranted(Manifest.permission.RECORD_AUDIO)) circleLineVisualizer.setAudioSessionId(playerService.getAudioSessionId());
                 circularSeekBarChanging = false;
-                setSupportActionBar(frameActionBar);
+                //  setSupportActionBar(frameActionBar);
                 break;
             case BottomSheetBehavior.STATE_COLLAPSED:
                 mediaController.setVisibility(View.VISIBLE);
@@ -787,7 +805,7 @@ public class MainActivity extends UniEXActivity.UniEXMusicActivity implements Vi
             if(bound){
                 updateUi(playerService.getMediaInfo());
                 playerService.updateMediaAdapterInfo();
-                listView.setAdapter(playerService.getMediaAdapterInfo());
+                recyclerView.setAdapter(playerService.getMediaAdapterInfo());
             }
         //}
     }

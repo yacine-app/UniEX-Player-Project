@@ -45,7 +45,7 @@ public class PlayerCore implements AudioManager.OnAudioFocusChangeListener {
     public static final int LOOP_STATE_ALL_REPEAT = 0x050E;
     public static final int LOOP_STATE_ONE_REPEAT = 0x082F;
 
-    private int CURRENT_POSITION = -1, LOOP_STATE = LOOP_STATE_ALL;
+    private int CURRENT_POSITION = -1, LOOP_STATE = LOOP_STATE_ALL, PLAYLIST_LENGTH = -1;
     private float PLAY_BACK_SPEED = 1.0f;
     private boolean cannotBePlayed = false;
     protected boolean ready = false;
@@ -59,7 +59,7 @@ public class PlayerCore implements AudioManager.OnAudioFocusChangeListener {
     private AudioFocusRequest audioFocusRequest;
     private AudioManager audioManager;
     private List<MediaSessionCompat.Callback> callbacks = new ArrayList<>();
-    private List<MediaSessionCompat.QueueItem> items = new ArrayList<>();
+    private MediaAdapterInfo mediaAdapterInfo = null;
     protected List<OnPreparedListener> onPreparedListeners = new ArrayList<>();
     private List<OnLoopChangedListener> onLoopChangedListeners = new ArrayList<>();
     private Handler handler = new Handler(Looper.getMainLooper());
@@ -125,10 +125,13 @@ public class PlayerCore implements AudioManager.OnAudioFocusChangeListener {
 
     public void removeAllOnPreparedListeners(){ this.onPreparedListeners.clear(); }
 
-    public void setQueueFromMediaAdapterInfo(@NonNull MediaAdapterInfo adapterInfo) {
-        CURRENT_POSITION = 0;
-        items = MediaInfo.fromMediaInfoList(adapterInfo.getMediaInfoList());
-        mediaSession.setQueue(items);
+    public void setMediaAdapterInfo(@NonNull MediaAdapterInfo adapterInfo) {
+        mediaAdapterInfo = adapterInfo;
+        //mediaSession.setQueue(adapterInfo.getItem());
+    }
+
+    public void setPlaylistLength(int length){
+        PLAYLIST_LENGTH = length;
     }
 
     //@RequiresPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
@@ -173,8 +176,8 @@ public class PlayerCore implements AudioManager.OnAudioFocusChangeListener {
 
     public void skipToNext(){
         boolean wasPlaying = isPlaying();
-        CURRENT_POSITION = CURRENT_POSITION + 1 >= items.size()? 0 : CURRENT_POSITION + 1;
-        this.setMediaSource(items.get(CURRENT_POSITION).getDescription().getMediaUri());
+        CURRENT_POSITION = CURRENT_POSITION + 1 >= PLAYLIST_LENGTH? 0 : CURRENT_POSITION + 1;
+        this.setMediaSource(mediaAdapterInfo.getItemQueue(CURRENT_POSITION).getDescription().getMediaUri());
         if(!cannotBePlayed && wasPlaying) play();
         if(!callbacks.isEmpty())
             for(MediaSessionCompat.Callback a: callbacks)
@@ -187,8 +190,8 @@ public class PlayerCore implements AudioManager.OnAudioFocusChangeListener {
             return;
         }
         boolean wasPlaying = isPlaying();
-        CURRENT_POSITION = CURRENT_POSITION - 1 < 0? items.size() - 1 : CURRENT_POSITION - 1;
-        this.setMediaSource(items.get(CURRENT_POSITION).getDescription().getMediaUri());
+        CURRENT_POSITION = CURRENT_POSITION - 1 < 0? PLAYLIST_LENGTH - 1 : CURRENT_POSITION - 1;
+        this.setMediaSource(mediaAdapterInfo.getItemQueue(CURRENT_POSITION).getDescription().getMediaUri());
         if(!cannotBePlayed && wasPlaying) play();
         if(!callbacks.isEmpty())
             for(MediaSessionCompat.Callback a: callbacks)
@@ -211,9 +214,9 @@ public class PlayerCore implements AudioManager.OnAudioFocusChangeListener {
         if(cannotBePlayed){
             Toast.makeText(context, context.getResources().getString(R.string.unable_to_play_during_call), Toast.LENGTH_SHORT).show();
             return;
-        }if(items.isEmpty())return;
+        }if(PLAYLIST_LENGTH < 0)return;
         wasPlaying = isPlaying();
-        if(!ready) setMediaSource(items.get(CURRENT_POSITION).getDescription().getMediaUri());
+        if(!ready) setMediaSource(mediaAdapterInfo.getItemQueue(CURRENT_POSITION).getDescription().getMediaUri());
         this.mediaPlayer.start();
         this.mediaSession.setPlaybackState(playBackStateBuilder
                 .setState(PlaybackStateCompat.STATE_PLAYING, getCurrentPosition(), PLAY_BACK_SPEED)
@@ -237,7 +240,7 @@ public class PlayerCore implements AudioManager.OnAudioFocusChangeListener {
                 a.onStop();
     }
 
-    public void skipToQueueItem(long id){
+    /*public void skipToQueueItem(long id){
         for(MediaSessionCompat.QueueItem a: items)
             if(a.getQueueId() == id){
                 skipTo(items.indexOf(a));
@@ -246,7 +249,7 @@ public class PlayerCore implements AudioManager.OnAudioFocusChangeListener {
         if(!callbacks.isEmpty())
             for(MediaSessionCompat.Callback a: callbacks)
                 a.onSkipToQueueItem(id);
-    }
+    }*/
 
     public void seekTo(long pos){
         this.mediaPlayer.seekTo((int) pos);
@@ -265,14 +268,15 @@ public class PlayerCore implements AudioManager.OnAudioFocusChangeListener {
         this.mediaPlayer.reset();
     }
 
+    @SuppressWarnings("unused")
     public void setPlayBackSpeed(float speed) { this.PLAY_BACK_SPEED = Math.max(Math.min(speed, 0.25f), 4.0f); }
 
     public void setErrorListener(ErrorListener errorListener) { this.errorListener = errorListener; }
 
     public void skipTo(int position){
-        if(position < 0 || position >= items.size())return;
+        if(position < 0 || position >= PLAYLIST_LENGTH)return;
         CURRENT_POSITION = position;
-        setMediaSource(items.get(CURRENT_POSITION).getDescription().getMediaUri());
+        setMediaSource(mediaAdapterInfo.getItemQueue(CURRENT_POSITION).getDescription().getMediaUri());
         this.mediaSession.setPlaybackState(playBackStateBuilder
                 .setState(PlaybackStateCompat.STATE_SKIPPING_TO_QUEUE_ITEM, this.mediaPlayer.getCurrentPosition(), 1.0f)
                 .build());
@@ -288,6 +292,7 @@ public class PlayerCore implements AudioManager.OnAudioFocusChangeListener {
         removeAllCallBacks();
         removeAllOnLoopChangedListeners();
         removeAllOnPreparedListeners();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) audioManager.abandonAudioFocusRequest(audioFocusRequest);
     }
 
     public int getCurrentPosition(){
@@ -301,11 +306,9 @@ public class PlayerCore implements AudioManager.OnAudioFocusChangeListener {
     public int getDuration(){ return this.mediaPlayer.getDuration(); }
 
     public boolean isPlaying(){
-        boolean res = false;
         try{
-            res = this.mediaPlayer.isPlaying();
-        }catch (IllegalStateException e){ Log.e(this.getClass().getName(), "", e); }
-        return res;
+            return this.mediaPlayer.isPlaying();
+        }catch (IllegalStateException e){ return false; }
     }
 
     public boolean isReady() { return ready; }
@@ -314,12 +317,16 @@ public class PlayerCore implements AudioManager.OnAudioFocusChangeListener {
 
     public int getLoopState() { return LOOP_STATE; }
 
-    public int getAudioSessionId(){ return this.mediaPlayer.getAudioSessionId(); }
+    public int getAudioSessionId(){
+        try {
+            return this.mediaPlayer.getAudioSessionId();
+        }catch (IllegalStateException e){ return -1; }
+    }
 
     @Nullable
     public MediaMetadataCompat getMetaData(){
-        if(items.isEmpty())return null;
-        MediaSessionCompat.QueueItem queueItem = items.get(CURRENT_POSITION);
+        if(PLAYLIST_LENGTH < 0)return null;
+        MediaSessionCompat.QueueItem queueItem = mediaAdapterInfo.getItemQueue(CURRENT_POSITION);
         return new MediaMetadataCompat.Builder()
                 .putBitmap(MediaMetadataCompat.METADATA_KEY_ART, queueItem.getDescription().getIconBitmap())
                 .putText(MediaMetadataCompat.METADATA_KEY_TITLE, queueItem.getDescription().getTitle())

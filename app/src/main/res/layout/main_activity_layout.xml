@@ -43,6 +43,8 @@
                 android:id="@+id/list"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:divider="@android:color/darker_gray"
+                android:dividerHeight="1dp"
                 android:choiceMode="singleChoice"/>
 
         </LinearLayout>
@@ -68,7 +70,8 @@
         <RelativeLayout
             android:id="@+id/media_controller"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:fitsSystemWindows="false">
 
             <androidx.cardview.widget.CardView
                 android:id="@+id/media_info_art_card"
@@ -173,7 +176,6 @@
             layout="@layout/player_frame_layout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"/>
-
 
     </FrameLayout>
 

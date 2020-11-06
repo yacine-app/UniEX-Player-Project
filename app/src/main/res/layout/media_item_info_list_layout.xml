@@ -6,6 +6,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/media_info_item_list"
     android:padding="7dp"
+    android:clickable="true"
+    android:focusable="true"
     android:background="?android:attr/selectableItemBackground">
 
     <androidx.cardview.widget.CardView
