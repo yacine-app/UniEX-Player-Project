@@ -232,7 +232,7 @@ public class MainActivity extends UniEXActivity.UniEXMusicActivity implements Vi
         super.onCreate(savedInstanceState);
         activity = this;
         prepareUi(0);
-        if(!PlayerService.SERVICE_ALREADY_CREATED) startService(new Intent(this, PlayerService.class));
+        if(!PlayerService.SERVICE_ALREADY_CREATED) startService(new Intent(this, PlayerService.class).setAction(PlayerService.START_SERVICE_FROM_ACTIVITY));
     }
 
     @Override

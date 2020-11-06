@@ -78,8 +78,11 @@ public class PlayerService extends MediaBrowserServiceCompat implements PlayerCo
     public static final String PLAY_LIST_INDEX              = "com.dzteam.UniExPlayer.Services.PlayerService.PLAY_LIST_INDEX";
     public static final String PLAYER_LOOP_STATE            = "com.dzteam.UniExPlayer.Services.PlayerService.PLAYER_LOOP_STATE";
     public static final String PLAYER_LAST_TIME_POSITION    = "com.dzteam.UniExPlayer.Services.PlayerService.PLAYER_LAST_TIME_POSITION";
+    public static final String START_SERVICE_FROM_ACTIVITY  = "com.dzteam.UniExPlayer.Services.PlayerService.START_SERVICE_FROM_ACTIVITY";
 
     private boolean bound = false;
+    private boolean startedFromActivity = false;
+    private boolean startedFromIntent = false;
     private int[] loopStates = new int[]{PlayerCore.LOOP_STATE_ALL, PlayerCore.LOOP_STATE_ALL_REPEAT, PlayerCore.LOOP_STATE_ONE_REPEAT};
     private int currentLoopIndex = 0;
     private KeyguardManager keyguardManager;
@@ -139,7 +142,7 @@ public class PlayerService extends MediaBrowserServiceCompat implements PlayerCo
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        //TODO
+
         MediaButtonReceiver.handleIntent(playerCore.getMediaSession(), intent);
 
         if(intent != null && intent.getAction() != null){
@@ -155,11 +158,21 @@ public class PlayerService extends MediaBrowserServiceCompat implements PlayerCo
                     break;
                 case ACTION_MEDIA_SERVICE_TO_ITEM:
                     skipTo(intent.getIntExtra(EXTRA_MEDIA_SERVICE_TO_ITEM, 0));
+                case START_SERVICE_FROM_ACTIVITY:
+                    if(!startedFromIntent) startedFromActivity = true;
+                    break;
+                default:
+                    startedFromIntent = true;
                     break;
             }
         }
 
-        Log.e(this.getClass().getName(), String.valueOf(intent.getAction()));
+        if(!startedFromActivity){
+
+            startedFromActivity = true;
+        }
+
+        //Log.e(this.getClass().getName(), String.valueOf(intent.getAction()));
 
         return START_STICKY;
     }

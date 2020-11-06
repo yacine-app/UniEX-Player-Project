@@ -153,6 +153,7 @@ public class PlayerCore implements AudioManager.OnAudioFocusChangeListener {
             reset();
             this.mediaPlayer.setDataSource(context, path);
             prepare();
+            ready = true;
         }catch (IOException e){ if(errorListener != null) errorListener.onError(e.getMessage()); }
     }
 
@@ -219,6 +220,7 @@ public class PlayerCore implements AudioManager.OnAudioFocusChangeListener {
             Toast.makeText(context, context.getResources().getString(R.string.unable_to_play_during_call), Toast.LENGTH_SHORT).show();
             return;
         }if(PLAYLIST_LENGTH < 0)return;
+        if(!this.mediaSession.isActive()) this.mediaSession.setActive(true);
         wasPlaying = isPlaying();
         if(!ready) setMediaSource(mediaAdapterInfo.getItemQueue(CURRENT_POSITION).getDescription().getMediaUri());
         this.mediaPlayer.start();
@@ -294,7 +296,7 @@ public class PlayerCore implements AudioManager.OnAudioFocusChangeListener {
 
     public void release(){
         stop();
-        //this.mediaSession.release();
+        this.mediaSession.release();
         this.mediaPlayer.reset();
         this.mediaPlayer.release();
         removeAllCallBacks();
@@ -357,7 +359,7 @@ public class PlayerCore implements AudioManager.OnAudioFocusChangeListener {
 
     @SuppressWarnings("deprecation")
     private void internalPrepare(Context context, String tag){
-        tag = tag==null?"Media_Player":tag;
+        tag = tag==null?context.getPackageName()+".Media_Player":tag;
         this.context = context;
         this.mediaPlayer = new MediaPlayer();
         this.mediaSession = new MediaSessionCompat(context, tag);
@@ -365,7 +367,6 @@ public class PlayerCore implements AudioManager.OnAudioFocusChangeListener {
         this.mediaSession.setFlags(MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS | MediaSessionCompat.FLAG_HANDLES_QUEUE_COMMANDS | MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS);
         this.mediaSession.setCallback(mediaCallBack);
         this.mediaSession.setSessionActivity(PendingIntent.getActivity(context, 0, new Intent(context, MainActivity.class).setAction(MainActivity.ACTION_LAUNCH_PLAY_BACK), PendingIntent.FLAG_UPDATE_CURRENT));
-        this.mediaSession.setActive(true);
         this.mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
             @Override
             public void onCompletion(MediaPlayer mp) {
