@@ -23,6 +23,10 @@
         <item name="android:windowBackground">@drawable/dialog_rounded_shape</item>
     </style>
 
+    <style name="AppTheme.LockScreen">
+        <item name="android:windowAnimationStyle">@null</item>
+    </style>
+
     <style name="AppTheme.NoDisplay" parent="@android:style/Theme.NoDisplay"/>
 
 </resources>

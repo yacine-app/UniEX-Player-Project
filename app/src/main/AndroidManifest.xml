@@ -66,6 +66,7 @@
         <activity
             android:name=".activities.ScreenLockPlayerActivity"
             android:showOnLockScreen="true"
+            android:noHistory="true"
             android:resizeableActivity="false"
             android:windowSoftInputMode="adjustNothing"
             android:launchMode="singleInstance"
@@ -74,7 +75,7 @@
             android:taskAffinity=""
             android:excludeFromRecents="true"
             android:configChanges="orientation|keyboardHidden|uiMode"
-            android:theme="@style/AppTheme">
+            android:theme="@style/AppTheme.LockScreen">
 
         </activity>
 
