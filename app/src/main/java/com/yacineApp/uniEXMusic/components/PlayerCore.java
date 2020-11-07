@@ -1,8 +1,10 @@
 package com.yacineApp.uniEXMusic.components;
 
 import android.app.PendingIntent;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.media.AudioAttributes;
 import android.media.AudioFocusRequest;
 import android.media.AudioManager;
@@ -11,6 +13,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
+import android.provider.OpenableColumns;
 import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
@@ -74,9 +77,9 @@ public class PlayerCore implements AudioManager.OnAudioFocusChangeListener {
                     PlaybackStateCompat.ACTION_PLAY
                     | PlaybackStateCompat.ACTION_PAUSE
                     | PlaybackStateCompat.ACTION_PLAY_PAUSE
-                    | PlaybackStateCompat.ACTION_PLAY_FROM_MEDIA_ID
-                    | PlaybackStateCompat.ACTION_PLAY_FROM_SEARCH
-                    | PlaybackStateCompat.ACTION_PLAY_FROM_URI
+//                    | PlaybackStateCompat.ACTION_PLAY_FROM_MEDIA_ID
+//                    | PlaybackStateCompat.ACTION_PLAY_FROM_SEARCH
+//                    | PlaybackStateCompat.ACTION_PLAY_FROM_URI
                     | PlaybackStateCompat.ACTION_FAST_FORWARD
                     | PlaybackStateCompat.ACTION_REWIND
                     | PlaybackStateCompat.ACTION_SKIP_TO_NEXT
@@ -110,6 +113,27 @@ public class PlayerCore implements AudioManager.OnAudioFocusChangeListener {
         }
     }
 
+    @Nullable
+    public static String extractFileName(@NonNull Context context, @NonNull Uri uri){
+        String name = null;
+        String scheme = uri.getScheme();
+        ContentResolver contentResolver = context.getContentResolver();
+        if (scheme == null || contentResolver == null) return null;
+        if(scheme.equals(ContentResolver.SCHEME_CONTENT)){
+            Cursor cursor = contentResolver.query(uri, null, null, null, null);
+            if (cursor == null)return null;
+            try {
+                if(cursor.moveToFirst()) name = cursor.getString(cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME));
+            }finally { cursor.close(); }
+        }else {
+            name = uri.getPath();
+            if(name == null) return null;
+            int cut = name.lastIndexOf("/");
+            if(cut != -1) name = name.substring(cut + 1);
+        }
+        return name;
+    }
+
     public void addCallback(MediaSessionCompat.Callback callback) { if(!this.callbacks.contains(callback)) this.callbacks.add(callback); }
 
     public void removeCallBack(MediaSessionCompat.Callback callback){ this.callbacks.remove(callback); }
@@ -135,6 +159,30 @@ public class PlayerCore implements AudioManager.OnAudioFocusChangeListener {
     }
 
     public void setPlaylistLength(int length){
+        if(length == 1){
+            playBackStateBuilder = new PlaybackStateCompat.Builder()
+                    .setActions(
+                            PlaybackStateCompat.ACTION_PLAY
+                            | PlaybackStateCompat.ACTION_PAUSE
+                            | PlaybackStateCompat.ACTION_PLAY_PAUSE
+                            | PlaybackStateCompat.ACTION_FAST_FORWARD
+                            | PlaybackStateCompat.ACTION_REWIND);
+        }else {
+            playBackStateBuilder = new PlaybackStateCompat.Builder()
+                    .setActions(
+                            PlaybackStateCompat.ACTION_PLAY
+                                    | PlaybackStateCompat.ACTION_PAUSE
+                                    | PlaybackStateCompat.ACTION_PLAY_PAUSE
+//                    | PlaybackStateCompat.ACTION_PLAY_FROM_MEDIA_ID
+//                    | PlaybackStateCompat.ACTION_PLAY_FROM_SEARCH
+//                    | PlaybackStateCompat.ACTION_PLAY_FROM_URI
+                                    | PlaybackStateCompat.ACTION_FAST_FORWARD
+                                    | PlaybackStateCompat.ACTION_REWIND
+                                    | PlaybackStateCompat.ACTION_SKIP_TO_NEXT
+                                    | PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS
+                                    | PlaybackStateCompat.ACTION_SKIP_TO_QUEUE_ITEM);
+        }
+        mediaSession.setPlaybackState(playBackStateBuilder.build());
         PLAYLIST_LENGTH = length;
     }
 
@@ -181,6 +229,7 @@ public class PlayerCore implements AudioManager.OnAudioFocusChangeListener {
 
     public void skipToNext(){
         boolean wasPlaying = isPlaying();
+        if(PLAYLIST_LENGTH <= 1) return;
         CURRENT_POSITION = CURRENT_POSITION + 1 >= PLAYLIST_LENGTH? 0 : CURRENT_POSITION + 1;
         this.setMediaSource(mediaAdapterInfo.getItemQueue(CURRENT_POSITION).getDescription().getMediaUri());
         if(!cannotBePlayed && wasPlaying) play();
@@ -190,6 +239,7 @@ public class PlayerCore implements AudioManager.OnAudioFocusChangeListener {
     }
 
     public void skipToPrevious(){
+        if(PLAYLIST_LENGTH <= 1) return;
         if(getCurrentPosition() > 5000){
             seekTo(0L);
             return;
@@ -335,7 +385,7 @@ public class PlayerCore implements AudioManager.OnAudioFocusChangeListener {
 
     @Nullable
     public MediaMetadataCompat getMetaData(){
-        if(PLAYLIST_LENGTH < 0)return null;
+        if(PLAYLIST_LENGTH < 0 || mediaAdapterInfo == null)return null;
         MediaSessionCompat.QueueItem queueItem = mediaAdapterInfo.getItemQueue(CURRENT_POSITION);
         return new MediaMetadataCompat.Builder()
                 .putBitmap(MediaMetadataCompat.METADATA_KEY_ART, queueItem.getDescription().getIconBitmap())

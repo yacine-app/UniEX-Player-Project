@@ -244,20 +244,20 @@ public class PlayerService extends MediaBrowserServiceCompat implements PlayerCo
     @Override
     public IBinder onBind(Intent intent) {
         //stopForeground(true);
-        s();
+        //s();
         bound = true;
         Log.e("BINDER", "bound!");
         return sBinder;
     }
 
-    private void s(){
+    /*private void s(){
         if (isPlaying()) startActivity(new Intent(this, MainActivity.class).setAction(MainActivity.ACTION_LAUNCH_PLAY_BACK).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
-    }
+    }*/
 
     @Override
     public void onRebind(Intent intent) {
         super.onRebind(intent);
-        s();
+        //s();
         bound = true;
         //stopForeground(true);
         Log.e("BINDER", "rebound!");
@@ -288,6 +288,7 @@ public class PlayerService extends MediaBrowserServiceCompat implements PlayerCo
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
     }
 
+    @NonNull
     private Bitmap createBitmap(Drawable drawable, int width, int height){
         width = width == 0 ? Math.max(drawable.getIntrinsicWidth(), 1) : width;
         height = height == 0 ? Math.max(drawable.getIntrinsicHeight(), 1) : height;
@@ -395,13 +396,14 @@ public class PlayerService extends MediaBrowserServiceCompat implements PlayerCo
 
     public void setCurrentPlayIndex(){ if(mediaAdapterInfo != null) mediaAdapterInfo.setSelectedIndex(new MediaAdapterInfo.Index(getCurrentPlayIndex())); }
 
-    public void setMediaQueue(@NonNull MediaAdapterInfo mediaAdapterInfo){
+    /*public void setMediaQueue(@NonNull MediaAdapterInfo mediaAdapterInfo){
         this.mediaAdapterInfo = mediaAdapterInfo;
         //this.mediaInfoList = mediaAdapterInfo.getMediaInfoList();
         playerCore.setMediaAdapterInfo(mediaAdapterInfo);
         playerCore.setPlaylistLength(mediaAdapterInfo.getItemCount());
-    }
+    }*/
 
+    @Deprecated
     public void updateMediaAdapterInfo(){
         /*this.mediaAdapterInfo = new MediaAdapterInfo(mediaInfoList);
         this.mediaAdapterInfo.setSelectedIndex(new MediaAdapterInfo.Index(getCurrentPlayIndex()));*/

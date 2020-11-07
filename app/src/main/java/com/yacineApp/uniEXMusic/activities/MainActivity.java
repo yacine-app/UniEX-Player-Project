@@ -30,6 +30,8 @@ import android.view.MenuItem;
 import android.view.Surface;
 import android.view.View;
 import android.view.WindowManager;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -100,6 +102,7 @@ public class MainActivity extends UniEXActivity.UniEXMusicActivity implements Vi
     private FrameLayout volumePanelView;
     private CircularSeekBar circularSeekBar, volumePanelController;
     private ImageView mediaArt, frameArt;
+    private Animation animation;
     private TextView mediaTitle, mediaArtist, frameTitle, frameArtist, frameCurrentTime, frameDuration;
     private ImageButton playPause, playPauseFrame, changeLoop, skipToNextFrame, skipToPreviousFrame, openQuickList;
     private PlayerCore.OnPreparedListener onPreparedListener = new PlayerCore.OnPreparedListener() {
@@ -146,6 +149,7 @@ public class MainActivity extends UniEXActivity.UniEXMusicActivity implements Vi
         @Override
         public void onPause() {
             super.onPause();
+            circleLineVisualizer.clearAnimation();
             updateUi(playerService.getMediaInfo());
             handler.removeCallbacks(runnable);
         }
@@ -153,12 +157,14 @@ public class MainActivity extends UniEXActivity.UniEXMusicActivity implements Vi
         @Override
         public void onStop() {
             super.onStop();
+            circleLineVisualizer.clearAnimation();
             onPause();
         }
 
         @Override
         public void onPlay() {
             super.onPlay();
+            circleLineVisualizer.startAnimation(animation);
             updateUi(playerService.getMediaInfo());
             playerService.setCurrentPlayIndex();
             if(bottomSheetBehavior.getState() == BottomSheetBehavior.STATE_EXPANDED) handler.postDelayed(runnable, CIRCULAR_SEEK_BAR_UPDATE_DELAY);
@@ -176,13 +182,14 @@ public class MainActivity extends UniEXActivity.UniEXMusicActivity implements Vi
             playerService.setOnLoopChangedListener(onLoopChangedListener);
             if(mediaAdapterInfo == null) prepareList();
             else {
-                playerService.updateMediaAdapterInfo();
+                //playerService.updateMediaAdapterInfo();
                 updateUi(playerService.getMediaInfo());
                 onPreparedListener.onPrepared();
             }
             recyclerView.setAdapter(playerService.getMediaAdapterInfo());
             onPreparedListener.onPrepared();
             changeBehaviorState(behaviorDefaultLaunch);
+            if(playerService.isPlaying() && animation != null) circleLineVisualizer.startAnimation(animation);
             bound = true;
         }
 
@@ -193,6 +200,7 @@ public class MainActivity extends UniEXActivity.UniEXMusicActivity implements Vi
                 playerService.removeCallBack(callback);
                 playerService.removeOnPreparedListener(onPreparedListener);
                 playerService.removeOnLoopChangedListener(onLoopChangedListener);
+                circleLineVisualizer.clearAnimation();
             }
             bound = false;
         }
@@ -230,6 +238,7 @@ public class MainActivity extends UniEXActivity.UniEXMusicActivity implements Vi
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        animation = AnimationUtils.loadAnimation(this, R.anim.circular_visualizer_rotate_anim);
         activity = this;
         prepareUi(0);
         if(!PlayerService.SERVICE_ALREADY_CREATED) startService(new Intent(this, PlayerService.class).setAction(PlayerService.START_SERVICE_FROM_ACTIVITY));
@@ -731,10 +740,10 @@ public class MainActivity extends UniEXActivity.UniEXMusicActivity implements Vi
             skipToPreviousFrame.setImageResource(R.drawable.ic_skip_to_previous_action_icon_holo_dark);
             openQuickList.setImageResource(R.drawable.ic_media_list_icon_holo_dark);
             frameTitle.setTextColor(Color.WHITE);
-            frameArtist.setTextColor(Color.LTGRAY);
-            frameCurrentTime.setTextColor(Color.LTGRAY);
-            frameDuration.setTextColor(Color.LTGRAY);
-            circularSeekBar.setColorList(new int[]{Color.LTGRAY, Color.LTGRAY});
+            frameArtist.setTextColor(Color.WHITE);
+            frameCurrentTime.setTextColor(Color.WHITE);
+            frameDuration.setTextColor(Color.WHITE);
+            circularSeekBar.setColorList(new int[]{Color.WHITE, Color.WHITE});
             //Toast.makeText(getApplicationContext(), "Light", Toast.LENGTH_SHORT).show();
         }else{
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -819,7 +828,7 @@ public class MainActivity extends UniEXActivity.UniEXMusicActivity implements Vi
             prepareUi(previousState);
             if(bound){
                 updateUi(playerService.getMediaInfo());
-                playerService.updateMediaAdapterInfo();
+                //playerService.updateMediaAdapterInfo();
                 recyclerView.setAdapter(playerService.getMediaAdapterInfo());
             }
         //}

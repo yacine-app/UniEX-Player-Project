@@ -3,9 +3,10 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context=".activities.MediaPlayerDialogActivity">
+    tools:context=".activities.MediaPlayerDialogActivity"
+    android:paddingBottom="10dp">
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/dialog_tool_bar"
@@ -58,12 +59,42 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/dialog_media_title">
 
-        <SeekBar
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentStart="true"
             android:layout_centerVertical="true"
-            android:layout_toStartOf="@id/dialog_button_play_pause_action"/>
+            android:orientation="vertical"
+            android:layout_toStartOf="@id/dialog_button_play_pause_action">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="10dp">
+
+                <TextView
+                    android:id="@+id/dialog_time_current_position"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentStart="true"
+                    android:text="@string/media_time_duration_nan"/>
+
+                <TextView
+                    android:id="@+id/dialog_time_duration"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:text="@string/media_time_duration_nan"/>
+
+            </RelativeLayout>
+
+            <SeekBar
+                android:id="@+id/seek_bar_dialog"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+        </LinearLayout>
 
         <ImageButton
             android:id="@+id/dialog_button_play_pause_action"

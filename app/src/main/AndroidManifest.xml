@@ -79,7 +79,8 @@
         </activity>
 
         <activity android:name=".activities.MediaPlayerDialogActivity"
-            android:theme="@style/AppTheme.MediaDialog">
+            android:theme="@style/AppTheme.MediaDialog"
+            android:configChanges="orientation|keyboardHidden|uiMode">
 
             <intent-filter>
                 <action android:name="android.intent.action.VIEW"/>
@@ -125,6 +126,13 @@
                 <action android:name="android.intent.action.HEADSET_PLUG"/>
             </intent-filter>
         </receiver>
+
+        <provider
+            android:authorities="{}id"
+            android:name=".services.UniEXSoundProvider"
+            android:exported="true"
+            android:enabled="false"
+            tools:ignore="ExportedContentProvider" />
 
         <service android:name="com.yacineApp.uniEXMusic.services.PlayerService"
             android:exported="true"

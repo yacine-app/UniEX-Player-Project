@@ -93,11 +93,21 @@ public class ColorPicker {
         return getLum(color) <= 169.5f;
     }
 
+    /**
+     * 
+     * @param color
+     * @return
+     */
     public static float getLum(@ColorInt int color){
         float[] c = toColor(color);
         return (c[0] * 299.0f + c[1] * 587.0f + c[2] * 114.0f) / 1000.0f;
     }
 
+    /**
+     * 
+     * @param color
+     * @return
+     */
     @NonNull
     public static float[] toColor(@ColorInt int color){
         return new float[]{(color & 0xFF0000) >>> 16, (color & 0xFF00  ) >>>  8, color & 0xFF};

@@ -22,10 +22,13 @@ import android.view.MotionEvent;
 import android.view.Surface;
 import android.view.View;
 import android.view.WindowManager;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -67,7 +70,7 @@ public class ScreenLockPlayerActivity extends UniEXActivity.UniEXMusicActivity i
     private ImageButton playPauseFrame, changeLoop, skipToNextFrame, skipToPreviousFrame, openQuickList;
     private KeyguardManager keyguardManager;
     private UniEXMusicActivity activity;
-
+    private Animation animation;
     private PlayerService playerService;
     private ConstraintLayout playerFrameLayout;
     private Runnable runnable = new Runnable() {
@@ -86,6 +89,7 @@ public class ScreenLockPlayerActivity extends UniEXActivity.UniEXMusicActivity i
         @Override
         public void onPlay() {
             super.onPlay();
+            circleLineVisualizer.startAnimation(animation);
             updateUi(playerService.getMediaInfo());
             handler.postDelayed(runnable, CIRCULAR_SEEK_BAR_UPDATE_DELAY);
         }
@@ -93,6 +97,7 @@ public class ScreenLockPlayerActivity extends UniEXActivity.UniEXMusicActivity i
         @Override
         public void onPause() {
             super.onPause();
+            circleLineVisualizer.clearAnimation();
             updateUi(playerService.getMediaInfo());
             handler.removeCallbacks(runnable);
         }
@@ -146,6 +151,7 @@ public class ScreenLockPlayerActivity extends UniEXActivity.UniEXMusicActivity i
             playerService.setOnLoopChangedListener(onLoopChangedListener);
             onPreparedListener.onPrepared();
             circleLineVisualizer.setAudioSessionId(playerService.getAudioSessionId());
+            if(playerService.isPlaying() && animation != null) circleLineVisualizer.startAnimation(animation);
         }
 
         @Override
@@ -155,6 +161,7 @@ public class ScreenLockPlayerActivity extends UniEXActivity.UniEXMusicActivity i
                 playerService.removeCallBack(callback);
                 playerService.removeOnPreparedListener(onPreparedListener);
                 playerService.removeOnLoopChangedListener(onLoopChangedListener);
+                circleLineVisualizer.clearAnimation();
             }
         }
     };
@@ -180,10 +187,10 @@ public class ScreenLockPlayerActivity extends UniEXActivity.UniEXMusicActivity i
             skipToPreviousFrame.setImageResource(R.drawable.ic_skip_to_previous_action_icon_holo_dark);
             openQuickList.setImageResource(R.drawable.ic_media_list_icon_holo_dark);
             frameTitle.setTextColor(Color.WHITE);
-            frameArtist.setTextColor(Color.LTGRAY);
-            frameCurrentTime.setTextColor(Color.LTGRAY);
-            frameDuration.setTextColor(Color.LTGRAY);
-            circularSeekBar.setColorList(new int[]{Color.LTGRAY, Color.LTGRAY});
+            frameArtist.setTextColor(Color.WHITE);
+            frameCurrentTime.setTextColor(Color.WHITE);
+            frameDuration.setTextColor(Color.WHITE);
+            circularSeekBar.setColorList(new int[]{Color.WHITE, Color.WHITE});
             //Toast.makeText(getApplicationContext(), "Light", Toast.LENGTH_SHORT).show();
         }else{
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -212,7 +219,7 @@ public class ScreenLockPlayerActivity extends UniEXActivity.UniEXMusicActivity i
         super.onCreate(savedInstanceState);
         IS_ACTIVITY_RUNNING = true;
         activity = this;
-
+        animation = AnimationUtils.loadAnimation(this, R.anim.circular_visualizer_rotate_anim);
         keyguardManager = (KeyguardManager) getSystemService(KEYGUARD_SERVICE);
         onConfigurationChanged(getResources().getConfiguration());
     }
@@ -329,8 +336,9 @@ public class ScreenLockPlayerActivity extends UniEXActivity.UniEXMusicActivity i
             }
         });
 
+
         playerFrameLayout.setOnTouchListener(new View.OnTouchListener() {
-            private float r = 0.0f, rx = 0, ry = 0;
+            private float r = 0.0f, rx = 0, ry = 0, nr = Math.min(defaultDisplay.getWidth(), defaultDisplay.getHeight()) / 2.0f;
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 switch (event.getAction()){
@@ -340,41 +348,54 @@ public class ScreenLockPlayerActivity extends UniEXActivity.UniEXMusicActivity i
                         break;
                     case MotionEvent.ACTION_MOVE:
                         r = (float) Math.sqrt(Math.pow(rx - event.getX(), 2) + Math.pow(ry - event.getY(), 2));
-                        setViewsAlpha(1.0f - r / 360.0f, false);
+                        setViewsOffset(nr - r, nr, false);
                         break;
                     case MotionEvent.ACTION_UP:
-                        if(r > 360.0f) {
+                        if(r > nr) {
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) keyguardManager.requestDismissKeyguard(activity, null);
                             if(!keyguardManager.isDeviceLocked()) finish();
-                        }else setViewsAlpha(1.0f, true);
+                        }else setViewsOffset(1.0f, 1.0f, true);
                         break;
                 }
                 return true;
             }
         });
-
     }
 
     @Override
     public void onWindowFocusChanged(boolean hasFocus) {
         super.onWindowFocusChanged(hasFocus);
-        if(hasFocus) setViewsAlpha(1.0f, true);
+        if(hasFocus) setViewsOffset(1.0f, 1.0f, true);
     }
 
-    private void setViewsAlpha(float alpha, boolean animated){
+    private void setViewsOffset(float offset, float max, boolean animated){
+        float off = offset / Math.max(max, 1.0f);
         if(animated){
-            mediaInfoFrameArtCard.animate().alpha(alpha).start();
-            circleLineVisualizer.animate().alpha(alpha).start();
-            frameArtist.animate().alpha(alpha).start();
-            frameTitle.animate().alpha(alpha).start();
-            mediaControllerFrame.animate().alpha(alpha).start();
+            mediaInfoFrameArtCard.animate().alpha(off).start();
+            circleLineVisualizer.animate().alpha(off).start();
+            frameArtist.animate().alpha(off).start();
+            frameTitle.animate().alpha(off).start();
+            mediaControllerFrame.animate().alpha(off).start();
+            playerFrameLayout.animate().scaleY(off).scaleX(off).start();
             return;
         }
-        mediaInfoFrameArtCard.setAlpha(alpha);
-        circleLineVisualizer.setAlpha(alpha);
-        frameArtist.setAlpha(alpha);
-        frameTitle.setAlpha(alpha);
-        mediaControllerFrame.setAlpha(alpha);
+        //playerFrameLayout.setAlpha(off);
+        mediaInfoFrameArtCard.setAlpha(off);
+        circleLineVisualizer.setAlpha(off);
+        frameArtist.setAlpha(off);
+        frameTitle.setAlpha(off);
+        mediaControllerFrame.setAlpha(off);
+        float sc = Math.max(1.125f - off / 8.0f, 1.0f);
+        playerFrameLayout.setScaleX(sc);
+        playerFrameLayout.setScaleY(sc);
+        /*frameTitle.setScaleX(sc);
+        frameTitle.setScaleY(sc);
+        frameArtist.setScaleX(sc);
+        frameArtist.setScaleY(sc);
+        mediaInfoFrameArtCard.setScaleX(sc);
+        mediaInfoFrameArtCard.setScaleY(sc);
+        circleLineVisualizer.setScaleX(sc);
+        mediaInfoFrameArtCard.setScaleY(sc);*/
     }
 
     @Override
