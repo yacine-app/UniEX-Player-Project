@@ -87,6 +87,7 @@
                     android:id="@+id/media_info_art"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
+                    android:contentDescription="@string/item_button_description_media_art"
                     android:scaleType="centerCrop"/>
 
             </androidx.cardview.widget.CardView>
@@ -147,6 +148,7 @@
                         android:layout_width="50dp"
                         android:layout_height="50dp"
                         android:src="@drawable/ic_skip_to_previous_action_icon"
+                        android:contentDescription="@string/item_button_description_skip_to_previous"
                         android:background="?attr/selectableItemBackgroundBorderless"/>
 
                     <ImageButton
@@ -154,6 +156,7 @@
                         android:layout_width="50dp"
                         android:layout_height="50dp"
                         android:src="@drawable/ic_play_action_icon"
+                        android:contentDescription="@string/item_button_description_play"
                         android:background="?attr/selectableItemBackgroundBorderless"/>
 
                     <ImageButton
@@ -161,6 +164,7 @@
                         android:layout_width="50dp"
                         android:layout_height="50dp"
                         android:src="@drawable/ic_skip_to_next_action_icon"
+                        android:contentDescription="@string/item_button_description_skip_to_next"
                         android:background="?attr/selectableItemBackgroundBorderless"/>
 
                 </LinearLayout>

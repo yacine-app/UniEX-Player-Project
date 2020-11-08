@@ -37,15 +37,16 @@
         android:hardwareAccelerated="true"
         android:requestLegacyExternalStorage="true"
         android:fullBackupContent="@xml/backup_descriptor"
-        android:name="com.yacineApp.uniEXMusic.ApplicationSetup">
+        android:name=".ApplicationSetup">
 
-        <activity android:name="com.yacineApp.uniEXMusic.activities.StartUpActivity"
+        <activity android:name=".activities.StartUpActivity"
             android:launchMode="singleTask"
             android:theme="@style/AppTheme"
             android:resizeableActivity="true"
             android:configChanges="screenSize|orientation|screenLayout|smallestScreenSize|mcc|mnc|layoutDirection|keyboardHidden|keyboard|touchscreen|density|fontScale|locale|navigation|uiMode|colorMode">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
+                <action android:name="android.intent.action.MUSIC"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
                 <category android:name="android.intent.category.APP_MUSIC"/>
             </intent-filter>
@@ -54,7 +55,7 @@
         <meta-data android:name="com.samsung.android.keepalive.density" android:value="true"/>
         <meta-data android:name="com.samsung.android.multidisplay.keep_process_alive" android:value="true"/>
 
-        <activity android:name="com.yacineApp.uniEXMusic.activities.MainActivity"
+        <activity android:name=".activities.MainActivity"
             android:launchMode="singleTop"
             android:hardwareAccelerated="true"
             android:resizeableActivity="true"
@@ -74,6 +75,7 @@
             android:showWhenLocked="true"
             android:taskAffinity=""
             android:excludeFromRecents="true"
+            android:hardwareAccelerated="true"
             android:configChanges="orientation|keyboardHidden|uiMode"
             android:theme="@style/AppTheme.LockScreen">
 
@@ -107,12 +109,14 @@
 
         </activity>
 
-        <activity android:name="com.yacineApp.uniEXMusic.activities.AboutActivity">
+        <activity android:name=".activities.AboutActivity">
 
         </activity>
 
-        <activity android:name="com.yacineApp.uniEXMusic.activities.SettingsActivity">
-
+        <activity android:name=".activities.SettingsActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+            </intent-filter>
         </activity>
 
         <receiver android:name="androidx.media.session.MediaButtonReceiver">
@@ -121,7 +125,7 @@
             </intent-filter>
         </receiver>
 
-        <receiver android:name="com.yacineApp.uniEXMusic.receivers.MediaControlReceiver">
+        <receiver android:name=".receivers.MediaControlReceiver">
             <intent-filter>
                 <action android:name="android.media.AUDIO_BECOMING_NOISY"/>
                 <action android:name="android.intent.action.HEADSET_PLUG"/>
@@ -135,11 +139,11 @@
             android:enabled="false"
             tools:ignore="ExportedContentProvider" />
 
-        <service android:name="com.yacineApp.uniEXMusic.services.PlayerService"
+        <service android:name=".services.PlayerService"
             android:exported="true"
             android:label="@string/uniex_playback_service_label"
             android:foregroundServiceType="mediaPlayback"
-            android:permission="null">
+            android:permission="@null">
             <intent-filter>
                 <action android:name="android.intent.action.MEDIA_BUTTON"/>
                 <action android:name="android.media.browse.MediaBrowserService"/>

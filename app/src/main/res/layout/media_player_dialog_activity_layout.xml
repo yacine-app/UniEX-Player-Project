@@ -34,6 +34,7 @@
                 android:layout_height="50dp"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
+                android:contentDescription="@string/item_button_description_close"
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:src="@drawable/ic_close_action_icon"/>
 
@@ -85,7 +86,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentEnd="true"
-                    android:text="@string/media_time_duration_nan"/>
+                    android:text="@string/media_time_duration_nan"
+                    tools:ignore="RelativeOverlap" />
 
             </RelativeLayout>
 
@@ -102,6 +104,7 @@
             android:layout_height="40dp"
             android:layout_alignParentEnd="true"
             android:src="@drawable/ic_play_action_icon"
+            android:contentDescription="@string/item_button_description_play"
             android:background="?attr/selectableItemBackgroundBorderless"/>
 
     </RelativeLayout>

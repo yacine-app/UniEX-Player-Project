@@ -11,7 +11,6 @@ import android.content.SharedPreferences;
 import android.content.pm.ServiceInfo;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.media.AudioManager;
@@ -289,7 +288,7 @@ public class PlayerService extends MediaBrowserServiceCompat implements PlayerCo
     }
 
     @NonNull
-    private Bitmap createBitmap(Drawable drawable, int width, int height){
+    private Bitmap createBitmap(@NonNull Drawable drawable, int width, int height){
         width = width == 0 ? Math.max(drawable.getIntrinsicWidth(), 1) : width;
         height = height == 0 ? Math.max(drawable.getIntrinsicHeight(), 1) : height;
         Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
@@ -319,20 +318,21 @@ public class PlayerService extends MediaBrowserServiceCompat implements PlayerCo
         expandedRemoveView.setImageViewBitmap(R.id.image_color_theme_notification ,bitmap);
 
         int playPauseIcon;
+        String playPauseDes = isPlaying() ? getString(R.string.item_button_description_pause) : getString(R.string.item_button_description_play);;
 
         if(colorResult.isLightColor()){
-            collapsedRemoveView.setTextColor(R.id.media_title_notification, Color.WHITE);
-            collapsedRemoveView.setTextColor(R.id.media_artist_notification, Color.WHITE);
-            collapsedRemoveView.setTextColor(R.id.app_name_notification, Color.WHITE);
+            collapsedRemoveView.setTextColor(R.id.media_title_notification, ColorPicker.FIRST_WHITE);
+            collapsedRemoveView.setTextColor(R.id.media_artist_notification, ColorPicker.SECOND_WHITE);
+            collapsedRemoveView.setTextColor(R.id.app_name_notification, ColorPicker.FIRST_WHITE);
             collapsedRemoveView.setImageViewResource(R.id.close_action_notification, R.drawable.ic_close_action_icon_holo_dark);
             collapsedRemoveView.setImageViewResource(R.id.skip_to_previous_action_notification, R.drawable.ic_skip_to_previous_action_icon_holo_dark);
             collapsedRemoveView.setImageViewResource(R.id.skip_to_next_action_notification, R.drawable.ic_skip_to_next_action_icon_holo_dark);
             collapsedRemoveView.setImageViewResource(R.id.app_name_icon_notification, R.drawable.ic_notification_uniex_logo_holo_dark);
             playPauseIcon = isPlaying() ? R.drawable.ic_pause_action_icon_holo_dark : R.drawable.ic_play_action_icon_holo_dark;
 
-            expandedRemoveView.setTextColor(R.id.media_title_notification, Color.WHITE);
-            expandedRemoveView.setTextColor(R.id.media_artist_notification, Color.WHITE);
-            expandedRemoveView.setTextColor(R.id.app_name_notification, Color.WHITE);
+            expandedRemoveView.setTextColor(R.id.media_title_notification, ColorPicker.FIRST_WHITE);
+            expandedRemoveView.setTextColor(R.id.media_artist_notification, ColorPicker.SECOND_WHITE);
+            expandedRemoveView.setTextColor(R.id.app_name_notification, ColorPicker.FIRST_WHITE);
             expandedRemoveView.setImageViewResource(R.id.close_action_notification, R.drawable.ic_close_action_icon_holo_dark);
             expandedRemoveView.setImageViewResource(R.id.skip_to_previous_action_notification, R.drawable.ic_skip_to_previous_action_icon_holo_dark);
             expandedRemoveView.setImageViewResource(R.id.skip_to_next_action_notification, R.drawable.ic_skip_to_next_action_icon_holo_dark);
@@ -340,18 +340,18 @@ public class PlayerService extends MediaBrowserServiceCompat implements PlayerCo
             expandedRemoveView.setImageViewResource(R.id.fast_forward_action_notification, R.drawable.ic_fast_forward_action_icon_holo_dark);
             expandedRemoveView.setImageViewResource(R.id.app_name_icon_notification, R.drawable.ic_notification_uniex_logo_holo_dark);
         }else {
-            collapsedRemoveView.setTextColor(R.id.media_title_notification, Color.BLACK);
-            collapsedRemoveView.setTextColor(R.id.media_artist_notification, Color.DKGRAY);
-            collapsedRemoveView.setTextColor(R.id.app_name_notification, Color.BLACK);
+            collapsedRemoveView.setTextColor(R.id.media_title_notification, ColorPicker.FIRST_BLACK);
+            collapsedRemoveView.setTextColor(R.id.media_artist_notification, ColorPicker.SECOND_BLACK);
+            collapsedRemoveView.setTextColor(R.id.app_name_notification, ColorPicker.FIRST_BLACK);
             collapsedRemoveView.setImageViewResource(R.id.close_action_notification, R.drawable.ic_close_action_icon);
             collapsedRemoveView.setImageViewResource(R.id.skip_to_previous_action_notification, R.drawable.ic_skip_to_previous_action_icon);
             collapsedRemoveView.setImageViewResource(R.id.skip_to_next_action_notification, R.drawable.ic_skip_to_next_action_icon);
             collapsedRemoveView.setImageViewResource(R.id.app_name_icon_notification, R.drawable.ic_notification_uniex_logo);
             playPauseIcon = isPlaying() ? R.drawable.ic_pause_action_icon : R.drawable.ic_play_action_icon;
 
-            expandedRemoveView.setTextColor(R.id.media_title_notification, Color.BLACK);
-            expandedRemoveView.setTextColor(R.id.media_artist_notification, Color.DKGRAY);
-            expandedRemoveView.setTextColor(R.id.app_name_notification, Color.BLACK);
+            expandedRemoveView.setTextColor(R.id.media_title_notification, ColorPicker.FIRST_BLACK);
+            expandedRemoveView.setTextColor(R.id.media_artist_notification, ColorPicker.SECOND_BLACK);
+            expandedRemoveView.setTextColor(R.id.app_name_notification, ColorPicker.FIRST_BLACK);
             expandedRemoveView.setImageViewResource(R.id.close_action_notification, R.drawable.ic_close_action_icon);
             expandedRemoveView.setImageViewResource(R.id.skip_to_previous_action_notification, R.drawable.ic_skip_to_previous_action_icon);
             expandedRemoveView.setImageViewResource(R.id.skip_to_next_action_notification, R.drawable.ic_skip_to_next_action_icon);
@@ -382,7 +382,10 @@ public class PlayerService extends MediaBrowserServiceCompat implements PlayerCo
 
 
         collapsedRemoveView.setImageViewResource(R.id.play_pause_action_notification, playPauseIcon);
+        collapsedRemoveView.setContentDescription(R.id.play_pause_action_notification, playPauseDes);
         expandedRemoveView.setImageViewResource(R.id.play_pause_action_notification, playPauseIcon);
+        expandedRemoveView.setContentDescription(R.id.play_pause_action_notification, playPauseDes);
+
 
         notificationBuilder.setCustomContentView(collapsedRemoveView);
         notificationBuilder.setCustomBigContentView(expandedRemoveView);

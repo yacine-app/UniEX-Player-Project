@@ -31,6 +31,21 @@
 
     -->
 
+    <string name="item_button_description_play">Play</string>
+    <string name="item_button_description_pause">Pause</string>
+    <string name="item_button_description_skip_to_next">Next</string>
+    <string name="item_button_description_skip_to_previous">Previous</string>
+    <string name="item_button_description_rewind">Rewind</string>
+    <string name="item_button_description_logo">Logo</string>
+    <string name="item_button_description_back_navigation">Back</string>
+    <string name="item_button_description_forward">Forward</string>
+    <string name="item_button_description_close">Close</string>
+    <string name="item_button_description_media_art">Art</string>
+    <string name="item_button_description_loop_play_all">Play all</string>
+    <string name="item_button_description_loop_repeat_all">Repeat all</string>
+    <string name="item_button_description_loop_repeat_one">Repeat one</string>
+    <string name="item_button_description_play_list">Playlist</string>
+
     <string name="about_activity_text_no_default_web_browser">No web browser was found!</string>
 
     <string name="text_message_no_default_equalizer">No default equalizer app was found!</string>

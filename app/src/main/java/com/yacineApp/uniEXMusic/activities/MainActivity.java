@@ -713,11 +713,16 @@ public class MainActivity extends UniEXActivity.UniEXMusicActivity implements Vi
     @SuppressWarnings("deprecation")
     private void updateUi(@Nullable MediaInfo metaData){
         if(metaData == null)return;
+        String playPauseDes;
         if(playerService.isPlaying()){
             playPause.setImageResource(R.drawable.ic_pause_action_icon);
+            playPauseDes = getString(R.string.item_button_description_pause);
         } else{
             playPause.setImageResource(R.drawable.ic_play_action_icon);
+            playPauseDes = getString(R.string.item_button_description_play);
         }
+        playPause.setContentDescription(playPauseDes);
+        playPauseFrame.setContentDescription(playPauseDes);
         Bitmap art = metaData.getArt();
         CharSequence title = metaData.getTitle();
         CharSequence artist = metaData.getArtist();
@@ -730,7 +735,7 @@ public class MainActivity extends UniEXActivity.UniEXMusicActivity implements Vi
         frameTitle.setSelected(true);
         mediaTitle.setSelected(true);
         int l = metaData.getColorResult().getHighColor();
-        int[] r = new int[]{Color.WHITE, l};
+        int[] r = new int[]{ColorPicker.FIRST_WHITE, l};
         circleLineVisualizer.setColor(l);
         if(ColorPicker.isLightColor(l)){
             if(bottomSheetBehavior.getState() != BottomSheetBehavior.STATE_COLLAPSED) getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
@@ -739,11 +744,11 @@ public class MainActivity extends UniEXActivity.UniEXMusicActivity implements Vi
             skipToNextFrame.setImageResource(R.drawable.ic_skip_to_next_action_icon_holo_dark);
             skipToPreviousFrame.setImageResource(R.drawable.ic_skip_to_previous_action_icon_holo_dark);
             openQuickList.setImageResource(R.drawable.ic_media_list_icon_holo_dark);
-            frameTitle.setTextColor(Color.WHITE);
-            frameArtist.setTextColor(Color.WHITE);
-            frameCurrentTime.setTextColor(Color.WHITE);
-            frameDuration.setTextColor(Color.WHITE);
-            circularSeekBar.setColorList(new int[]{Color.WHITE, Color.WHITE});
+            frameTitle.setTextColor(ColorPicker.FIRST_WHITE);
+            frameArtist.setTextColor(ColorPicker.SECOND_WHITE);
+            frameCurrentTime.setTextColor(ColorPicker.SECOND_WHITE);
+            frameDuration.setTextColor(ColorPicker.SECOND_WHITE);
+            circularSeekBar.setColorList(new int[]{ColorPicker.SECOND_WHITE, ColorPicker.SECOND_WHITE});
             //Toast.makeText(getApplicationContext(), "Light", Toast.LENGTH_SHORT).show();
         }else{
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -754,11 +759,11 @@ public class MainActivity extends UniEXActivity.UniEXMusicActivity implements Vi
             skipToNextFrame.setImageResource(R.drawable.ic_skip_to_next_action_icon);
             skipToPreviousFrame.setImageResource(R.drawable.ic_skip_to_previous_action_icon);
             openQuickList.setImageResource(R.drawable.ic_media_list_icon);
-            frameTitle.setTextColor(Color.BLACK);
-            frameArtist.setTextColor(Color.DKGRAY);
-            frameCurrentTime.setTextColor(Color.DKGRAY);
-            frameDuration.setTextColor(Color.DKGRAY);
-            circularSeekBar.setColorList(new int[]{Color.DKGRAY, Color.DKGRAY});
+            frameTitle.setTextColor(ColorPicker.FIRST_BLACK);
+            frameArtist.setTextColor(ColorPicker.SECOND_BLACK);
+            frameCurrentTime.setTextColor(ColorPicker.SECOND_BLACK);
+            frameDuration.setTextColor(ColorPicker.SECOND_BLACK);
+            circularSeekBar.setColorList(new int[]{ColorPicker.SECOND_BLACK, ColorPicker.SECOND_BLACK});
         }
         GradientDrawable gradientDrawable = new GradientDrawable(GradientDrawable.Orientation.TL_BR,
                 r);

@@ -7,7 +7,6 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
-import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Build;
 import android.os.Bundle;
@@ -28,7 +27,6 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -169,6 +167,7 @@ public class ScreenLockPlayerActivity extends UniEXActivity.UniEXMusicActivity i
     @SuppressWarnings("deprecation")
     private void updateUi(@Nullable MediaInfo metaData){
         if(metaData == null)return;
+        playPauseFrame.setContentDescription(playerService.isPlaying() ? getString(R.string.item_button_description_pause) : getString(R.string.item_button_description_play));
         Bitmap art = metaData.getArt();
         CharSequence title = metaData.getTitle();
         CharSequence artist = metaData.getArtist();
@@ -177,7 +176,7 @@ public class ScreenLockPlayerActivity extends UniEXActivity.UniEXMusicActivity i
         frameArtist.setText(artist);
         frameTitle.setSelected(true);
         int l = metaData.getColorResult().getHighColor();
-        int[] r = new int[]{Color.WHITE, l};
+        int[] r = new int[]{ColorPicker.FIRST_WHITE, l};
         circleLineVisualizer.setColor(l);
         if(ColorPicker.isLightColor(l)){
             if(defaultDisplay.getRotation() != Surface.ROTATION_270) getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
@@ -186,11 +185,11 @@ public class ScreenLockPlayerActivity extends UniEXActivity.UniEXMusicActivity i
             skipToNextFrame.setImageResource(R.drawable.ic_skip_to_next_action_icon_holo_dark);
             skipToPreviousFrame.setImageResource(R.drawable.ic_skip_to_previous_action_icon_holo_dark);
             openQuickList.setImageResource(R.drawable.ic_media_list_icon_holo_dark);
-            frameTitle.setTextColor(Color.WHITE);
-            frameArtist.setTextColor(Color.WHITE);
-            frameCurrentTime.setTextColor(Color.WHITE);
-            frameDuration.setTextColor(Color.WHITE);
-            circularSeekBar.setColorList(new int[]{Color.WHITE, Color.WHITE});
+            frameTitle.setTextColor(ColorPicker.FIRST_WHITE);
+            frameArtist.setTextColor(ColorPicker.SECOND_WHITE);
+            frameCurrentTime.setTextColor(ColorPicker.SECOND_WHITE);
+            frameDuration.setTextColor(ColorPicker.SECOND_WHITE);
+            circularSeekBar.setColorList(new int[]{ColorPicker.SECOND_WHITE, ColorPicker.SECOND_WHITE});
             //Toast.makeText(getApplicationContext(), "Light", Toast.LENGTH_SHORT).show();
         }else{
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -201,11 +200,11 @@ public class ScreenLockPlayerActivity extends UniEXActivity.UniEXMusicActivity i
             skipToNextFrame.setImageResource(R.drawable.ic_skip_to_next_action_icon);
             skipToPreviousFrame.setImageResource(R.drawable.ic_skip_to_previous_action_icon);
             openQuickList.setImageResource(R.drawable.ic_media_list_icon);
-            frameTitle.setTextColor(Color.BLACK);
-            frameArtist.setTextColor(Color.DKGRAY);
-            frameCurrentTime.setTextColor(Color.DKGRAY);
-            frameDuration.setTextColor(Color.DKGRAY);
-            circularSeekBar.setColorList(new int[]{Color.DKGRAY, Color.DKGRAY});
+            frameTitle.setTextColor(ColorPicker.FIRST_BLACK);
+            frameArtist.setTextColor(ColorPicker.SECOND_BLACK);
+            frameCurrentTime.setTextColor(ColorPicker.SECOND_BLACK);
+            frameDuration.setTextColor(ColorPicker.SECOND_BLACK);
+            circularSeekBar.setColorList(new int[]{ColorPicker.SECOND_BLACK, ColorPicker.SECOND_BLACK});
         }
         GradientDrawable gradientDrawable = new GradientDrawable(GradientDrawable.Orientation.TL_BR,
                 r);

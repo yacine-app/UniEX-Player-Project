@@ -19,6 +19,15 @@ import java.util.Set;
  */
 public class ColorPicker {
 
+    @ColorInt
+    public static final int FIRST_WHITE  = 0x0FFFFFFFF;
+    @ColorInt
+    public static final int SECOND_WHITE = 0x0BBFFFFFF;
+    @ColorInt
+    public static final int FIRST_BLACK  = 0x0FF000000;
+    @ColorInt
+    public static final int SECOND_BLACK = 0x0BB000000;
+
     /**
      * ColorResult that gives the most and the least color that are used within bitmap image source.
      */
@@ -173,7 +182,7 @@ public class ColorPicker {
      * @see ColorResult
      * @see Bitmap
      */
-    public ColorPicker(@NonNull Bitmap image){
+    public ColorPicker(@NonNull final Bitmap image){
         bitmap = Bitmap.createScaledBitmap(image, 82, 82, true);
         this.thread = new Thread(runnable);
     }

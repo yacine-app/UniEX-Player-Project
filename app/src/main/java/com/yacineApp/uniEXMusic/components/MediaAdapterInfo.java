@@ -23,9 +23,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.yacineApp.uniEXMusic.R;
 import com.yacineApp.uniEXMusic.components.utils.CursorRecyclerViewAdapter;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.HashMap;
 
 public class MediaAdapterInfo extends CursorRecyclerViewAdapter<MediaAdapterInfo.ViewHolder> {
 
@@ -52,7 +50,8 @@ public class MediaAdapterInfo extends CursorRecyclerViewAdapter<MediaAdapterInfo
 
     }
 
-    private List<MediaInfo> mediaInfoList = new ArrayList<>();
+    //private List<MediaInfo> mediaInfoList = new ArrayList<>();
+    private HashMap<Long, MediaInfo> mediaInfoHashMap = new HashMap<>();
     private Index index = null;
     private AppCompatActivity activity;
     private Bitmap defaultIcon;
@@ -76,24 +75,36 @@ public class MediaAdapterInfo extends CursorRecyclerViewAdapter<MediaAdapterInfo
         return new ViewHolder(constraintLayout);
     }
 
+    @Nullable
     public MediaInfo getItem(int pos){
-        Cursor cursor = getCursor();
-        assert cursor != null;
-        if(!cursor.moveToPosition(pos)){
-            if(!cursor.moveToFirst()) return null;
-        }
-        if(mediaInfoList.size() != getItemCount()) setSize(getItemCount());
-        MediaInfo mediaInfo = mediaInfoList.get(pos);
-        if(mediaInfo == null){
-            mediaInfo = MediaInfo.valueOf(cursor);
-            mediaInfo.prepare(defaultIcon);
-            mediaInfoList.set(pos, mediaInfo);
-        }
-        return mediaInfo;
+        return getItem(pos, null);
     }
 
+    @Nullable
+    private MediaInfo getItem(int pos, @Nullable ViewHolder holder){
+        Cursor cursor = getCursor();
+        assert cursor != null;
+        long id = getItemId(pos);
+        if(!cursor.moveToPosition(pos)) if(!cursor.moveToFirst()) return null;
+        //if(mediaInfoList.size() != getItemCount()) setSize(getItemCount());
+        MediaInfo mediaInfo = mediaInfoHashMap.get(id);
+        if(mediaInfo == null){
+            mediaInfo = MediaInfo.valueOf(cursor);
+            if(holder == null) mediaInfo.prepare(defaultIcon);
+            else {
+                mediaInfo.setOnDonePreparingListener(onDonePreparingListener);
+                mediaInfo.prepareSync(defaultIcon, holder);
+            }
+            mediaInfoHashMap.put(id, mediaInfo);
+        }
+        return mediaInfo;
+
+    }
+
+    @Nullable
     public MediaSessionCompat.QueueItem getItemQueue(int pos){
         MediaInfo a = getItem(pos);
+        if(a == null) return null;
         return new MediaSessionCompat.QueueItem(
                 new MediaDescriptionCompat.Builder()
                         .setIconBitmap(a.getArt())
@@ -103,14 +114,14 @@ public class MediaAdapterInfo extends CursorRecyclerViewAdapter<MediaAdapterInfo
                         .build(), a.getId());
     }
 
-    public void setSize(int size){
-        mediaInfoList = new ArrayList<>(Collections.<MediaInfo>nCopies(size, null));
-    }
+    //public void setSize(int size){
+        //mediaInfoList = new ArrayList<>(Collections.<MediaInfo>nCopies(size, null));
+    //}
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, @Nullable Cursor cursor) {
         if(cursor == null) return;
-        if(getItemCount() != mediaInfoList.size()) setSize(getItemCount());
+        //if(getItemCount() != mediaInfoList.size()) setSize(getItemCount());
         holder.title.setTextColor(0x0FF252525);
         holder.artist.setTextColor(0x0FF2F2F2F);
         holder.title.setTypeface(Typeface.defaultFromStyle(Typeface.NORMAL));
@@ -119,14 +130,15 @@ public class MediaAdapterInfo extends CursorRecyclerViewAdapter<MediaAdapterInfo
             holder.title.setTextColor(getContext().getResources().getColor(R.color.colorMainTheme, null));
             holder.artist.setTextColor(getContext().getResources().getColor(R.color.colorMainTheme, null));
         }
-        //int pos = cursor.getPosition();
-        MediaInfo mediaInfo;
-        //if (!MediaInfo.contains(mediaInfoList, getItemId(pos))) {
+        int pos = cursor.getPosition();
+        MediaInfo mediaInfo = getItem(pos, holder);
+        /*if (MediaInfo.contains(mediaInfoList, getItemId(pos))) {
             mediaInfo = MediaInfo.valueOf(cursor);
             mediaInfo.setOnDonePreparingListener(onDonePreparingListener);
             mediaInfo.prepareSync(defaultIcon, holder);
             mediaInfoList.add(mediaInfo);
-        //}else mediaInfo = mediaInfoList.get(pos);
+        }else mediaInfo = mediaInfoList.get(pos);*/
+        if(mediaInfo == null) return;
         holder.setArtist(mediaInfo.getArtist());
         holder.setTitle(mediaInfo.getTitle());
         holder.setArt(mediaInfo.getSmallArt());

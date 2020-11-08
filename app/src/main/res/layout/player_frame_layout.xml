@@ -2,6 +2,7 @@
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/test"
@@ -40,6 +41,7 @@
             android:layout_height="?attr/actionBarSize"
             android:layout_gravity="start"
             android:src="@drawable/ic_back_arrow_action_icon"
+            android:contentDescription="@string/item_button_description_back_navigation"
             android:background="?attr/selectableItemBackgroundBorderless"/>
 
     </androidx.appcompat.widget.Toolbar>
@@ -61,6 +63,7 @@
             android:id="@+id/media_info_frame_art"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:contentDescription="@string/item_button_description_media_art"
             android:scaleType="centerCrop"/>
 
     </androidx.cardview.widget.CardView>
@@ -131,7 +134,8 @@
             android:textSize="17sp"
             android:layout_marginEnd="30dp"
             android:layout_marginTop="10dp"
-            android:text="@string/media_time_duration_nan"/>
+            android:text="@string/media_time_duration_nan"
+            tools:ignore="RelativeOverlap" />
 
         <ImageButton
             android:id="@+id/open_quick_list_frame"
@@ -142,6 +146,7 @@
             android:layout_toStartOf="@id/seek_circular_bar_frame_layout"
             android:scaleType="centerCrop"
             android:src="@drawable/ic_media_list_icon"
+            android:contentDescription="@string/item_button_description_play_list"
             android:background="?attr/selectableItemBackgroundBorderless"/>
 
         <ImageButton
@@ -152,6 +157,7 @@
             android:layout_centerVertical="true"
             android:scaleType="centerCrop"
             android:src="@drawable/ic_skip_to_previous_action_icon"
+            android:contentDescription="@string/item_button_description_skip_to_previous"
             android:background="?attr/selectableItemBackgroundBorderless"/>
 
         <LinearLayout
@@ -178,6 +184,7 @@
             android:layout_centerInParent="true"
             android:scaleType="centerCrop"
             android:src="@drawable/ic_play_action_icon"
+            android:contentDescription="@string/item_button_description_play"
             android:background="?attr/selectableItemBackgroundBorderless"/>
 
         <ImageButton
@@ -188,6 +195,7 @@
             android:layout_toEndOf="@id/seek_circular_bar_frame_layout"
             android:scaleType="centerCrop"
             android:src="@drawable/ic_skip_to_next_action_icon"
+            android:contentDescription="@string/item_button_description_skip_to_next"
             android:background="?attr/selectableItemBackgroundBorderless"/>
 
         <ImageButton
@@ -199,6 +207,7 @@
             android:layout_toEndOf="@id/seek_circular_bar_frame_layout"
             android:scaleType="centerCrop"
             android:src="@drawable/ic_play_all_once_icon"
+            android:contentDescription="@string/item_button_description_loop_play_all"
             android:background="?attr/selectableItemBackgroundBorderless"/>
 
         <TextView
@@ -209,7 +218,8 @@
             android:textSize="17sp"
             android:layout_marginStart="30dp"
             android:layout_marginTop="10dp"
-            android:text="@string/media_time_duration_nan"/>
+            android:text="@string/media_time_duration_nan"
+            tools:ignore="RelativeOverlap" />
 
     </RelativeLayout>
 

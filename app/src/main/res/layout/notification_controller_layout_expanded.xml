@@ -11,7 +11,8 @@
         android:layout_width="match_parent"
         android:layout_height="130dp"
         android:scaleType="fitXY"
-        android:src="@drawable/test"/>
+        android:src="@drawable/test"
+        tools:ignore="ContentDescription" />
 
     <LinearLayout
         android:layout_width="wrap_content"
@@ -43,6 +44,7 @@
                     android:layout_width="19dp"
                     android:layout_height="19dp"
                     android:src="@drawable/ic_notification_uniex_logo"
+                    android:contentDescription="@string/item_button_description_logo"
                     app:tint="?android:textColor" />
 
                 <TextView
@@ -51,6 +53,7 @@
                     android:layout_height="wrap_content"
                     android:text="@string/app_name"
                     android:textSize="13sp"
+                    android:singleLine="true"
                     android:gravity="center_vertical" />
 
             </LinearLayout>
@@ -63,6 +66,7 @@
                 android:layout_marginEnd="20dp"
                 android:scaleType="centerCrop"
                 android:src="@drawable/ic_close_action_icon"
+                android:contentDescription="@string/item_button_description_close"
                 android:background="?android:attr/selectableItemBackground"/>
 
         </RelativeLayout>
@@ -111,6 +115,7 @@
                     android:layout_height="30dp"
                     android:scaleType="centerCrop"
                     android:src="@drawable/ic_rewind_action_icon"
+                    android:contentDescription="@string/item_button_description_rewind"
                     android:background="?android:attr/selectableItemBackground"/>
 
                 <ImageButton
@@ -120,6 +125,7 @@
                     android:layout_marginStart="10dp"
                     android:scaleType="centerCrop"
                     android:src="@drawable/ic_skip_to_previous_action_icon"
+                    android:contentDescription="@string/item_button_description_skip_to_previous"
                     android:background="?android:attr/selectableItemBackground"/>
 
                 <ImageButton
@@ -130,6 +136,7 @@
                     android:layout_marginStart="10dp"
                     android:layout_marginEnd="10dp"
                     android:src="@drawable/ic_play_action_icon"
+                    android:contentDescription="@string/item_button_description_play"
                     android:background="?android:attr/selectableItemBackground"/>
 
                 <ImageButton
@@ -138,6 +145,7 @@
                     android:layout_height="30dp"
                     android:scaleType="centerCrop"
                     android:src="@drawable/ic_skip_to_next_action_icon"
+                    android:contentDescription="@string/item_button_description_skip_to_next"
                     android:layout_marginEnd="10dp"
                     android:background="?android:attr/selectableItemBackground"/>
 
@@ -147,6 +155,7 @@
                     android:layout_height="30dp"
                     android:scaleType="centerCrop"
                     android:src="@drawable/ic_fast_forward_action_icon"
+                    android:contentDescription="@string/item_button_description_forward"
                     android:background="?android:attr/selectableItemBackground"/>
 
             </LinearLayout>
@@ -161,6 +170,7 @@
         android:layout_height="130dp"
         android:scaleType="centerCrop"
         android:src="@drawable/logo_start_splash_screen"
+        android:contentDescription="@string/item_button_description_media_art"
         android:background="#66FEFEFE"
         android:layout_alignParentEnd="true"/>
 
