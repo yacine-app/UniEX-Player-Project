@@ -317,11 +317,11 @@ public class MainActivity extends UniEXActivity.UniEXMusicActivity implements Vi
                 break;
             case R.id.skip_to_next:
             case R.id.skip_to_next_frame:
-                sendMediaEvent(PlaybackStateCompat.ACTION_SKIP_TO_NEXT);
+                playerService.skipToNext();
                 break;
             case R.id.skip_to_previous:
             case R.id.skip_to_previous_frame:
-                sendMediaEvent(PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS);
+                playerService.skipToPrevious();
                 break;
             case R.id.frameLayout:
                 //TODO

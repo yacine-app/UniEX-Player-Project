@@ -453,6 +453,10 @@ public class PlayerService extends MediaBrowserServiceCompat implements PlayerCo
 
     public void rewind(){ playerCore.rewind(); }
 
+    public void skipToNext(){ playerCore.skipToNext(); }
+
+    public void skipToPrevious(){ playerCore.skipToPrevious(); }
+
     public void setOnPreparedListener(PlayerCore.OnPreparedListener onPreparedListener){ playerCore.addOnPreparedListener(onPreparedListener); }
 
     public void removeOnPreparedListener(PlayerCore.OnPreparedListener onPreparedListener){ playerCore.removeOnPreparedListener(onPreparedListener); }

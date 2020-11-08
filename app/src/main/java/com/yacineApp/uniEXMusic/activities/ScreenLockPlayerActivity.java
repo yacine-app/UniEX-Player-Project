@@ -230,10 +230,10 @@ public class ScreenLockPlayerActivity extends UniEXActivity.UniEXMusicActivity i
                 playerService.playPause();
                 break;
             case R.id.skip_to_next_frame:
-                sendMediaEvent(PlaybackStateCompat.ACTION_SKIP_TO_NEXT);
+                playerService.skipToNext();
                 break;
             case R.id.skip_to_previous_frame:
-                sendMediaEvent(PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS);
+                playerService.skipToPrevious();
                 break;
             case R.id.frameLayout:
                 //TODO

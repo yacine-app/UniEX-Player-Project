@@ -16,6 +16,7 @@ import com.yacineApp.uniEXMusic.R;
 import java.util.ArrayList;
 import java.util.List;
 
+@Deprecated
 public class LoadInternalMedia implements Runnable {
 
     public interface OnDoneListener {
