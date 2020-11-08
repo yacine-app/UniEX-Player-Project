@@ -131,6 +131,8 @@ public class MediaInfo {
         try {
             MediaMetadataRetriever retriever = new MediaMetadataRetriever();
             BitmapFactory.Options options = new BitmapFactory.Options();
+            options.outHeight = 320;
+            options.outWidth = 320;
             retriever.setDataSource(this.path);
             this.rawArt = retriever.getEmbeddedPicture();
             if (this.rawArt != null)
