@@ -267,7 +267,7 @@ public class PlayerService extends MediaBrowserServiceCompat implements PlayerCo
         //startForeground(NOTIFICATION_ID, notification(null));
         Log.e("BINDER", "unbound!");
         bound = false;
-        return false;
+        return true;
     }
 
     @Nullable

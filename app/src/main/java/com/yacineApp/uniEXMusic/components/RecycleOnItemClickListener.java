@@ -34,7 +34,7 @@ public abstract class RecycleOnItemClickListener implements RecyclerView.OnItemT
         View view = rv.findChildViewUnder(e.getX(), e.getY());
         if(view != null && gestureDetector.onTouchEvent(e)) {
             onItemClick(view, rv.getChildAdapterPosition(view));
-            return true;
+            //return true;
         }
         return false;
     }

@@ -12,12 +12,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.yacineApp.uniEXMusic.R;
@@ -35,14 +35,19 @@ public class MediaAdapterInfo extends CursorRecyclerViewAdapter<MediaAdapterInfo
     public static class ViewHolder extends RecyclerView.ViewHolder {
         TextView title, artist;
         private ImageView art;
-        public ViewHolder(@NonNull ConstraintLayout constraintLayout) {
-            super(constraintLayout);
-            art = itemView.findViewById(R.id.art_image_list);
-            title = itemView.findViewById(R.id.media_info_title);
-            artist = itemView.findViewById(R.id.media_info_artist);
+        private boolean isEmptyView = false;
+        public ViewHolder(@NonNull View view) {
+            super(view);
+            art = view.findViewById(R.id.art_image_list);
+            title = view.findViewById(R.id.media_info_title);
+            artist = view.findViewById(R.id.media_info_artist);
             title.setTextColor(0x0FF252525);
             artist.setTextColor(0x0FF2F2F2F);
             title.setTypeface(Typeface.defaultFromStyle(Typeface.NORMAL));
+        }
+        public ViewHolder(@NonNull RelativeLayout relativeLayout){
+            super(relativeLayout);
+            isEmptyView = true;
         }
         public void setArt(Bitmap art) { this.art.setImageBitmap(art); }
         public void setArtist(String artist) { this.artist.setText(artist); }
@@ -50,12 +55,14 @@ public class MediaAdapterInfo extends CursorRecyclerViewAdapter<MediaAdapterInfo
 
     }
 
+    private static final int emptyView = 0x0E08DF;
+
     //private List<MediaInfo> mediaInfoList = new ArrayList<>();
     private HashMap<Long, MediaInfo> mediaInfoHashMap = new HashMap<>();
     private Index index = null;
     private AppCompatActivity activity;
     private Bitmap defaultIcon;
-    private MediaInfo.OnDonePreparingListener onDonePreparingListener = new MediaInfo.OnDonePreparingListener() {
+    private MediaInfo.OnDonePreparingListener<ViewHolder> onDonePreparingListener = new MediaInfo.OnDonePreparingListener<ViewHolder>() {
         @Override
         public void onPrepared(@NonNull final MediaInfo mediaInfo, @NonNull final ViewHolder holder) {
             if(activity == null) return;
@@ -71,8 +78,12 @@ public class MediaAdapterInfo extends CursorRecyclerViewAdapter<MediaAdapterInfo
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        ConstraintLayout constraintLayout = (ConstraintLayout) LayoutInflater.from(getContext()).inflate(R.layout.media_item_info_list_layout, parent, false);
-        return new ViewHolder(constraintLayout);
+        if(viewType == emptyView){
+            RelativeLayout view = (RelativeLayout) LayoutInflater.from(getContext()).inflate(R.layout.empty_list_music_layout_item, parent, false);
+            return new ViewHolder(view);
+        }
+        View view = LayoutInflater.from(getContext()).inflate(R.layout.media_item_info_list_layout, parent, false);
+        return new ViewHolder(view);
     }
 
     @Nullable
@@ -91,10 +102,7 @@ public class MediaAdapterInfo extends CursorRecyclerViewAdapter<MediaAdapterInfo
         if(mediaInfo == null){
             mediaInfo = MediaInfo.valueOf(cursor);
             if(holder == null) mediaInfo.prepare(defaultIcon);
-            else {
-                mediaInfo.setOnDonePreparingListener(onDonePreparingListener);
-                mediaInfo.prepareSync(defaultIcon, holder);
-            }
+            else mediaInfo.prepareSync(defaultIcon, holder, onDonePreparingListener);
             mediaInfoHashMap.put(id, mediaInfo);
         }
         return mediaInfo;
@@ -119,16 +127,16 @@ public class MediaAdapterInfo extends CursorRecyclerViewAdapter<MediaAdapterInfo
     //}
 
     @Override
-    public void onBindViewHolder(@NonNull ViewHolder holder, @Nullable Cursor cursor) {
-        if(cursor == null) return;
+    protected void onBindViewHolder(@NonNull ViewHolder holder, @Nullable Cursor cursor) {
+        if(cursor == null || holder.isEmptyView) return;
         //if(getItemCount() != mediaInfoList.size()) setSize(getItemCount());
         holder.title.setTextColor(0x0FF252525);
-        holder.artist.setTextColor(0x0FF2F2F2F);
+        holder.artist.setTextColor(0x0BB2F2F2F);
         holder.title.setTypeface(Typeface.defaultFromStyle(Typeface.NORMAL));
         if(index != null && index.index == cursor.getPosition()){
             holder.title.setTypeface(holder.title.getTypeface(), Typeface.BOLD);
             holder.title.setTextColor(getContext().getResources().getColor(R.color.colorMainTheme, null));
-            holder.artist.setTextColor(getContext().getResources().getColor(R.color.colorMainTheme, null));
+            holder.artist.setTextColor(getContext().getResources().getColor(R.color.colorMainTheme, null) | 0x0BB000000);
         }
         int pos = cursor.getPosition();
         MediaInfo mediaInfo = getItem(pos, holder);
@@ -142,6 +150,13 @@ public class MediaAdapterInfo extends CursorRecyclerViewAdapter<MediaAdapterInfo
         holder.setArtist(mediaInfo.getArtist());
         holder.setTitle(mediaInfo.getTitle());
         holder.setArt(mediaInfo.getSmallArt());
+    }
+
+    @Override
+    protected void onEmptyResult(@NonNull RecyclerView recyclerView) {
+        //onCreateViewHolder(recyclerView, emptyView);
+        //recyclerView.smoothScrollToPosition(0);
+        //relativeLayout.addView(textView);
     }
 
     @SuppressWarnings("unused")

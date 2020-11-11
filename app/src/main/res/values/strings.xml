@@ -27,6 +27,8 @@
     <string name="about_activity_text_website">Website</string>
     <string name="about_activity_text_version">Version: %s</string>
 
+    <string name="list_empty_music_message">No music file were found.</string>
+
     <!--
 
     -->

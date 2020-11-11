@@ -9,7 +9,6 @@ import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
-import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
 import android.media.AudioManager;
 import android.media.audiofx.AudioEffect;
@@ -20,8 +19,6 @@ import android.os.IBinder;
 import android.os.Looper;
 import android.os.Parcelable;
 import android.support.v4.media.session.MediaSessionCompat;
-import android.support.v4.media.session.PlaybackStateCompat;
-import android.util.Log;
 import android.view.Display;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -43,7 +40,6 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.cardview.widget.CardView;
-import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.core.content.ContextCompat;
 import androidx.core.view.OnApplyWindowInsetsListener;
@@ -52,7 +48,6 @@ import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.yacineApp.uniEXMusic.components.LoadInternalMedia;
 import com.yacineApp.uniEXMusic.components.MediaAdapterInfo;
 import com.yacineApp.uniEXMusic.components.MediaInfo;
 import com.yacineApp.uniEXMusic.components.PlayerCore;
@@ -97,7 +92,7 @@ public class MainActivity extends UniEXActivity.UniEXMusicActivity implements Vi
     private View includedLayout;
     private View mediaController;
     private View firstViewChild;
-    private BottomSheetBehavior bottomSheetBehavior;
+    private BottomSheetBehavior<FrameLayout> bottomSheetBehavior;
     private TimeFormatter timeFormatter;
     private FrameLayout volumePanelView;
     private CircularSeekBar circularSeekBar, volumePanelController;
@@ -186,9 +181,18 @@ public class MainActivity extends UniEXActivity.UniEXMusicActivity implements Vi
                 updateUi(playerService.getMediaInfo());
                 onPreparedListener.onPrepared();
             }
-            recyclerView.setAdapter(playerService.getMediaAdapterInfo());
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    recyclerView.setAdapter(playerService.getMediaAdapterInfo());
+                    try {
+                        if (bottomSheetBehavior.getState() == BottomSheetBehavior.STATE_EXPANDED)
+                            circleLineVisualizer.setAudioSessionId(playerService.getAudioSessionId());
+                    }catch (IllegalStateException ignored){}
+                }
+            });
             onPreparedListener.onPrepared();
-            changeBehaviorState(behaviorDefaultLaunch);
+            //changeBehaviorState(behaviorDefaultLaunch);
             if(playerService.isPlaying() && animation != null) circleLineVisualizer.startAnimation(animation);
             bound = true;
         }
@@ -247,6 +251,7 @@ public class MainActivity extends UniEXActivity.UniEXMusicActivity implements Vi
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
+        //Toast.makeText(this, "Intent", Toast.LENGTH_SHORT).show();
         handleIntent(intent);
     }
 
@@ -283,33 +288,9 @@ public class MainActivity extends UniEXActivity.UniEXMusicActivity implements Vi
         return super.onOptionsItemSelected(item);
     }
 
-    /*@Override
-    public void onDone(@NonNull final List<MediaInfo> mediaInfoList) {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                mediaAdapterInfo = new MediaAdapterInfo(activity);
-                if(playerService != null){
-                    mediaAdapterInfo.setSelectedIndex(new MediaAdapterInfo.Index(playerService.getCurrentPlayIndex()));
-                    playerService.setMediaQueue(mediaAdapterInfo);
-                }
-                recyclerView.setAdapter(mediaAdapterInfo);
-            }
-        });
-    }*/
-
-    /*@Override
-    public void onItemClick(@NonNull View view, int position) {
-        if(bound && playerService.getMediaAdapterInfo() != null)
-            playerService.getMediaAdapterInfo().setSelectedIndex(new MediaAdapterInfo.Index(position));
-        startService(
-                new Intent(this, PlayerService.class)
-                        .setAction(PlayerService.ACTION_MEDIA_SERVICE_TO_ITEM)
-                        .putExtra(PlayerService.EXTRA_MEDIA_SERVICE_TO_ITEM, position));
-    }*/
-
     @Override
     public void onClick(@NonNull View v) {
+        if(playerService == null) return;
         switch (v.getId()){
             case R.id.play_pause:
             case R.id.play_pause_frame:
@@ -336,16 +317,19 @@ public class MainActivity extends UniEXActivity.UniEXMusicActivity implements Vi
                 //setWithOrientation();
                 break;
             case R.id.back_button_arrow_frame:
-                changeBehaviorState(BottomSheetBehavior.STATE_COLLAPSED);
+                changeBehaviorState(BottomSheetBehavior.STATE_COLLAPSED, true);
+                break;
+            case R.id.media_controller:
+                changeBehaviorState(BottomSheetBehavior.STATE_EXPANDED, true);
                 break;
         }
     }
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if((BottomSheetBehavior.STATE_EXPANDED == bottomSheetBehavior.getState() || BottomSheetBehavior.STATE_DRAGGING == bottomSheetBehavior.getState()) && keyCode == KeyEvent.KEYCODE_BACK){
+        if(bottomSheetBehavior.getState() != BottomSheetBehavior.STATE_COLLAPSED && keyCode == KeyEvent.KEYCODE_BACK){
             bottomSheetBehavior.setDraggable(true);
-            changeBehaviorState(BottomSheetBehavior.STATE_COLLAPSED);
+            changeBehaviorState(BottomSheetBehavior.STATE_COLLAPSED, true);
             return false;
         }/*if(keyCode == KeyEvent.KEYCODE_VOLUME_UP || keyCode == KeyEvent.KEYCODE_VOLUME_DOWN || keyCode == KeyEvent.KEYCODE_VOLUME_MUTE){
             if(!circularSeekBarChanging) {
@@ -364,12 +348,8 @@ public class MainActivity extends UniEXActivity.UniEXMusicActivity implements Vi
         super.onResume();
         if(bottomSheetBehavior.getState() == BottomSheetBehavior.STATE_EXPANDED && playerService != null) circleLineVisualizer.setAudioSessionId(playerService.getAudioSessionId());
         bindService(new Intent(this, PlayerService.class), connection, BIND_ADJUST_WITH_ACTIVITY);
-//        if(getIntent() != null && ACTION_LAUNCH_PLAY_BACK.equals(getIntent().getAction()))
-//            behaviorDefaultLaunch = BottomSheetBehavior.STATE_EXPANDED;
-//        else behaviorDefaultLaunch = bottomSheetBehavior.getState();
         handler.postDelayed(runnable, CIRCULAR_SEEK_BAR_UPDATE_DELAY);
         if(circleLineVisualizer != null && bound) circleLineVisualizer.setAudioSessionId(playerService.getAudioSessionId());
-        //handler.postDelayed(runnable1, LAYOUT_CHANGES_UPDATE_DELAY);
     }
 
     @Override
@@ -378,9 +358,7 @@ public class MainActivity extends UniEXActivity.UniEXMusicActivity implements Vi
         if(bottomSheetBehavior.getState() == BottomSheetBehavior.STATE_EXPANDED && playerService != null) circleLineVisualizer.release();
             try {
             unbindService(connection);
-        }catch (IllegalArgumentException e){
-            Log.e(this.getClass().getName(), "Error: ", e);
-        }
+        }catch (IllegalArgumentException ignored){ }
         bound = false;
         handler.removeCallbacks(runnable);
         circleLineVisualizer.release();
@@ -502,21 +480,36 @@ public class MainActivity extends UniEXActivity.UniEXMusicActivity implements Vi
                     if(bound && playerService.isPlaying())
                         behaviorDefaultLaunch = BottomSheetBehavior.STATE_EXPANDED;
             }
-            changeBehaviorState(behaviorDefaultLaunch);
+            changeBehaviorState(behaviorDefaultLaunch, true);
             oldIntent = null;
         }
     }
 
-    private void changeBehaviorState(int state){
-        organizeBottomSheet(state);
+    private void changeBehaviorState(int state, boolean animated) {
+        if(!animated){
+            organizeBottomSheet(state);
+            bottomSheetBehavior.setState(state);
+            return;
+        }
+        organizeBottomSheet(state == BottomSheetBehavior.STATE_COLLAPSED ? BottomSheetBehavior.STATE_EXPANDED : BottomSheetBehavior.STATE_COLLAPSED);
+        organizeBottomSheet(BottomSheetBehavior.STATE_DRAGGING);
+        if(state == BottomSheetBehavior.STATE_EXPANDED) {
+            mediaController.animate().alpha(0.0f).start();
+            frameActionBar.animate().alpha(1.0f).start();
+        }else {
+            mediaController.animate().alpha(1.0f).start();
+            frameActionBar.animate().alpha(0.0f).start();
+        }
         bottomSheetBehavior.setState(state);
     }
 
     @SuppressWarnings("deprecation")
     private void prepareUi(int state){
         windowDisplayView = ((WindowManager) getSystemService(WINDOW_SERVICE)).getDefaultDisplay();
-        if(getIntent() != null && ACTION_LAUNCH_PLAY_BACK.equals(getIntent().getAction()))
+        if(getIntent() != null && ACTION_LAUNCH_PLAY_BACK.equals(getIntent().getAction())) {
             behaviorDefaultLaunch = BottomSheetBehavior.STATE_EXPANDED;
+            getIntent().setAction("");
+        }
 
         setContentView(R.layout.main_activity_layout);
 
@@ -612,9 +605,9 @@ public class MainActivity extends UniEXActivity.UniEXMusicActivity implements Vi
         });
 
         circularSeekBar.setIndicatorEnabled(false);
-        FrameLayout bottomSheet = findViewById(R.id.frameLayout);
+        final FrameLayout bottomSheet = findViewById(R.id.frameLayout);
 
-        bottomSheet.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
+        //bottomSheet.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
 
         bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet);
 
@@ -631,7 +624,7 @@ public class MainActivity extends UniEXActivity.UniEXMusicActivity implements Vi
                 includedLayout.setAlpha(slideOffset);
                 //mainActionBar.setAlpha(mediaController.getAlpha());
             }
-          });
+        });
 
         defaultPeekHeight = bottomSheetBehavior.getPeekHeight();
 
@@ -650,7 +643,7 @@ public class MainActivity extends UniEXActivity.UniEXMusicActivity implements Vi
                 params.rightMargin = windowInsets.getSystemWindowInsetRight();
                 params.leftMargin = windowInsets.getSystemWindowInsetLeft();
                 firstViewChild.setLayoutParams(params);
-                organizeBottomSheet(bottomSheetBehavior.getState());
+                //organizeBottomSheet(bottomSheetBehavior.getState());
                 return windowInsets;
             }
         });
@@ -664,15 +657,16 @@ public class MainActivity extends UniEXActivity.UniEXMusicActivity implements Vi
         skipToNextFrame.setOnClickListener(this);
         openQuickList.setOnClickListener(this);
         changeLoop.setOnClickListener(this);
+        mediaController.setOnClickListener(this);
         findViewById(R.id.back_button_arrow_frame).setOnClickListener(this);
 
         circularSeekBar.setOnRoundedSeekChangeListener(this);
 
         setSupportActionBar(mainActionBar);
 
-        changeBehaviorState(behaviorDefaultLaunch);
+        changeBehaviorState(behaviorDefaultLaunch, false);
 
-        if(state != 0) changeBehaviorState(state);
+        if(state != 0) changeBehaviorState(state, false);
 
         if(timeFormatter != null) frameDuration.setText(timeFormatter.getTotalTime());
 
@@ -686,18 +680,7 @@ public class MainActivity extends UniEXActivity.UniEXMusicActivity implements Vi
             finish(getText(R.string.permission_non_granted_message));
             return;
         }
-        /*mediaAdapterInfo = new MediaAdapterInfo(listView);
-        if(playerService != null){
-            mediaAdapterInfo.setSelectedIndex(new MediaAdapterInfo.Index(playerService.getCurrentPlayIndex()));
-            playerService.setMediaQueue(mediaAdapterInfo);
-        }
-        listView.setAdapter(mediaAdapterInfo);*/
-        /*LoadInternalMedia loadInternalMedia = new LoadInternalMedia(this);
-        loadInternalMedia.setStart(0);
-        loadInternalMedia.setLength(1);
-        loadInternalMedia.setOnDoneListener(this);
-        loadInternalMedia.execute();*/
-        runOnUiThread(new Runnable() {
+        handler.post(new Runnable() {
             @Override
             public void run() {
                 if(playerService != null){
@@ -774,8 +757,8 @@ public class MainActivity extends UniEXActivity.UniEXMusicActivity implements Vi
 
     @SuppressWarnings("deprecation")
     private void organizeBottomSheet(int state){
-        if(playerService == null)return;
-        MediaInfo mediaInfo = playerService.getMediaInfo();
+        //if(playerService == null)return;
+        MediaInfo mediaInfo = playerService == null ? null : playerService.getMediaInfo();
         switch (state){
             case BottomSheetBehavior.STATE_EXPANDED:
                 handler.postDelayed(runnable, CIRCULAR_SEEK_BAR_UPDATE_DELAY);
@@ -785,13 +768,13 @@ public class MainActivity extends UniEXActivity.UniEXMusicActivity implements Vi
                 mediaController.animate().alpha(0.0f).start();
                 frameActionBar.animate().alpha(1.0f).start();
                 mainActionBar.setVisibility(View.GONE);
-                if(mediaInfo != null){
+                if(mediaInfo != null && playerService != null){
                     if(mediaInfo.getColorResult().isLightColor() && windowDisplayView.getRotation() != Surface.ROTATION_270 || Build.VERSION.SDK_INT < Build.VERSION_CODES.O){
                         getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
                     }
                     else {
                         getWindow().getDecorView().setSystemUiVisibility(0);
-                        getWindow().getDecorView().requestFocus();
+                        //getWindow().getDecorView().requestFocus();
                         getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR | View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
                     }
                 }
@@ -808,7 +791,7 @@ public class MainActivity extends UniEXActivity.UniEXMusicActivity implements Vi
                 frameActionBar.animate().alpha(0.0f).start();
                 circleLineVisualizer.release();
                 circularSeekBarChanging = true;
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && playerService != null) {
                     getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR | View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
                 }
                 setSupportActionBar(mainActionBar);
@@ -819,7 +802,7 @@ public class MainActivity extends UniEXActivity.UniEXMusicActivity implements Vi
                 mediaController.setVisibility(View.VISIBLE);
                 frameActionBar.setVisibility(View.VISIBLE);
                 includedLayout.setVisibility(View.VISIBLE);
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && playerService != null) {
                     getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR | View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
                 }
                 break;

@@ -254,6 +254,7 @@ public class PlayerCore implements AudioManager.OnAudioFocusChangeListener {
     }
 
     public void pause(){
+        if(PLAYLIST_LENGTH < 1) return;
         wasPlaying = isPlaying();
         this.mediaPlayer.pause();
         this.mediaSession.setPlaybackState(playBackStateBuilder
@@ -269,7 +270,7 @@ public class PlayerCore implements AudioManager.OnAudioFocusChangeListener {
         if(cannotBePlayed){
             Toast.makeText(context, context.getResources().getString(R.string.unable_to_play_during_call), Toast.LENGTH_SHORT).show();
             return;
-        }if(PLAYLIST_LENGTH < 0)return;
+        }if(PLAYLIST_LENGTH < 1)return;
         if(!this.mediaSession.isActive()) this.mediaSession.setActive(true);
         wasPlaying = isPlaying();
         if(!ready) setMediaSource(mediaAdapterInfo.getItemQueue(CURRENT_POSITION).getDescription().getMediaUri());

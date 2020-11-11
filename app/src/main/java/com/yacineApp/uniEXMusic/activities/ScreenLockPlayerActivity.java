@@ -14,7 +14,6 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
 import android.support.v4.media.session.MediaSessionCompat;
-import android.support.v4.media.session.PlaybackStateCompat;
 import android.util.Log;
 import android.view.Display;
 import android.view.MotionEvent;
@@ -379,6 +378,7 @@ public class ScreenLockPlayerActivity extends UniEXActivity.UniEXMusicActivity i
             return;
         }
         //playerFrameLayout.setAlpha(off);
+        if(mediaInfoFrameArtCard.getAlpha() == off) return;
         mediaInfoFrameArtCard.setAlpha(off);
         circleLineVisualizer.setAlpha(off);
         frameArtist.setAlpha(off);
@@ -401,7 +401,7 @@ public class ScreenLockPlayerActivity extends UniEXActivity.UniEXMusicActivity i
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
         if(intent == null)return;
-        if(CLOSE_LOOK_SCREEN_ACTIVITY.equals(intent.getAction())) finish("Done!");
+        if(CLOSE_LOOK_SCREEN_ACTIVITY.equals(intent.getAction())) finish();
     }
 
     @Override

@@ -8,7 +8,6 @@ import android.net.Uri;
 import android.provider.MediaStore;
 import android.support.v4.media.MediaDescriptionCompat;
 import android.support.v4.media.session.MediaSessionCompat;
-import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -20,8 +19,8 @@ import java.util.List;
 
 public class MediaInfo {
 
-    public interface OnDonePreparingListener {
-        void onPrepared(@NonNull MediaInfo mediaInfo, @NonNull MediaAdapterInfo.ViewHolder holder);
+    public interface OnDonePreparingListener<VH> {
+        void onPrepared(@NonNull MediaInfo mediaInfo, @NonNull VH holder);
     }
 
     private byte[] rawArt;
@@ -33,7 +32,6 @@ public class MediaInfo {
     private String title, path, artist, album = null, albumArtist = null, genre = null, comment = null, composer = null, lyrics = null, encoder = null, language = null;
     private boolean enabled = true;
     private ColorPicker.ColorResult colorResult;
-    private OnDonePreparingListener onDonePreparingListener;
 
     private MediaInfo(){}
 
@@ -44,8 +42,6 @@ public class MediaInfo {
         this.path = path;
         mkPrepare(null);
     }
-
-    public void setOnDonePreparingListener(OnDonePreparingListener onDonePreparingListener) { this.onDonePreparingListener = onDonePreparingListener; }
 
     @SuppressWarnings("deprecation")
     @NonNull
@@ -71,12 +67,12 @@ public class MediaInfo {
         return mediaInfo;
     }
 
-    protected void prepareSync(@Nullable final Bitmap def, @Nullable final MediaAdapterInfo.ViewHolder holder){
+    protected <VH> void prepareSync(@Nullable final Bitmap def, @Nullable final VH holder, @Nullable final OnDonePreparingListener<VH> listener){
         new Thread(new Runnable() {
             @Override
             public void run() {
                 prepare(def);
-                if(onDonePreparingListener != null && holder != null) onDonePreparingListener.onPrepared(MediaInfo.this, holder);
+                if(listener != null && holder != null) listener.onPrepared(MediaInfo.this, holder);
             }
         }).start();
     }
@@ -141,9 +137,7 @@ public class MediaInfo {
             this.smallArt = Bitmap.createScaledBitmap(this.art, 80, 80, false);
             this.colorResult = this.rawArt != null ? ColorPicker.valueOf(this.art) : ColorPicker.valueOf(0x0FFEF9A7E, 0x0FF040404);
             retriever.close();
-        }catch (NoSuchMethodError e){
-            Log.e(this.getClass().getName(), "Error: ", e);
-        }
+        }catch (NoSuchMethodError ignored){ }
     }
 
     @SuppressWarnings("unused")

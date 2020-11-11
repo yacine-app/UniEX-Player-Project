@@ -5,6 +5,7 @@ import android.database.Cursor;
 import android.database.DataSetObserver;
 import android.net.Uri;
 import android.provider.MediaStore;
+import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -26,6 +27,12 @@ public abstract class CursorRecyclerViewAdapter<VH extends RecyclerView.ViewHold
         this.rowIdColumn = validId ? cursor.getColumnIndex(MediaStore.Audio.Media._ID) : -1;
         this.dataSetObserver = new RecyclerDataObserver();
         if(cursor != null) cursor.registerDataSetObserver(dataSetObserver);
+    }
+
+    @Override
+    public void onAttachedToRecyclerView(@NonNull RecyclerView recyclerView) {
+        super.onAttachedToRecyclerView(recyclerView);
+        if(getItemCount() == 0) onEmptyResult(recyclerView);
     }
 
     @Override
@@ -68,7 +75,9 @@ public abstract class CursorRecyclerViewAdapter<VH extends RecyclerView.ViewHold
         return 0;
     }
 
-    public abstract void onBindViewHolder(@NonNull VH holder, @Nullable Cursor cursor);
+    protected abstract void onBindViewHolder(@NonNull VH holder, @Nullable Cursor cursor);
+
+    protected abstract void onEmptyResult(@NonNull RecyclerView recyclerView);
 
     public class RecyclerDataObserver extends DataSetObserver {
         @Override

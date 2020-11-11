@@ -23,8 +23,8 @@
             android:layout_height="?attr/actionBarSize"
             app:menu="@menu/main_media_track_menu"
             android:background="@android:color/white"
-            app:constraintSet="@style/ThemeOverlay.AppCompat.ActionBar"
             app:layout_constraintTop_toTopOf="parent"
+            app:constraintSet="@style/ThemeOverlay.AppCompat.ActionBar"
             android:elevation="4dp"
             app:title="@string/app_name" />
 
@@ -69,7 +69,10 @@
             android:id="@+id/media_controller"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:fitsSystemWindows="false">
+            android:fitsSystemWindows="false"
+            android:focusable="true"
+            android:clickable="true"
+            android:background="?attr/selectableItemBackground">
 
             <androidx.cardview.widget.CardView
                 android:id="@+id/media_info_art_card"
@@ -120,8 +123,6 @@
                     android:layout_height="wrap_content"
                     android:singleLine="true"
                     android:marqueeRepeatLimit="marquee_forever"
-                    android:focusable="true"
-                    android:focusableInTouchMode="true"
                     android:freezesText="true"
                     android:scrollHorizontally="true"
                     android:ellipsize="marquee"
